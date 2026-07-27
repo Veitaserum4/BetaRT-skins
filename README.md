@@ -31,6 +31,9 @@ A mod that brings Path Tracing to Minecraft Beta 1.7.3 using RTX Remix, aiming t
 Download the latest release, import the .zip file into PrismLauncher (`Add Instance > Import`), Run the game.
 <img width="1437" height="300" alt="image" src="https://github.com/user-attachments/assets/b5f9b958-a87d-4ea5-afb4-87aea1549676" />
 
+### PBR Texture packs:
+https://github.com/Veitaserum4/Jacobs-BetaRT-PBR
+
 ## Credits
 - [sparkles](https://github.com/Kim2091) for their remix branch [Remix Plus](https://github.com/RemixProjGroup/dxvk-remix)
 - jacob on the RTX Remix Showcase Discord for guidance, project logo, and the PBR pack. 
