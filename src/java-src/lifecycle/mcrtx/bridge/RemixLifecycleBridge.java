@@ -70,6 +70,7 @@ public final class RemixLifecycleBridge {
     public static synchronized void rememberMinecraftInstance(Minecraft minecraft) {
         if (minecraft != null) {
             currentMinecraft = minecraft;
+            minecraft.n = false;
         }
     }
 
