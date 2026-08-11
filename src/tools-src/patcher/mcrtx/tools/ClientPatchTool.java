@@ -360,9 +360,41 @@ public final class ClientPatchTool {
                 patchFirstPersonRender(method);
             } else if (method.name.equals("a") && method.desc.equals("(Lls;Liz;)V")) {
                 patchFirstPersonItemRender(method);
+            } else if (method.name.equals("d") && method.desc.equals("(F)V")) {
+                patchFirstPersonFireRender(method);
             }
         }
         return writeClass(classNode);
+    }
+
+    private static void patchFirstPersonFireRender(MethodNode method) {
+        if (hasHelperCall(method, "onEntityFireOverlayStart", "(Lsn;)V")) {
+            return;
+        }
+
+        method.instructions.insertBefore(method.instructions.getFirst(), firstPersonFireRenderStartCall());
+
+        for (AbstractInsnNode node = method.instructions.getFirst(); node != null; ) {
+            AbstractInsnNode next = node.getNext();
+            if (node.getOpcode() == Opcodes.RETURN) {
+                method.instructions.insertBefore(node, staticHelperCall("onEntityFireOverlayEnd", "()V"));
+            }
+            node = next;
+        }
+    }
+
+    private static InsnList firstPersonFireRenderStartCall() {
+        InsnList instructions = new InsnList();
+        instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
+        instructions.add(new FieldInsnNode(Opcodes.GETFIELD, FIRST_PERSON_RENDERER_CLASS, "a", "Lnet/minecraft/client/Minecraft;"));
+        instructions.add(new FieldInsnNode(Opcodes.GETFIELD, MINECRAFT_CLASS, "h", "Ldc;"));
+        instructions.add(new MethodInsnNode(
+                Opcodes.INVOKESTATIC,
+                hookOwner("onEntityFireOverlayStart"),
+                "onEntityFireOverlayStart",
+                "(Lsn;)V",
+                false));
+        return instructions;
     }
 
     private static byte[] patchNw(byte[] content) {
