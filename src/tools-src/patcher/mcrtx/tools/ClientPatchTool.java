@@ -88,6 +88,13 @@ public final class ClientPatchTool {
                 }
 
                 String entryName = entry.getName();
+
+                if (entryName.startsWith("META-INF/")) {
+                    if (entryName.endsWith(".SF") || entryName.endsWith(".DSA") || entryName.endsWith(".RSA") || entryName.endsWith("MANIFEST.MF")) {
+                        continue;
+                    }
+                }
+
                 if (entryName.equals(MINECRAFT_CLASS + ".class")) {
                     content = patchMinecraft(content);
                 } else if (entryName.equals("px.class")) {
@@ -771,6 +778,20 @@ public final class ClientPatchTool {
             return;
         }
 
+        for (AbstractInsnNode node = method.instructions.getFirst(); node != null; node = node.getNext()) {
+            if (node instanceof FieldInsnNode fieldNode
+                    && fieldNode.getOpcode() == Opcodes.GETFIELD
+                    && fieldNode.owner.equals(CHUNK_RENDERER_CLASS)
+                    && fieldNode.name.equals("u")
+                    && fieldNode.desc.equals("Z")) {
+                AbstractInsnNode next = node.getNext();
+                if (next instanceof JumpInsnNode jumpNode && jumpNode.getOpcode() == Opcodes.IFNE) {
+                    method.instructions.insert(jumpNode.label, onChunkUpdateStartCall());
+                    break;
+                }
+            }
+        }
+
         final int chunkBuildEnabledLocal = 21;
 
         for (AbstractInsnNode node = method.instructions.getFirst(); node != null; node = node.getNext()) {
@@ -1343,6 +1364,7 @@ public final class ClientPatchTool {
             case "onWeatherRenderEnd":
                 return PARTICLE_HOOKS_CLASS;
             case "onChunkSectionUnload":
+            case "onChunkUpdateStart":
             case "onChunkBuildBegin":
             case "onChunkBlock":
             case "onChunkBuildEnd":
@@ -1895,6 +1917,7 @@ public final class ClientPatchTool {
         InsnList instructions = new InsnList();
         instructions.add(new VarInsnNode(Opcodes.ILOAD, chunkBuildEnabledLocal));
         instructions.add(new JumpInsnNode(Opcodes.IFEQ, skip));
+
         instructions.add(new VarInsnNode(Opcodes.ILOAD, 13));
         instructions.add(new MethodInsnNode(
                 Opcodes.INVOKESTATIC,
@@ -1902,8 +1925,26 @@ public final class ClientPatchTool {
                 "onChunkBuildEnd",
                 "(Z)V",
                 false));
+
         instructions.add(skip);
         return instructions;
+    }
+
+    private static InsnList onChunkUpdateStartCall() {
+        InsnList list = new InsnList();
+        list.add(new VarInsnNode(Opcodes.ALOAD, 0));
+        list.add(new FieldInsnNode(Opcodes.GETFIELD, CHUNK_RENDERER_CLASS, "c", "I"));
+        list.add(new VarInsnNode(Opcodes.ALOAD, 0));
+        list.add(new FieldInsnNode(Opcodes.GETFIELD, CHUNK_RENDERER_CLASS, "d", "I"));
+        list.add(new VarInsnNode(Opcodes.ALOAD, 0));
+        list.add(new FieldInsnNode(Opcodes.GETFIELD, CHUNK_RENDERER_CLASS, "e", "I"));
+        list.add(new MethodInsnNode(
+            Opcodes.INVOKESTATIC,
+            hookOwner("onChunkUpdateStart"),
+            "onChunkUpdateStart",
+            "(III)V",
+            false));
+        return list;
     }
 
     private static ClassNode readClass(byte[] content) {

@@ -13,6 +13,15 @@ public final class MinecraftRemixChunkHooks {
         }
     }
 
+    public static void onChunkUpdateStart(int originX, int originY, int originZ) {
+        long __perf = HookProfiler.begin();
+        try {
+            RemixChunkCapture.onChunkUpdateStart(originX, originY, originZ);
+        } finally {
+            HookProfiler.endHook("hook.onChunkUpdateStart", __perf);
+        }
+    }
+
     public static boolean onChunkBuildBegin(
             int originX,
             int originY,
