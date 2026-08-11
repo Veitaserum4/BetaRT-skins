@@ -82,12 +82,18 @@ public final class ClientPatchTool {
             Enumeration<JarEntry> entries = jarFile.entries();
             while (entries.hasMoreElements()) {
                 JarEntry entry = entries.nextElement();
+                String entryName = entry.getName();
+
+                if (entryName.startsWith("META-INF/") &&
+                   (entryName.endsWith(".SF") || entryName.endsWith(".DSA") || entryName.endsWith(".RSA") || entryName.endsWith(".EC"))) {
+                    continue;
+                }
+
                 byte[] content;
                 try (InputStream inputStream = jarFile.getInputStream(entry)) {
                     content = readAllBytes(inputStream);
                 }
 
-                String entryName = entry.getName();
                 if (entryName.equals(MINECRAFT_CLASS + ".class")) {
                     content = patchMinecraft(content);
                 } else if (entryName.equals("px.class")) {
@@ -1007,6 +1013,12 @@ public final class ClientPatchTool {
             AbstractInsnNode next = node.getNext();
             if (node.getOpcode() == Opcodes.RETURN) {
                 method.instructions.insertBefore(node, staticHelperCall("onItemEntityRenderEnd", "()V"));
+            } else if (node.getOpcode() == Opcodes.LDC && node instanceof LdcInsnNode ldcInsnNode) {
+                if (ldcInsnNode.cst instanceof Float f && f == 0.5f) {
+                    if (next != null && next.getOpcode() == Opcodes.FSTORE && ((VarInsnNode) next).var == 14) {
+                        ldcInsnNode.cst = 0.25f;
+                    }
+                }
             }
             node = next;
         }
