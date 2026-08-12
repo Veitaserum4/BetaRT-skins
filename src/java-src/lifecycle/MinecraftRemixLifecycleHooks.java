@@ -81,7 +81,11 @@ public final class MinecraftRemixLifecycleHooks {
             McrtxHookPerfTracker.reset();
             UiOverlayCapture.reset();
             RemixUiCapture.reset();
-            RemixLifecycleBridge.shutdown();
+            // BetaRT: RTX Remix often crashes or hangs when tearing down the Vulkan device.
+            // Since the game has already saved all state by the time this hook runs,
+            // there is no reason to risk a crash/hang during native teardown.
+            // We forcefully halt the JVM instantly, and the OS will cleanly reclaim GPU memory.
+            Runtime.getRuntime().halt(0);
         } finally {
             HookProfiler.endHook("hook.onShutdown", __perf);
             HookProfiler.flushAll();
