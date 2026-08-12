@@ -23,6 +23,7 @@ constexpr float kWallTorchLightHorizontalOffset = 0.27f;
 constexpr float kWallTorchLightVerticalOffset = 0.22f;
 inline constexpr remixapi_Float3D kTorchLightRadiance = {540.0f, 331.5f, 121.5f};
 inline constexpr remixapi_Float3D kRedstoneTorchLightRadiance = {220.0f, 36.0f, 24.0f};
+inline constexpr remixapi_Float3D kLavaBucketLightRadiance = {240.0f, 100.0f, 20.0f};
 
 std::uint64_t makeTorchLightHash(const WorldBlockPosition& position);
 bool containsWorldBlockPosition(
