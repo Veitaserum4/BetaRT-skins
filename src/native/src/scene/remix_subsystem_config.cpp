@@ -368,6 +368,16 @@ void RemixRenderer::updateAtmosphereConfigLocked(float celestialAngle, bool forc
   setGameValueFloatLocked("__atmosphere.sun.elevation", elevationDegrees, 2, false);
   setGameValueFloatLocked("__atmosphere.sun.rotation", sunRotationDegrees, 2, false);
 
+  // Dynamic sunset ozone and saturation controls
+  // When elevation > 15, we use full Earth ozone and 1.0x sunset saturation.
+  // When elevation < 0, we use 0.0x ozone (no purple) and 1.5x saturation (intense red/orange).
+  const float sunsetBlend = std::clamp((15.0f - elevationDegrees) / 15.0f, 0.0f, 1.0f);
+  const float ozoneMultiplier = 1.0f - sunsetBlend;
+  const float saturationScale = 1.0f + (0.5f * sunsetBlend);
+
+  setGameValueFloatLocked("__atmosphere.sunsetOzoneMultiplier", ozoneMultiplier, 2, false);
+  setGameValueFloatLocked("__atmosphere.sunsetSaturationScale", saturationScale, 2, false);
+
   // Minecraft's moon sits directly opposite the sun on the celestial wheel:
   // mirrored elevation and a 180-degree-flipped rotation. Beta 1.7.3 has a
   // single full-moon texture, so the phase stays fixed at full (0.5).
