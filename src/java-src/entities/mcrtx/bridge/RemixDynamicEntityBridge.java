@@ -31,7 +31,7 @@ public final class RemixDynamicEntityBridge {
         }
     }
 
-    public static synchronized void setEntityHeldTorch(
+    public static synchronized void setEntityLight(
             int entityId,
             double worldX,
             double worldY,
@@ -40,7 +40,7 @@ public final class RemixDynamicEntityBridge {
         if (!RemixLifecycleBridge.isInitialized() || entityId < 0) {
             return;
         }
-        nSetEntityHeldTorch(entityId, worldX, worldY, worldZ, itemId);
+        nSetEntityLight(entityId, worldX, worldY, worldZ, itemId);
     }
 
     public static synchronized void setDynamicEntityBoneTransform(
@@ -145,7 +145,7 @@ public final class RemixDynamicEntityBridge {
     private static native void nBeginDynamicEntity(int entityId, int hurtStage, int creeperFuseStage);
     private static native void nSetDynamicEntityTexture(String texturePath);
     private static native void nSetFirstPersonHeldItem(int itemId);
-    private static native void nSetEntityHeldTorch(
+    private static native void nSetEntityLight(
             int entityId,
             double worldX,
             double worldY,

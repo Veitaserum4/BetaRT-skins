@@ -65,6 +65,7 @@ constexpr std::uint8_t kLitRedstoneOreBlockId = 74;
 constexpr std::uint8_t kRedstoneTorchOffBlockId = 75;
 constexpr std::uint8_t kRedstoneTorchOnBlockId = 76;
 constexpr std::uint8_t kStoneButtonBlockId = 77;
+constexpr std::uint16_t kLavaBucketItemId = 327;
 constexpr std::uint8_t kIronDoorBlockId = 71;
 constexpr std::uint8_t kGoldenRailBlockId = 27;
 constexpr std::uint8_t kDetectorRailBlockId = 28;

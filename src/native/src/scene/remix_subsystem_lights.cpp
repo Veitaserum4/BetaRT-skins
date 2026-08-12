@@ -156,15 +156,17 @@ std::string describeTorchLightHashSubmission(
 
   return stream.str();
 }
-bool isTorchLightItemId(int itemId) {
+bool isEmissiveEntityItem(int itemId) {
   return itemId == kTorchBlockId || itemId == kRedstoneTorchOnBlockId;
 }
-std::uint64_t makeEntityHeldTorchLightHash(int entityId) {
+
+std::uint64_t makeEntityLightHash(int entityId) {
   return kEntityHeldTorchLightHashSeed ^ static_cast<std::uint64_t>(static_cast<std::uint32_t>(entityId));
 }
 
-remixapi_Float3D entityHeldTorchRadiance(int itemId) {
-  return itemId == kRedstoneTorchOnBlockId ? kRedstoneTorchLightRadiance : kTorchLightRadiance;
+remixapi_Float3D entityLightRadiance(int itemId) {
+  if (itemId == kRedstoneTorchOnBlockId) return kRedstoneTorchLightRadiance;
+  return kTorchLightRadiance;
 }
 }  // namespace
 void RemixRenderer::setFirstPersonHeldItem(int itemId) {
@@ -179,9 +181,9 @@ void RemixRenderer::setFirstPersonHeldItem(int itemId) {
   heldItemId_ = heldTorchLightsEnabled_ ? itemId : -1;
 }
 
-void RemixRenderer::setEntityHeldTorch(int entityId, double worldX, double worldY, double worldZ, int itemId) {
-  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Native, "RemixRenderer::setEntityHeldTorch");
-  MCRTX_TRACY_SCOPE("RemixRenderer::setEntityHeldTorch");
+void RemixRenderer::setEntityLight(int entityId, double worldX, double worldY, double worldZ, int itemId) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Native, "RemixRenderer::setEntityLight");
+  MCRTX_TRACY_SCOPE("RemixRenderer::setEntityLight");
   std::scoped_lock lock(mutex_);
 
   if (!initialized_ || entityId < 0) {
@@ -194,7 +196,7 @@ void RemixRenderer::setEntityHeldTorch(int entityId, double worldX, double world
   }
 
   const bool supportsLightCreation = remix_.CreateLight != nullptr;
-  if (!supportsLightCreation || !isTorchLightItemId(itemId)) {
+  if (!supportsLightCreation || !isEmissiveEntityItem(itemId)) {
     destroyEntityHeldTorchLight(entityId);
     return;
   }
@@ -380,7 +382,7 @@ bool RemixRenderer::refreshTorchLightDefinitions(const WorldRenderOrigin& render
   }
 
   for (auto& [entityId, state] : entityHeldTorchLights_) {
-    if (!refreshEntityHeldTorchLightDefinition(entityId, state, renderOrigin)) {
+    if (!updateEntityLight(entityId, state, renderOrigin)) {
       return false;
     }
   }
@@ -388,11 +390,11 @@ bool RemixRenderer::refreshTorchLightDefinitions(const WorldRenderOrigin& render
   return true;
 }
 
-bool RemixRenderer::refreshEntityHeldTorchLightDefinition(
+bool RemixRenderer::updateEntityLight(
     int entityId,
     EntityHeldTorchLightState& state,
     const WorldRenderOrigin& renderOrigin) {
-  if (remix_.CreateLight == nullptr || !isTorchLightItemId(state.itemId)) {
+  if (remix_.CreateLight == nullptr || !isEmissiveEntityItem(state.itemId)) {
     if (state.handle != nullptr) {
       destroyLightHandle(state.handle);
       state.handle = nullptr;
@@ -422,15 +424,15 @@ bool RemixRenderer::refreshEntityHeldTorchLightDefinition(
   remixapi_LightInfo lightInfo {};
   lightInfo.sType = REMIXAPI_STRUCT_TYPE_LIGHT_INFO;
   lightInfo.pNext = &originInfo;
-  lightInfo.hash = persistentLightHashForRenderOrigin(makeEntityHeldTorchLightHash(entityId), renderOrigin);
-  lightInfo.radiance = entityHeldTorchRadiance(state.itemId);
+  lightInfo.hash = persistentLightHashForRenderOrigin(makeEntityLightHash(entityId), renderOrigin);
+  lightInfo.radiance = entityLightRadiance(state.itemId);
   lightInfo.isDynamic = TRUE;
   lightInfo.ignoreViewModel = FALSE;
   lightInfo.ignoreFirstPersonPlayerShadow = FALSE;
 
   if (state.handle == nullptr) {
     const remixapi_ErrorCode result = [&]() {
-      MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Remix, "CreateLight.entityHeldTorch");
+      MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Remix, "CreateLight.entityLight");
       return remix_.CreateLight(&lightInfo, &state.handle);
     }();
     if (result != REMIXAPI_ERROR_CODE_SUCCESS) {
@@ -445,7 +447,7 @@ bool RemixRenderer::refreshEntityHeldTorchLightDefinition(
   if (remix_.UpdateLightDefinition == nullptr) {
     destroyLightHandle(state.handle);
     state.handle = nullptr;
-    return refreshEntityHeldTorchLightDefinition(entityId, state, renderOrigin);
+    return updateEntityLight(entityId, state, renderOrigin);
   }
 
   const remixapi_ErrorCode result = [&]() {
@@ -466,9 +468,7 @@ bool RemixRenderer::reconcileHeldItemTorchLight(const WorldRenderOrigin& renderO
   MCRTX_TRACY_SCOPE("RemixRenderer::reconcileHeldItemTorchLight");
 
   const bool supportsLightCreation = remix_.CreateLight != nullptr;
-  const bool isTorch = heldItemId_ == kTorchBlockId;
-  const bool isRedstoneTorch = heldItemId_ == kRedstoneTorchOnBlockId;
-  if (!supportsLightCreation || (!isTorch && !isRedstoneTorch)) {
+  if (!supportsLightCreation || !isEmissiveEntityItem(heldItemId_)) {
     destroyHeldItemTorchLight();
     return true;
   }
@@ -497,7 +497,7 @@ bool RemixRenderer::reconcileHeldItemTorchLight(const WorldRenderOrigin& renderO
   lightInfo.sType = REMIXAPI_STRUCT_TYPE_LIGHT_INFO;
   lightInfo.pNext = &originInfo;
   lightInfo.hash = persistentLightHashForRenderOrigin(kHeldTorchLightHash, renderOrigin);
-  lightInfo.radiance = isRedstoneTorch ? kRedstoneTorchLightRadiance : kTorchLightRadiance;
+  lightInfo.radiance = entityLightRadiance(heldItemId_);
   lightInfo.isDynamic = TRUE;
   lightInfo.ignoreViewModel = TRUE;
   lightInfo.ignoreFirstPersonPlayerShadow = TRUE;
@@ -570,6 +570,21 @@ void RemixRenderer::clearHeldTorchLightsLocked() {
     destroyEntityHeldTorchLight(entityHeldTorchLights_.begin()->first);
   }
   entityHeldTorchLightsSeenThisFrame_.clear();
+}
+
+void RemixRenderer::updateEntityLightsLocked(const WorldRenderOrigin& renderOrigin) {
+  for (auto it = entityHeldTorchLights_.begin(); it != entityHeldTorchLights_.end();) {
+    const int entityId = it->first;
+    if (entityHeldTorchLightsSeenThisFrame_.find(entityId) == entityHeldTorchLightsSeenThisFrame_.end()) {
+      if (it->second.handle != nullptr) {
+        destroyLightHandle(it->second.handle);
+      }
+      it = entityHeldTorchLights_.erase(it);
+    } else {
+      updateEntityLight(entityId, it->second, renderOrigin);
+      ++it;
+    }
+  }
 }
 
 void RemixRenderer::destroyEntityHeldTorchLight(int entityId) {

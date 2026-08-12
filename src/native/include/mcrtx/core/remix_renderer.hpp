@@ -66,7 +66,7 @@ public:
   void beginDynamicEntity(int entityId, std::uint32_t hurtStage, std::uint32_t creeperFuseStage);
   void setDynamicEntityTexture(const std::string& texturePath);
   void setFirstPersonHeldItem(int itemId);
-  void setEntityHeldTorch(int entityId, double worldX, double worldY, double worldZ, int itemId);
+  void setEntityLight(int entityId, double worldX, double worldY, double worldZ, int itemId);
   void setPlayerShadowsEnabled(bool enabled);
   void setHeldTorchLightsEnabled(bool enabled);
   void setDynamicEntityRenderingEnabled(bool enabled);
@@ -329,7 +329,8 @@ private:
   bool reconcileChunkTorchLights(ChunkMeshData& meshData, const std::vector<TorchLightPlacement>& desiredTorchLights);
   bool reconcileHeldItemTorchLight(const WorldRenderOrigin& renderOrigin);
   bool refreshTorchLightDefinitions(const WorldRenderOrigin& renderOrigin);
-  bool refreshEntityHeldTorchLightDefinition(int entityId, EntityHeldTorchLightState& state, const WorldRenderOrigin& renderOrigin);
+  bool updateEntityLight(int entityId, EntityHeldTorchLightState& state, const WorldRenderOrigin& renderOrigin);
+  void updateEntityLightsLocked(const WorldRenderOrigin& renderOrigin);
   void destroyEntityHeldTorchLight(int entityId);
   bool rebuildCloudMesh(
       bool fancy,
