@@ -17,7 +17,7 @@ namespace detail {
 
 // ---- Shared constants -----------------------------------------------------
 
-constexpr std::size_t kTerrainMaterialClassCount = 7;
+constexpr std::size_t kTerrainMaterialClassCount = 8;
 constexpr std::uint8_t kOpaqueTerrainMaterialClass = 0;
 constexpr std::uint8_t kCutoutTerrainMaterialClass = 1;
 constexpr std::uint8_t kWaterTerrainMaterialClass = 2;
@@ -25,6 +25,7 @@ constexpr std::uint8_t kLavaTerrainMaterialClass = 3;
 constexpr std::uint8_t kPoweredRedstoneTerrainMaterialClass = 4;
 constexpr std::uint8_t kPortalTerrainMaterialClass = 5;
 constexpr std::uint8_t kIceTerrainMaterialClass = 6;
+constexpr std::uint8_t kUnlitRedstoneOreTerrainMaterialClass = 7;
 constexpr std::uint8_t kCubeBlockRenderType = 0;
 constexpr std::uint8_t kCrossedQuadBlockRenderType = 1;
 constexpr std::uint8_t kTorchBlockRenderType = 2;
@@ -59,6 +60,8 @@ constexpr std::uint8_t kLeverBlockId = 69;
 constexpr std::uint8_t kStonePressurePlateBlockId = 70;
 constexpr std::uint8_t kStoneStairsBlockId = 67;
 constexpr std::uint8_t kWoodPressurePlateBlockId = 72;
+constexpr std::uint8_t kRedstoneOreBlockId = 73;
+constexpr std::uint8_t kLitRedstoneOreBlockId = 74;
 constexpr std::uint8_t kRedstoneTorchOffBlockId = 75;
 constexpr std::uint8_t kRedstoneTorchOnBlockId = 76;
 constexpr std::uint8_t kStoneButtonBlockId = 77;
@@ -142,8 +145,9 @@ constexpr std::uint64_t kCutoutTerrainMaterialHash = 0x4D43525458435554ull;
 constexpr std::uint64_t kWaterTerrainMaterialHash = 0x4D43525458575452ull;
 constexpr std::uint64_t kLavaTerrainMaterialHash = 0x4D435254584C4156ull;
 constexpr std::uint64_t kPoweredRedstoneTerrainMaterialHash = 0x4D43525458524453ull;
-constexpr std::uint64_t kPortalTerrainMaterialHash = 0x4D4352545850544Cull;
+constexpr std::uint64_t kPortalTerrainMaterialHash = 0x4D43525458505254ull;
 constexpr std::uint64_t kIceTerrainMaterialHash = 0x4D43525458494345ull;
+constexpr std::uint64_t kUnlitRedstoneOreTerrainMaterialHash = 0x4D4352545855524Full;
 constexpr std::uint64_t kDestroyOverlayMaterialHash = 0x4D43525458444F4Dull;
 constexpr std::uint64_t kBlockOutlineGlowMaterialHash = 0x4D4352545842474Cull;
 constexpr std::uint64_t kBlockOutlineRgbMaterialHashSeed = 0x4D43525458425200ull;

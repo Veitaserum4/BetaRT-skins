@@ -96,13 +96,13 @@ void RemixRenderer::computeFaceCoverage(ChunkMeshData& meshData) {
   //   4 = -Y (localY == 0),  5 = +Y (localY == 15)
 
   const auto isSolidOccluder = [&](int index) -> bool {
-    if (meshData.occupancy[index] == 0) return false;
-    const ChunkBlockCell& cell = meshData.cells[index];
-    if (cell.renderType != kCubeBlockRenderType) return false;
-    if (cell.materialClass != kOpaqueTerrainMaterialClass) return false;
-    if (usesPartialCubeBounds(cell)) return false;
-    return true;
-  };
+      if (meshData.occupancy[index] == 0) return false;
+      const ChunkBlockCell& cell = meshData.cells[index];
+      if (cell.renderType != kCubeBlockRenderType) return false;
+      if (cell.materialClass != kOpaqueTerrainMaterialClass && cell.materialClass != kUnlitRedstoneOreTerrainMaterialClass) return false;
+      if (usesPartialCubeBounds(cell)) return false;
+      return true;
+    };
 
   // Face 0: -Z, fixed localZ = 0
   {
