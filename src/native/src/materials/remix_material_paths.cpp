@@ -123,6 +123,27 @@ std::filesystem::path RemixRenderer::resolveTerrainEmissiveTexturePath() {
   return {};
 }
 
+std::filesystem::path RemixRenderer::resolveItemsEmissiveTexturePath() {
+  std::vector<std::filesystem::path> attemptedPaths;
+
+  const std::filesystem::path moduleDirectory = getCurrentModuleDirectory();
+  if (!moduleDirectory.empty()) {
+    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"gui" / L"items_emissive.dds");
+    attemptedPaths.push_back(moduleDirectory / L"gui" / L"items_emissive.dds");
+  }
+
+  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"gui" / L"items_emissive.dds");
+  attemptedPaths.push_back(std::filesystem::current_path() / L"gui" / L"items_emissive.dds");
+
+  for (const auto& path : attemptedPaths) {
+    if (std::filesystem::exists(path)) {
+      return path;
+    }
+  }
+
+  return {};
+}
+
 std::filesystem::path RemixRenderer::resolveRedstoneEmissiveTexturePath() {
   std::vector<std::filesystem::path> attemptedPaths;
 

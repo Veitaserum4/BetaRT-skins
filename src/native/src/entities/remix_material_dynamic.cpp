@@ -104,6 +104,10 @@ remixapi_MaterialHandle RemixRenderer::acquireDynamicEntityMaterial(
     } else if (!redstoneEmissiveTexturePath_.empty()) {
       emissiveTexturePath = &redstoneEmissiveTexturePath_;
     }
+  } else if (normalizedTexturePath == "gui/items.png") {
+    if (!itemsEmissiveTexturePath_.empty()) {
+      emissiveTexturePath = &itemsEmissiveTexturePath_;
+    }
   }
 
   const wchar_t* emissiveTexture = emissiveTexturePath == nullptr ? nullptr : emissiveTexturePath->c_str();
