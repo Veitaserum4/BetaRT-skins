@@ -1,3 +1,5 @@
+import mcrtx.bridge.RemixChunkBridge;
+
 public final class RemixChunkCapture {
     private RemixChunkCapture() {
     }
@@ -12,6 +14,10 @@ public final class RemixChunkCapture {
 
     public static void onWorldChanged(fd world) {
         RemixChunkWorldState.onWorldChanged(world);
+    }
+
+    public static void onChunkUpdateStart(int originX, int originY, int originZ) {
+        RemixChunkBridge.unloadChunkSection(originX, originY, originZ);
     }
 
     public static boolean onChunkBuildBegin(
