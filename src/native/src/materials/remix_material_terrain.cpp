@@ -188,6 +188,24 @@ bool RemixRenderer::initializeTerrainMaterials() {
       0,
       terrainPbrTextures,
       terrainSssTextures);
+  const bool unlitRedstoneOreCreated = createTerrainMaterial(
+      kUnlitRedstoneOreTerrainMaterialClass,
+      false,
+      false,
+      false,
+      {1.0f, 1.0f, 1.0f},
+      1.0f,
+      1.0f,
+      terrainAtlasPath_,
+      kUnlitRedstoneOreTerrainMaterialHash,
+      nullptr,
+      0.0f,
+      {0.0f, 0.0f, 0.0f},
+      0,
+      0,
+      0,
+      terrainPbrTextures,
+      terrainSssTextures);
   remixapi_MaterialInfoOpaqueEXT destroyOverlayOpaqueInfo {};
       remixapi_MaterialInfoOpaqueSubsurfaceEXT destroyOverlaySubsurfaceInfo {};
   destroyOverlayOpaqueInfo.sType = REMIXAPI_STRUCT_TYPE_MATERIAL_INFO_OPAQUE_EXT;
@@ -358,6 +376,9 @@ bool RemixRenderer::initializeTerrainMaterials() {
   }
   if (!cutoutCreated) {
     log("Cutout terrain material unavailable; cutout faces will use fallback material");
+  }
+  if (!unlitRedstoneOreCreated) {
+    log("Unlit redstone ore material unavailable; unlit redstone ore will use fallback material");
   }
   if (!redstoneEmissiveTexturePath_.empty()) {
     log("Redstone emissive map loaded from " + redstoneEmissiveTexturePath_.string());

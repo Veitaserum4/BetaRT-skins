@@ -21,6 +21,7 @@
 
 #include "mcrtx/scene/celestial_textures.hpp"
 #include "mcrtx/core/world_origin.hpp"
+#include "mcrtx/core/remix_render_common.hpp"
 #include "mcrtx/lifecycle/remix_renderer_frame.hpp"
 #include "mcrtx/scene/remix_renderer_scene.hpp"
 #include "mcrtx/entities/remix_renderer_dynamic.hpp"
@@ -487,7 +488,7 @@ private:
   std::filesystem::path portalTexturePath_ {};
   std::filesystem::path lavaEmissiveTexturePath_ {};
   std::filesystem::path redstoneEmissiveTexturePath_ {};
-  std::array<remixapi_MaterialHandle, 7> terrainMaterialHandles_ {};
+  std::array<remixapi_MaterialHandle, detail::kTerrainMaterialClassCount> terrainMaterialHandles_ {};
   remixapi_MaterialHandle cloudMaterialHandle_ {nullptr};
   remixapi_MaterialHandle destroyOverlayMaterialHandle_ {nullptr};
   remixapi_MaterialHandle blockOutlineGlowMaterialHandle_ {nullptr};
