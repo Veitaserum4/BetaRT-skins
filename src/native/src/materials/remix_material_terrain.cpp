@@ -17,6 +17,7 @@ bool RemixRenderer::initializeTerrainMaterials() {
   const OptionalPbrTextures terrainPbrTextures = resolveOptionalPbrTextures(terrainAtlasPath_);
   const OptionalSssTextures terrainSssTextures = resolveOptionalSssTextures(terrainAtlasPath_);
   terrainEmissiveTexturePath_ = resolveTerrainEmissiveTexturePath();
+  itemsEmissiveTexturePath_ = resolveItemsEmissiveTexturePath();
   cloudTexturePath_ = resolveCloudTexturePath();
   fireTexturePath_ = resolveFireTexturePath();
   waterTexturePath_ = resolveWaterTexturePath();
@@ -352,6 +353,9 @@ bool RemixRenderer::initializeTerrainMaterials() {
   if (!terrainEmissiveTexturePath_.empty()) {
     log("Terrain emissive map loaded from " + terrainEmissiveTexturePath_.string());
   }
+  if (!itemsEmissiveTexturePath_.empty()) {
+    log("Items emissive map loaded from " + itemsEmissiveTexturePath_.string());
+  }
   if (!cutoutCreated) {
     log("Cutout terrain material unavailable; cutout faces will use fallback material");
   }
@@ -555,6 +559,7 @@ void RemixRenderer::destroyTerrainMaterials() {
   portalTexturePath_.clear();
   lavaEmissiveTexturePath_.clear();
   terrainEmissiveTexturePath_.clear();
+  itemsEmissiveTexturePath_.clear();
   redstoneEmissiveTexturePath_.clear();
 }
 }  // namespace mcrtx

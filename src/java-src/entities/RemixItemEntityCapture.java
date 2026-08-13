@@ -13,13 +13,40 @@ final class RemixItemEntityCapture {
         pickupRenderActive = false;
     }
 
+    private static java.lang.reflect.Field itemStackField;
+    private static boolean itemStackFieldSearched;
+
+    private static iz getItemStackFromEntity(sn entity) {
+        if (!itemStackFieldSearched) {
+            itemStackFieldSearched = true;
+            for (java.lang.reflect.Field f : entity.getClass().getDeclaredFields()) {
+                if (f.getType() == iz.class) {
+                    f.setAccessible(true);
+                    itemStackField = f;
+                    break;
+                }
+            }
+        }
+        if (itemStackField != null) {
+            try {
+                return (iz) itemStackField.get(entity);
+            } catch (Exception e) {
+                // Ignore
+            }
+        }
+        return null;
+    }
+
     static void onRenderStart(sn entity) {
         if (!canCapture() || entity == null) {
             return;
         }
         RemixDynamicEntitySession.ensureFrame();
         pickupRenderActive = true;
-        RemixDynamicEntitySession.beginEntity(entity.aD, 0, 0, 0.0f, "");
+        iz itemStack = getItemStackFromEntity(entity);
+        int itemId = itemStack != null ? itemStack.c : -1;
+        String texture = (itemId > -1 && itemId < 256) ? "/terrain.png" : "/gui/items.png";
+        RemixDynamicEntitySession.beginEntity(entity.aD, 0, 0, 0.0f, texture);
     }
 
     static void onRenderEnd() {

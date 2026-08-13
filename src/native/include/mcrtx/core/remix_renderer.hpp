@@ -362,6 +362,7 @@ private:
   static std::filesystem::path resolveRedstoneEmissiveTexturePath();
   static std::filesystem::path resolveDynamicEntityTexturePath(const std::string& texturePath);
   static std::filesystem::path resolveParticleTexturePath(std::uint32_t textureKind);
+  static std::filesystem::path resolveItemsEmissiveTexturePath();
   static std::filesystem::path resolveTerrainAtlasPath();
   static std::filesystem::path resolveTerrainEmissiveTexturePath();
   void destroyCloudMesh();
@@ -476,6 +477,7 @@ private:
   bool loggedLightSubmissionPath_ {false};
   std::filesystem::path terrainAtlasPath_ {};
   std::filesystem::path terrainEmissiveTexturePath_ {};
+  std::filesystem::path itemsEmissiveTexturePath_ {};
   std::filesystem::path cloudTexturePath_ {};
   std::filesystem::path sunTexturePath_ {};
   std::filesystem::path moonTexturePath_ {};
