@@ -47,6 +47,12 @@ final class RemixItemEntityCapture {
         int itemId = itemStack != null ? itemStack.c : -1;
         String texture = (itemId > -1 && itemId < 256) ? "/terrain.png" : "/gui/items.png";
         RemixDynamicEntitySession.beginEntity(entity.aD, 0, 0, 0.0f, texture);
+        
+        double worldX = entity.aM;
+        double worldY = entity.aN;
+        double worldZ = entity.aO;
+        
+        mcrtx.bridge.RemixDynamicEntityBridge.setEntityLight(entity.aD, worldX, worldY, worldZ, itemId);
     }
 
     static void onRenderEnd() {
