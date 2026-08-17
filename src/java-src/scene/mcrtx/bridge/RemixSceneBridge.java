@@ -109,6 +109,12 @@ public final class RemixSceneBridge {
         }
     }
 
+    public static synchronized void reloadMaterials() {
+        if (RemixLifecycleBridge.isInitialized()) {
+            nReloadMaterials();
+        }
+    }
+
     private static native void nUpdateCamera(
             double px, double py, double pz,
             float fx, float fy, float fz,
@@ -141,4 +147,5 @@ public final class RemixSceneBridge {
     private static native void nClearCloudLayer();
     private static native void nClearWorldScene();
     private static native void nSetScreenTint(float r, float g, float b, float a);
+    private static native void nReloadMaterials();
 }

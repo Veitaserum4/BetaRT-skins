@@ -4,6 +4,8 @@
 #include "mcrtx/core/runtime_config.hpp"
 
 #include <cctype>
+#include <fstream>
+#include <string>
 
 namespace mcrtx::material {
 
@@ -21,9 +23,55 @@ std::filesystem::path resolveOptionalPbrSibling(const std::filesystem::path& tex
 
   const std::filesystem::path parentPath = texturePath.parent_path();
   const std::wstring stemWithSuffix = texturePath.stem().wstring() + suffix;
+
+  std::filesystem::path relativeToAssets;
+  bool foundAssets = false;
+  for (auto it = parentPath.begin(); it != parentPath.end(); ++it) {
+    if (foundAssets) {
+      relativeToAssets /= *it;
+    } else if (*it == L"mcrtx_assets" || *it == L"mcrtx_texturepack_cache") {
+      foundAssets = true;
+    }
+  }
+
+  std::filesystem::path cacheBase = std::filesystem::current_path() / L"mcrtx_texturepack_cache";
+  std::filesystem::path currentCacheDir;
+  
+  std::filesystem::path currentTxt = cacheBase / L"current.txt";
+  if (std::filesystem::exists(currentTxt)) {
+    std::ifstream file(currentTxt);
+    std::string currentId;
+    if (std::getline(file, currentId) && !currentId.empty()) {
+      currentCacheDir = cacheBase / currentId;
+    }
+  }
+
   for (const wchar_t* extension : {L".dds", L".png"}) {
-    std::filesystem::path candidatePath = parentPath / stemWithSuffix;
-    candidatePath.replace_extension(extension);
+    std::filesystem::path filename = std::filesystem::path(stemWithSuffix).replace_extension(extension);
+    
+    if (foundAssets && !currentCacheDir.empty()) {
+      std::filesystem::path cacheCandidate = currentCacheDir / relativeToAssets / filename;
+      if (std::filesystem::exists(cacheCandidate)) {
+        return cacheCandidate;
+      }
+    }
+
+    // Fallback: check cache using the parent path relative to current dir
+    if (!currentCacheDir.empty()) {
+      std::filesystem::path cacheRootCandidate = currentCacheDir / parentPath / filename;
+      if (std::filesystem::exists(cacheRootCandidate)) {
+        return cacheRootCandidate;
+      }
+
+      // Also check the root of the cache just in case
+      std::filesystem::path cacheFlatCandidate = currentCacheDir / filename;
+      if (std::filesystem::exists(cacheFlatCandidate)) {
+        return cacheFlatCandidate;
+      }
+    }
+
+    // Original path check
+    std::filesystem::path candidatePath = parentPath / filename;
     if (std::filesystem::exists(candidatePath)) {
       return candidatePath;
     }

@@ -108,6 +108,12 @@ JNIEXPORT void JNICALL Java_mcrtx_bridge_RemixSceneBridge_nClearWorldScene(JNIEn
   RemixRenderer::instance().clearWorldScene();
 }
 
+JNIEXPORT void JNICALL Java_mcrtx_bridge_RemixSceneBridge_nReloadMaterials(
+    JNIEnv*, jclass) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Jni, "nReloadMaterials");
+  RemixRenderer::instance().initializeTerrainMaterials();
+}
+
 JNIEXPORT void JNICALL Java_mcrtx_bridge_RemixSceneBridge_nSetScreenTint(
     JNIEnv*, jclass, jfloat r, jfloat g, jfloat b, jfloat a) {
   MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Jni, "nSetScreenTint");

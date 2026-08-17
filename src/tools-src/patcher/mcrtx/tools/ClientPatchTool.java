@@ -96,6 +96,8 @@ public final class ClientPatchTool {
 
                 if (entryName.equals(MINECRAFT_CLASS + ".class")) {
                     content = patchMinecraft(content);
+                } else if (entryName.equals("ik.class")) {
+                    content = patchIk(content);
                 } else if (entryName.equals("px.class")) {
                     content = patchPx(content);
                 } else if (entryName.equals(CHUNK_RENDERER_CLASS + ".class")) {
@@ -353,6 +355,26 @@ public final class ClientPatchTool {
         return writeClass(classNode);
     }
 
+    private static byte[] patchIk(byte[] content) {
+        ClassNode classNode = readClass(content);
+        System.out.println("Patching ik.class (TexturePackList) methods:");
+        for (MethodNode method : classNode.methods) {
+            System.out.println(" - " + method.name + " " + method.desc);
+            patchTexturePackList(method);
+        }
+        return writeClass(classNode);
+    }
+
+    private static void patchTexturePackList(MethodNode method) {
+        if (method.name.equals("a") && method.desc.equals("(Li;)Z")) {
+            System.out.println("Found setTexturePack method in ik.class!");
+            InsnList instructions = new InsnList();
+            instructions.add(new VarInsnNode(Opcodes.ALOAD, 1));
+            instructions.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "mcrtx/bridge/TexturePackBridge", "onTexturePackChanged", "(Ljava/lang/Object;)V", false));
+            method.instructions.insert(method.instructions.getFirst(), instructions);
+        }
+    }
+
     private static byte[] patchV(byte[] content) {
         ClassNode classNode = readClass(content);
         for (MethodNode method : classNode.methods) {
@@ -524,6 +546,16 @@ public final class ClientPatchTool {
                 startupInstructions.add(onDisplayCreatedCall());
                 startupInstructions.add(rememberMinecraftInstanceCall());
                 method.instructions.insert(node, startupInstructions);
+            }
+            if (node.getOpcode() == Opcodes.RETURN) {
+                InsnList bootInstructions = new InsnList();
+                bootInstructions.add(new MethodInsnNode(
+                    Opcodes.INVOKESTATIC,
+                    "mcrtx/bridge/TexturePackBridge",
+                    "onGameBooted",
+                    "()V",
+                    false));
+                method.instructions.insertBefore(node, bootInstructions);
             }
         }
     }
