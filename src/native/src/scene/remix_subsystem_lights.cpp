@@ -5,6 +5,7 @@
 #include "mcrtx/scene/remix_light_common.hpp"
 #include "mcrtx/core/remix_render_common.hpp"
 #include "mcrtx/core/runtime_config.hpp"
+
 #include "mcrtx/lifecycle/perf_log.hpp"
 
 #include <algorithm>
