@@ -5,6 +5,7 @@
 #include "mcrtx/scene/remix_light_common.hpp"
 #include "mcrtx/core/remix_render_common.hpp"
 #include "mcrtx/core/runtime_config.hpp"
+
 #include "mcrtx/lifecycle/perf_log.hpp"
 
 #include <algorithm>
@@ -157,7 +158,7 @@ std::string describeTorchLightHashSubmission(
   return stream.str();
 }
 bool isEmissiveEntityItem(int itemId) {
-  return itemId == kTorchBlockId || itemId == kRedstoneTorchOnBlockId;
+  return itemId == kTorchBlockId || itemId == kRedstoneTorchOnBlockId || itemId == kLavaBucketItemId;
 }
 
 std::uint64_t makeEntityLightHash(int entityId) {
@@ -166,6 +167,7 @@ std::uint64_t makeEntityLightHash(int entityId) {
 
 remixapi_Float3D entityLightRadiance(int itemId) {
   if (itemId == kRedstoneTorchOnBlockId) return kRedstoneTorchLightRadiance;
+  if (itemId == kLavaBucketItemId) return kLavaBucketLightRadiance;
   return kTorchLightRadiance;
 }
 }  // namespace
