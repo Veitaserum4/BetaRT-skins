@@ -39,6 +39,8 @@ public:
   bool initialize(HWND sourceHwnd, std::uint32_t width, std::uint32_t height, std::filesystem::path remixDllPath = {});
   void shutdown();
 
+  bool initializeTerrainMaterials();
+
   void resize(std::uint32_t width, std::uint32_t height);
   void updateCamera(const CameraState& camera);
   void updateCloudLayer(
@@ -310,7 +312,6 @@ private:
   void pumpOutputWindowMessages();
   void updateOutputWindowSize();
   void syncOutputWindowInteractivity(remixapi_UIState uiState);
-  bool initializeTerrainMaterials();
   void createBlockOutlineMaterials();
   void destroyTerrainMaterials();
   void destroyBlockOutlineMaterials();

@@ -1567,6 +1567,7 @@ $runtimeSourceFiles = @(
     (Join-Path $javaSourceRoot "lifecycle\mcrtx\bridge\RemixLifecycleBridge.java"),
     (Join-Path $javaSourceRoot "lifecycle\mcrtx\bridge\McrtxPerfNative.java"),
     (Join-Path $javaSourceRoot "scene\mcrtx\bridge\RemixSceneBridge.java"),
+    (Join-Path $javaSourceRoot "scene\mcrtx\bridge\TexturePackBridge.java"),
     (Join-Path $javaSourceRoot "ui\mcrtx\bridge\RemixUiBridge.java"),
     (Join-Path $javaSourceRoot "entities\mcrtx\bridge\RemixDynamicEntityBridge.java"),
     (Join-Path $javaSourceRoot "particles\mcrtx\bridge\RemixParticleOverlayBridge.java"),

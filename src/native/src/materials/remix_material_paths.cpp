@@ -15,6 +15,19 @@ using namespace mcrtx::material;
 
 namespace {
 
+void pushAssetCandidates(
+    std::vector<std::filesystem::path>& attemptedPaths,
+    const std::filesystem::path& moduleDirectory,
+    const std::filesystem::path& relativePath) {
+  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_texturepack_cache" / relativePath);
+  if (!moduleDirectory.empty()) {
+    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / relativePath);
+    attemptedPaths.push_back(moduleDirectory / relativePath);
+  }
+  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / relativePath);
+  attemptedPaths.push_back(std::filesystem::current_path() / relativePath);
+}
+
 void appendAtlasCandidates(
     std::vector<std::filesystem::path>& attemptedPaths,
     const std::filesystem::path& baseDirectory,
@@ -100,97 +113,45 @@ std::filesystem::path RemixRenderer::resolveTerrainAtlasPath() {
 
 std::filesystem::path RemixRenderer::resolveTerrainEmissiveTexturePath() {
   std::vector<std::filesystem::path> attemptedPaths;
-
   const std::filesystem::path moduleDirectory = getCurrentModuleDirectory();
-  if (!moduleDirectory.empty()) {
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"terrain_emissive.dds");
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"terrain_emissive.png");
-    attemptedPaths.push_back(moduleDirectory / L"terrain_emissive.dds");
-    attemptedPaths.push_back(moduleDirectory / L"terrain_emissive.png");
-  }
-
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"terrain_emissive.dds");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"terrain_emissive.png");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"terrain_emissive.dds");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"terrain_emissive.png");
-
+  pushAssetCandidates(attemptedPaths, moduleDirectory, L"terrain_emissive.dds");
+  pushAssetCandidates(attemptedPaths, moduleDirectory, L"terrain_emissive.png");
   for (const auto& path : attemptedPaths) {
-    if (std::filesystem::exists(path)) {
-      return path;
-    }
+    if (std::filesystem::exists(path)) return path;
   }
-
   return {};
 }
 
 std::filesystem::path RemixRenderer::resolveItemsEmissiveTexturePath() {
   std::vector<std::filesystem::path> attemptedPaths;
-
   const std::filesystem::path moduleDirectory = getCurrentModuleDirectory();
-  if (!moduleDirectory.empty()) {
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"gui" / L"items_emissive.dds");
-    attemptedPaths.push_back(moduleDirectory / L"gui" / L"items_emissive.dds");
-  }
-
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"gui" / L"items_emissive.dds");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"gui" / L"items_emissive.dds");
-
+  pushAssetCandidates(attemptedPaths, moduleDirectory, L"gui/items_emissive.dds");
+  pushAssetCandidates(attemptedPaths, moduleDirectory, L"gui/items_emissive.png");
   for (const auto& path : attemptedPaths) {
-    if (std::filesystem::exists(path)) {
-      return path;
-    }
+    if (std::filesystem::exists(path)) return path;
   }
-
   return {};
 }
 
 std::filesystem::path RemixRenderer::resolveRedstoneEmissiveTexturePath() {
   std::vector<std::filesystem::path> attemptedPaths;
-
   const std::filesystem::path moduleDirectory = getCurrentModuleDirectory();
-  if (!moduleDirectory.empty()) {
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"redstone_emissive.dds");
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"redstone_emissive.png");
-    attemptedPaths.push_back(moduleDirectory / L"redstone_emissive.dds");
-    attemptedPaths.push_back(moduleDirectory / L"redstone_emissive.png");
-  }
-
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"redstone_emissive.dds");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"redstone_emissive.png");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"redstone_emissive.dds");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"redstone_emissive.png");
-
+  pushAssetCandidates(attemptedPaths, moduleDirectory, L"redstone_emissive.dds");
+  pushAssetCandidates(attemptedPaths, moduleDirectory, L"redstone_emissive.png");
   for (const auto& path : attemptedPaths) {
-    if (std::filesystem::exists(path)) {
-      return path;
-    }
+    if (std::filesystem::exists(path)) return path;
   }
-
   return {};
 }
 
 std::filesystem::path RemixRenderer::resolveCloudTexturePath() {
   std::vector<std::filesystem::path> attemptedPaths;
-
   const std::filesystem::path moduleDirectory = getCurrentModuleDirectory();
-  if (!moduleDirectory.empty()) {
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"clouds.dds");
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"clouds.png");
-    attemptedPaths.push_back(moduleDirectory / L"clouds.dds");
-    attemptedPaths.push_back(moduleDirectory / L"clouds.png");
-  }
-
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"clouds.dds");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"clouds.png");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"clouds.dds");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"clouds.png");
-
+  pushAssetCandidates(attemptedPaths, moduleDirectory, L"clouds.dds");
+  pushAssetCandidates(attemptedPaths, moduleDirectory, L"clouds.png");
   for (const auto& path : attemptedPaths) {
-    if (std::filesystem::exists(path)) {
-      return path;
-    }
+    if (std::filesystem::exists(path)) return path;
   }
-
   return {};
 }
 
@@ -210,126 +171,56 @@ std::filesystem::path RemixRenderer::resolveMoonTexturePath() {
 
 std::filesystem::path RemixRenderer::resolveFireTexturePath() {
   std::vector<std::filesystem::path> attemptedPaths;
-
   const std::filesystem::path moduleDirectory = getCurrentModuleDirectory();
-  if (!moduleDirectory.empty()) {
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"fire.dds");
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"fire.png");
-    attemptedPaths.push_back(moduleDirectory / L"fire.dds");
-    attemptedPaths.push_back(moduleDirectory / L"fire.png");
-  }
-
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"fire.dds");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"fire.png");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"fire.dds");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"fire.png");
-
+  pushAssetCandidates(attemptedPaths, moduleDirectory, L"fire.dds");
+  pushAssetCandidates(attemptedPaths, moduleDirectory, L"fire.png");
   for (const auto& path : attemptedPaths) {
-    if (std::filesystem::exists(path)) {
-      return path;
-    }
+    if (std::filesystem::exists(path)) return path;
   }
-
   return {};
 }
 
 std::filesystem::path RemixRenderer::resolveWaterTexturePath() {
   std::vector<std::filesystem::path> attemptedPaths;
-
   const std::filesystem::path moduleDirectory = getCurrentModuleDirectory();
-  if (!moduleDirectory.empty()) {
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"water.dds");
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"water.png");
-    attemptedPaths.push_back(moduleDirectory / L"water.dds");
-    attemptedPaths.push_back(moduleDirectory / L"water.png");
-  }
-
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"water.dds");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"water.png");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"water.dds");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"water.png");
-
+  pushAssetCandidates(attemptedPaths, moduleDirectory, L"water.dds");
+  pushAssetCandidates(attemptedPaths, moduleDirectory, L"water.png");
   for (const auto& path : attemptedPaths) {
-    if (std::filesystem::exists(path)) {
-      return path;
-    }
+    if (std::filesystem::exists(path)) return path;
   }
-
   return {};
 }
 
 std::filesystem::path RemixRenderer::resolveLavaTexturePath() {
   std::vector<std::filesystem::path> attemptedPaths;
-
   const std::filesystem::path moduleDirectory = getCurrentModuleDirectory();
-  if (!moduleDirectory.empty()) {
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"lava.dds");
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"lava.png");
-    attemptedPaths.push_back(moduleDirectory / L"lava.dds");
-    attemptedPaths.push_back(moduleDirectory / L"lava.png");
-  }
-
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"lava.dds");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"lava.png");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"lava.dds");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"lava.png");
-
+  pushAssetCandidates(attemptedPaths, moduleDirectory, L"lava.dds");
+  pushAssetCandidates(attemptedPaths, moduleDirectory, L"lava.png");
   for (const auto& path : attemptedPaths) {
-    if (std::filesystem::exists(path)) {
-      return path;
-    }
+    if (std::filesystem::exists(path)) return path;
   }
-
   return {};
 }
 
 std::filesystem::path RemixRenderer::resolvePortalTexturePath() {
   std::vector<std::filesystem::path> attemptedPaths;
-
   const std::filesystem::path moduleDirectory = getCurrentModuleDirectory();
-  if (!moduleDirectory.empty()) {
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"portal.dds");
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"portal.png");
-    attemptedPaths.push_back(moduleDirectory / L"portal.dds");
-    attemptedPaths.push_back(moduleDirectory / L"portal.png");
-  }
-
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"portal.dds");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"portal.png");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"portal.dds");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"portal.png");
-
+  pushAssetCandidates(attemptedPaths, moduleDirectory, L"portal.dds");
+  pushAssetCandidates(attemptedPaths, moduleDirectory, L"portal.png");
   for (const auto& path : attemptedPaths) {
-    if (std::filesystem::exists(path)) {
-      return path;
-    }
+    if (std::filesystem::exists(path)) return path;
   }
-
   return {};
 }
 
 std::filesystem::path RemixRenderer::resolveLavaEmissiveTexturePath() {
   std::vector<std::filesystem::path> attemptedPaths;
-
   const std::filesystem::path moduleDirectory = getCurrentModuleDirectory();
-  if (!moduleDirectory.empty()) {
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"lava_emissive.dds");
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"lava_emissive.png");
-    attemptedPaths.push_back(moduleDirectory / L"lava_emissive.dds");
-    attemptedPaths.push_back(moduleDirectory / L"lava_emissive.png");
-  }
-
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"lava_emissive.dds");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"lava_emissive.png");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"lava_emissive.dds");
-  attemptedPaths.push_back(std::filesystem::current_path() / L"lava_emissive.png");
-
+  pushAssetCandidates(attemptedPaths, moduleDirectory, L"lava_emissive.dds");
+  pushAssetCandidates(attemptedPaths, moduleDirectory, L"lava_emissive.png");
   for (const auto& path : attemptedPaths) {
-    if (std::filesystem::exists(path)) {
-      return path;
-    }
+    if (std::filesystem::exists(path)) return path;
   }
-
   return {};
 }
 
@@ -354,34 +245,21 @@ std::filesystem::path RemixRenderer::resolveDynamicEntityTexturePath(const std::
 
   std::vector<std::filesystem::path> attemptedPaths;
   const std::filesystem::path moduleDirectory = getCurrentModuleDirectory();
-  if (!moduleDirectory.empty()) {
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / ddsPath);
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / relativePath);
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"entities" / ddsPath);
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"entities" / relativePath);
-  }
-
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / ddsPath);
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / relativePath);
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"entities" / ddsPath);
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"entities" / relativePath);
+  pushAssetCandidates(attemptedPaths, moduleDirectory, ddsPath);
+  pushAssetCandidates(attemptedPaths, moduleDirectory, relativePath);
+  pushAssetCandidates(attemptedPaths, moduleDirectory, std::filesystem::path(L"entities") / ddsPath);
+  pushAssetCandidates(attemptedPaths, moduleDirectory, std::filesystem::path(L"entities") / relativePath);
 
   const bool hasDirectory = relativePath.has_parent_path();
   if (!hasDirectory) {
     const std::filesystem::path mobDdsPath = std::filesystem::path(L"mob") / ddsPath;
     const std::filesystem::path mobRelativePath = std::filesystem::path(L"mob") / relativePath;
-    if (!moduleDirectory.empty()) {
-      attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"entities" / mobDdsPath);
-      attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / L"entities" / mobRelativePath);
-    }
-    attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"entities" / mobDdsPath);
-    attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / L"entities" / mobRelativePath);
+    pushAssetCandidates(attemptedPaths, moduleDirectory, std::filesystem::path(L"entities") / mobDdsPath);
+    pushAssetCandidates(attemptedPaths, moduleDirectory, std::filesystem::path(L"entities") / mobRelativePath);
   }
 
   for (const auto& path : attemptedPaths) {
-    if (std::filesystem::exists(path)) {
-      return path;
-    }
+    if (std::filesystem::exists(path)) return path;
   }
 
   return {};
@@ -409,22 +287,11 @@ std::filesystem::path RemixRenderer::resolveParticleTexturePath(std::uint32_t te
           : std::filesystem::path(L"rain.png"));
 
   const std::filesystem::path moduleDirectory = getCurrentModuleDirectory();
-  if (!moduleDirectory.empty()) {
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / ddsPath);
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / pngPath);
-    attemptedPaths.push_back(moduleDirectory / ddsPath);
-    attemptedPaths.push_back(moduleDirectory / pngPath);
-  }
-
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / ddsPath);
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / pngPath);
-  attemptedPaths.push_back(std::filesystem::current_path() / ddsPath);
-  attemptedPaths.push_back(std::filesystem::current_path() / pngPath);
+  pushAssetCandidates(attemptedPaths, moduleDirectory, ddsPath);
+  pushAssetCandidates(attemptedPaths, moduleDirectory, pngPath);
 
   for (const auto& path : attemptedPaths) {
-    if (std::filesystem::exists(path)) {
-      return path;
-    }
+    if (std::filesystem::exists(path)) return path;
   }
 
   return {};
