@@ -17,7 +17,8 @@ public final class RemixChunkCapture {
     }
 
     public static void onChunkUpdateStart(int originX, int originY, int originZ) {
-        RemixChunkBridge.unloadChunkSection(originX, originY, originZ);
+        // Do not unload the chunk section here. Rebuilding the chunk will natively
+        // overwrite the old mesh and reconcile the torch lights, preserving light handles.
     }
 
     public static boolean onChunkBuildBegin(
