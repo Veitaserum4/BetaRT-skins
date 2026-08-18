@@ -309,8 +309,11 @@ bool RemixRenderer::updateTorchLight(const TorchLightPlacement& placement, const
     return remix_.UpdateLightDefinition(lightIt->second.handle, &lightInfo);
   }();
   if (result != REMIXAPI_ERROR_CODE_SUCCESS) {
-    setError("UpdateLightDefinition failed: " + errorCodeToString(result));
-    return false;
+    // UpdateLightDefinition is the per-frame draw registration for
+    // AutoInstancePersistentLights. On transient failure (e.g. queue full),
+    // do not destroy and recreate the light, as that causes a 1-frame flicker.
+    // Instead, just return true and try again next frame.
+    return true;
   }
 
   const TorchLightHashLogMode logMode = torchLightHashLogMode();
@@ -348,6 +351,7 @@ bool RemixRenderer::reconcileChunkTorchLights(
   const WorldRenderOrigin renderOrigin = currentRenderOriginLocked();
   for (const TorchLightPlacement& placement : desiredTorchLights) {
     const bool existed = torchLights_.find(placement.blockPosition) != torchLights_.end();
+
     if (!updateTorchLight(placement, renderOrigin)) {
       for (const WorldBlockPosition& createdPosition : createdLights) {
         destroyTorchLight(createdPosition);
@@ -457,8 +461,9 @@ bool RemixRenderer::updateEntityLight(
     return remix_.UpdateLightDefinition(state.handle, &lightInfo);
   }();
   if (result != REMIXAPI_ERROR_CODE_SUCCESS) {
-    setError("UpdateLightDefinition failed: " + errorCodeToString(result));
-    return false;
+    // On transient failure (e.g. queue full), do not destroy and recreate
+    // the light, as that causes a flicker. Just return true.
+    return true;
   }
 
   state.renderOrigin = renderOrigin;
@@ -532,8 +537,9 @@ bool RemixRenderer::reconcileHeldItemTorchLight(const WorldRenderOrigin& renderO
     return remix_.UpdateLightDefinition(heldItemTorchLightHandle_, &lightInfo);
   }();
   if (result != REMIXAPI_ERROR_CODE_SUCCESS) {
-    setError("UpdateLightDefinition failed: " + errorCodeToString(result));
-    return false;
+    // On transient failure (e.g. queue full), do not destroy and recreate
+    // the light, as that causes a flicker. Just return true.
+    return true;
   }
 
   heldItemTorchLightRenderOrigin_ = renderOrigin;
