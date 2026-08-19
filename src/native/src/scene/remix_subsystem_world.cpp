@@ -426,6 +426,7 @@ void RemixRenderer::updateAtmosphereState(float celestialAngle, bool forceDarkAt
     return;
   }
 
+  
   updateAtmosphereConfigLocked(celestialAngle, forceDarkAtmosphere);
 }
 

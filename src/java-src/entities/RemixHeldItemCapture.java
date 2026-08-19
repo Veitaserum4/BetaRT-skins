@@ -10,11 +10,47 @@ final class RemixHeldItemCapture {
     private static final int REDSTONE_TORCH_OFF_BLOCK_ID = 75;
     private static final int REDSTONE_TORCH_ON_BLOCK_ID = 76;
     private static final int LAVA_BUCKET_ITEM_ID = 327;
+    private static final int CLOCK_ITEM_ID = 347;
+    private static final int COMPASS_ITEM_ID = 345;
     private static final float ENTITY_HELD_TORCH_RIGHT_NUDGE = 0.18f;
 
     private static volatile boolean heldTorchLightsEnabled = true;
 
     private RemixHeldItemCapture() {
+    }
+
+    private static int getClockFrame() {
+        net.minecraft.client.Minecraft mc = RemixLifecycleBridge.getRememberedMinecraft();
+        if (mc != null && mc.f != null && mc.f.t != null) {
+            boolean isNether = mc.f.t instanceof wd;
+            double time = !isNether ? mc.f.b(1.0f) : Math.random();
+            return (int)(time * 64.0) % 64;
+        }
+        return 0;
+    }
+
+    private static int getCompassFrame() {
+        net.minecraft.client.Minecraft mc = RemixLifecycleBridge.getRememberedMinecraft();
+        if (mc != null && mc.f != null && mc.h != null) {
+            gs player = (gs) mc.h;
+            int spawnX = 0;
+            int spawnZ = 0;
+            try {
+                java.lang.reflect.Field fieldX = mc.f.x.getClass().getDeclaredField("a");
+                fieldX.setAccessible(true);
+                spawnX = fieldX.getInt(mc.f.x);
+                java.lang.reflect.Field fieldZ = mc.f.x.getClass().getDeclaredField("c");
+                fieldZ.setAccessible(true);
+                spawnZ = fieldZ.getInt(mc.f.x);
+            } catch (Exception e) {}
+            double dx = (double)spawnX - player.aM;
+            double dz = (double)spawnZ - player.aO;
+            double targetAngle = (Math.atan2(dz, dx) * 180.0 / Math.PI) - (player.aS + 90.0);
+            while (targetAngle < 0) targetAngle += 360.0;
+            while (targetAngle >= 360.0) targetAngle -= 360.0;
+            return (int)(targetAngle / 360.0 * 32.0) % 32;
+        }
+        return 0;
     }
 
     static void setHeldTorchLightsEnabled(boolean enabled) {
@@ -71,6 +107,12 @@ final class RemixHeldItemCapture {
     }
 
     private static String texturePathForItem(iz itemStack) {
+        if (itemStack.c == CLOCK_ITEM_ID) {
+            return "/gui/clock.png?frame=" + getClockFrame();
+        }
+        if (itemStack.c == COMPASS_ITEM_ID) {
+            return "/gui/compass.png?frame=" + getCompassFrame();
+        }
         return itemStack.c < 256 ? TERRAIN_TEXTURE_PATH : GUI_ITEMS_TEXTURE_PATH;
     }
 

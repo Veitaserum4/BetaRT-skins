@@ -104,6 +104,8 @@ void clearActiveDynamicEntityState(DynamicEntityBuildState& state) {
   state.quadFingerprint = 0;
   state.currentTextureIndex = 0xFFFFFFFFu;
   state.currentTextureFingerprint = 0;
+  state.currentTextureFrame = 0;
+  state.currentTextureNumFrames = 1;
   state.texturePaths.clear();
   state.quadCount = 0;
   state.boneTransforms.clear();
@@ -137,6 +139,23 @@ bool appendDynamicEntityQuadLocked(DynamicEntityBuildState& state,
       vertices[13], vertices[14],
       vertices[18], vertices[19],
   };
+
+  if (state.currentTextureNumFrames > 1) {
+    float minU = std::min({quad.texcoords[0], quad.texcoords[2], quad.texcoords[4], quad.texcoords[6]});
+    float minV = std::min({quad.texcoords[1], quad.texcoords[3], quad.texcoords[5], quad.texcoords[7]});
+    
+    float gridU = std::floor(minU * 16.0f) / 16.0f;
+    float gridV = std::floor(minV * 16.0f) / 16.0f;
+    
+    for (int i = 0; i < 4; ++i) {
+      float u_rel = (quad.texcoords[i * 2] - gridU) * 16.0f;
+      float v_rel = (quad.texcoords[i * 2 + 1] - gridV) * 16.0f;
+      
+      quad.texcoords[i * 2] = (u_rel + state.currentTextureFrame) / static_cast<float>(state.currentTextureNumFrames);
+      quad.texcoords[i * 2 + 1] = v_rel;
+    }
+  }
+
   quad.color = colorRgba;
   quad.textureIndex = state.currentTextureIndex;
   quad.textureFingerprint = state.currentTextureFingerprint;
@@ -202,17 +221,34 @@ void RemixRenderer::setDynamicEntityTexture(const std::string& texturePath) {
     return;
   }
 
+  std::string parsedPath = texturePath;
+  std::uint32_t frame = 0;
+  std::uint32_t numFrames = 1;
+  if (parsedPath.find("gui/clock.png?frame=") != std::string::npos || parsedPath.find("gui/compass.png?frame=") != std::string::npos) {
+    auto equalPos = parsedPath.find('=');
+    if (equalPos != std::string::npos) {
+      try {
+        frame = static_cast<std::uint32_t>(std::stoi(parsedPath.substr(equalPos + 1)));
+      } catch (...) {}
+    }
+    numFrames = parsedPath.find("gui/clock.png") != std::string::npos ? 64 : 32;
+    parsedPath = parsedPath.substr(0, parsedPath.find('?'));
+  }
+
+  activeDynamicEntity_.currentTextureFrame = frame;
+  activeDynamicEntity_.currentTextureNumFrames = numFrames;
+
   for (std::size_t index = 0; index < activeDynamicEntity_.texturePaths.size(); ++index) {
-    if (activeDynamicEntity_.texturePaths[index] == texturePath) {
+    if (activeDynamicEntity_.texturePaths[index] == parsedPath) {
       activeDynamicEntity_.currentTextureIndex = static_cast<std::uint32_t>(index);
-      activeDynamicEntity_.currentTextureFingerprint = computeDynamicEntityTextureFingerprint(texturePath);
+      activeDynamicEntity_.currentTextureFingerprint = computeDynamicEntityTextureFingerprint(parsedPath);
       return;
     }
   }
 
   activeDynamicEntity_.currentTextureIndex = static_cast<std::uint32_t>(activeDynamicEntity_.texturePaths.size());
-  activeDynamicEntity_.currentTextureFingerprint = computeDynamicEntityTextureFingerprint(texturePath);
-  activeDynamicEntity_.texturePaths.push_back(texturePath);
+  activeDynamicEntity_.currentTextureFingerprint = computeDynamicEntityTextureFingerprint(parsedPath);
+  activeDynamicEntity_.texturePaths.push_back(parsedPath);
 }
 
 void RemixRenderer::setDynamicEntityBoneTransform(
