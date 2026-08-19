@@ -211,6 +211,7 @@ final class RemixDynamicEntitySession {
                                     conn.setConnectTimeout(5000);
                                     conn.setReadTimeout(5000);
                                     conn.setRequestProperty("User-Agent", "Mozilla/5.0");
+                                    conn.setRequestProperty("Connection", "close");
                                     
                                     if (conn.getResponseCode() == 200) {
                                         java.io.InputStream in = conn.getInputStream();
