@@ -79,7 +79,7 @@ final class RemixFirstPersonCapture {
         }
 
         active = true;
-        activeTexture = RemixDynamicEntitySession.normalizeTexturePath(lastExtractedSkinUrl, null);
+        activeTexture = RemixDynamicEntitySession.normalizeTexturePath(lastExtractedSkinUrl, PLAYER_TEXTURE_PATH);
         RemixDynamicEntitySession.prepareAuxiliaryEntity(0, 0, 0.0f);
         RemixDynamicEntityBridge.beginDynamicEntity(FIRST_PERSON_ENTITY_ID, 0, 0);
         RemixDynamicEntityBridge.setDynamicEntityTexture(activeTexture);
@@ -107,7 +107,7 @@ final class RemixFirstPersonCapture {
         long lookupRendererEndNanos = System.nanoTime();
 
         RemixDynamicEntitySession.ensureFrame();
-        String normalizedSkinUrl = RemixDynamicEntitySession.normalizeTexturePath(lastExtractedSkinUrl, null);
+        String normalizedSkinUrl = RemixDynamicEntitySession.normalizeTexturePath(lastExtractedSkinUrl, PLAYER_TEXTURE_PATH);
         RemixDynamicEntitySession.beginEntity(
                 FIRST_PERSON_SHADOW_ENTITY_ID, 0, 0, 0.0f, shadowTextureAlias(normalizedSkinUrl));
         shadowCaptureActive = true;

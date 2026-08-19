@@ -25,6 +25,7 @@ void pushAssetCandidates(
     attemptedPaths.push_back(moduleDirectory / relativePath);
   }
   attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / relativePath);
+  attemptedPaths.push_back(std::filesystem::current_path() / L".." / L"libraries" / L"mcrtx_assets" / relativePath);
   attemptedPaths.push_back(std::filesystem::current_path() / relativePath);
 }
 
@@ -100,6 +101,7 @@ std::filesystem::path RemixRenderer::resolveTerrainAtlasPath() {
   }
 
   appendAtlasCandidates(attemptedPaths, std::filesystem::current_path() / L"mcrtx_assets", L"terrain", preferDds);
+  appendAtlasCandidates(attemptedPaths, std::filesystem::current_path() / L".." / L"libraries" / L"mcrtx_assets", L"terrain", preferDds);
   appendAtlasCandidates(attemptedPaths, std::filesystem::current_path(), L"terrain", preferDds);
 
   for (const auto& path : attemptedPaths) {
