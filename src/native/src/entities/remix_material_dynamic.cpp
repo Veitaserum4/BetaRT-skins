@@ -96,6 +96,7 @@ remixapi_MaterialHandle RemixRenderer::acquireDynamicEntityMaterial(
   const bool isSpiderBody = normalizedTexturePath == "mob/spider.png";
 
   std::filesystem::path spiderEyesTexturePath;
+  std::filesystem::path optionalEmissivePath;
   const std::filesystem::path* emissiveTexturePath = nullptr;
   const std::filesystem::path* materialTexturePath = &resolvedTexturePath;
   if (normalizedTexturePath == "terrain.png") {
@@ -107,6 +108,11 @@ remixapi_MaterialHandle RemixRenderer::acquireDynamicEntityMaterial(
   } else if (normalizedTexturePath == "gui/items.png") {
     if (!itemsEmissiveTexturePath_.empty()) {
       emissiveTexturePath = &itemsEmissiveTexturePath_;
+    }
+  } else {
+    optionalEmissivePath = resolveOptionalPbrSibling(resolvedTexturePath, L"_emissive");
+    if (!optionalEmissivePath.empty()) {
+      emissiveTexturePath = &optionalEmissivePath;
     }
   }
 
