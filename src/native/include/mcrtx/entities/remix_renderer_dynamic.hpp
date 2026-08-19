@@ -52,6 +52,8 @@ struct DynamicEntityBuildState {
   std::uint64_t quadFingerprint {0};
   std::uint32_t currentTextureIndex {0xFFFFFFFFu};
   std::uint64_t currentTextureFingerprint {0};
+  std::uint32_t currentTextureFrame {0};
+  std::uint32_t currentTextureNumFrames {1};
   std::vector<std::string> texturePaths {};
   std::array<DynamicEntityQuad, kDynamicEntityMaxQuadCount> quads {};
   std::size_t quadCount {0};

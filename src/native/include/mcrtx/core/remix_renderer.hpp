@@ -447,6 +447,7 @@ private:
   DWORD standaloneWorkerThreadId_ {0};
   bool renderSubmissionInFlight_ {false};
   bool initialized_ {false};
+  
   bool syntheticUiTestEnabled_ {false};
   bool worldOriginRebaseEnabled_ {false};
   bool syntheticUiTextureRegistered_ {false};
