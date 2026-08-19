@@ -12,9 +12,9 @@ namespace mcrtx::material {
 using namespace mcrtx::detail;
 
 namespace {
-
 constexpr float kDefaultHeightMapDisplaceIn = 0.05f;
 constexpr float kDefaultHeightMapDisplaceOut = 0.0f;
+}  // namespace
 
 std::filesystem::path resolveOptionalPbrSibling(const std::filesystem::path& texturePath, const wchar_t* suffix) {
   if (texturePath.empty()) {
@@ -80,6 +80,7 @@ std::filesystem::path resolveOptionalPbrSibling(const std::filesystem::path& tex
   return {};
 }
 
+namespace {
 std::filesystem::path resolveOptionalHeightTexture(const std::filesystem::path& texturePath) {
   if (const std::filesystem::path heightPath = resolveOptionalPbrSibling(texturePath, L"_height"); !heightPath.empty()) {
     return heightPath;
