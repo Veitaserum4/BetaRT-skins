@@ -169,8 +169,21 @@ final class RemixDynamicEntitySession {
     private static final java.util.Set<String> downloadedThisSession = java.util.Collections.newSetFromMap(new java.util.concurrent.ConcurrentHashMap<String, Boolean>());
     private static final java.util.Set<String> downloadingSkins = java.util.Collections.newSetFromMap(new java.util.concurrent.ConcurrentHashMap<String, Boolean>());
     private static final java.util.Set<String> existingSkinsCache = java.util.Collections.newSetFromMap(new java.util.concurrent.ConcurrentHashMap<String, Boolean>());
+    private static final java.util.Map<String, String> activeSkinPaths = new java.util.concurrent.ConcurrentHashMap<String, String>();
+
+    static void clearSkinCache() {
+        downloadedThisSession.clear();
+    }
+
+    private static Object lastWorld = null;
 
     static String normalizeTexturePath(String primaryTexture, String fallbackTexture) {
+        net.minecraft.client.Minecraft mc = mcrtx.bridge.RemixLifecycleBridge.getRememberedMinecraft();
+        if (mc != null && mc.f != lastWorld) {
+            lastWorld = mc.f;
+            clearSkinCache();
+        }
+
         String normalizedPrimary = stripTexturePrefix(primaryTexture);
         if (!normalizedPrimary.isEmpty() && normalizedPrimary.charAt(0) == '/') {
             return normalizedPrimary;
@@ -185,20 +198,38 @@ final class RemixDynamicEntitySession {
                     String prefix = path.toLowerCase().contains("cloak") ? "cloak_" : "skin_";
                     String ddsFileName = prefix + fileName.substring(0, fileName.length() - 4) + ".dds";
                     
-                    boolean fileExists = existingSkinsCache.contains(ddsFileName);
+                    final String baseName = prefix + fileName.substring(0, fileName.length() - 4);
+                    
+                    String activePath = activeSkinPaths.get(normalizedPrimary);
+                    boolean fileExists = activePath != null;
+                    
                     if (!fileExists) {
                         java.io.File skinsDir = new java.io.File("../libraries/mcrtx_assets/skins");
                         if (!skinsDir.exists()) {
                             skinsDir.mkdirs();
                         }
-                        java.io.File ddsFile = new java.io.File(skinsDir, ddsFileName);
-                        fileExists = ddsFile.exists() && ddsFile.length() > 0;
-                        if (fileExists) {
-                            existingSkinsCache.add(ddsFileName);
+                        
+                        // Look for newest skin_Jacob*.dds
+                        java.io.File[] existingFiles = skinsDir.listFiles(new java.io.FilenameFilter() {
+                            public boolean accept(java.io.File dir, String name) {
+                                return name.startsWith(baseName) && name.endsWith(".dds");
+                            }
+                        });
+                        if (existingFiles != null && existingFiles.length > 0) {
+                            java.io.File newest = existingFiles[0];
+                            for (java.io.File f : existingFiles) {
+                                if (f.lastModified() > newest.lastModified()) newest = f;
+                            }
+                            if (newest.length() > 0) {
+                                activePath = "/skins/" + newest.getName();
+                                activeSkinPaths.put(normalizedPrimary, activePath);
+                                fileExists = true;
+                            }
                         }
                     }
 
                     boolean shouldDownload = !downloadedThisSession.contains(normalizedPrimary);
+
 
                     if (shouldDownload && downloadingSkins.add(normalizedPrimary)) {
                         downloadedThisSession.add(normalizedPrimary);
@@ -208,6 +239,7 @@ final class RemixDynamicEntitySession {
                                 System.out.println("[BetaRT] Attempting to download skin from: " + url.toString());
                                 try {
                                     java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+                                    conn.setUseCaches(false);
                                     conn.setConnectTimeout(5000);
                                     conn.setReadTimeout(5000);
                                     conn.setRequestProperty("User-Agent", "Mozilla/5.0");
@@ -219,13 +251,36 @@ final class RemixDynamicEntitySession {
                                         in.close();
                                         if (image != null) {
                                             java.io.File skinsDir = new java.io.File("../libraries/mcrtx_assets/skins");
-                                            java.io.File ddsFile = new java.io.File(skinsDir, ddsFileName);
+                                            if (!skinsDir.exists()) skinsDir.mkdirs();
+                                            
+                                            // Delete old skins
+                                            java.io.File[] oldFiles = skinsDir.listFiles(new java.io.FilenameFilter() {
+                                                public boolean accept(java.io.File dir, String name) {
+                                                    return name.startsWith(baseName) && name.endsWith(".dds");
+                                                }
+                                            });
+                                            if (oldFiles != null) {
+                                                for (java.io.File f : oldFiles) {
+                                                    try { f.delete(); } catch(Exception e) {}
+                                                }
+                                            }
+                                            
+                                            String newFileName = baseName + "_" + System.currentTimeMillis() + ".dds";
+                                            java.io.File ddsFile = new java.io.File(skinsDir, newFileName);
                                             java.io.File tempFile = new java.io.File(ddsFile.getAbsolutePath() + ".tmp");
+                                            
                                             saveAsDDS(image, tempFile);
-                                            tempFile.renameTo(ddsFile);
-                                            ddsFile.setLastModified(System.currentTimeMillis());
-                                            existingSkinsCache.add(ddsFileName);
-                                            System.out.println("[BetaRT] Successfully downloaded and converted skin: " + ddsFileName);
+                                            
+                                            // Using nio Files.move for reliable overwrite and exception logging
+                                            try {
+                                                java.nio.file.Files.move(tempFile.toPath(), ddsFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                                            } catch (Exception e) {
+                                                System.out.println("[BetaRT] Failed to move temp skin file: " + e.getMessage());
+                                                tempFile.renameTo(ddsFile); // fallback
+                                            }
+                                            
+                                            activeSkinPaths.put(normalizedPrimary, "/skins/" + newFileName);
+                                            System.out.println("[BetaRT] Successfully downloaded and converted skin: " + newFileName);
                                         } else {
                                             System.out.println("[BetaRT] Failed to parse skin image data from: " + url.toString());
                                         }
@@ -242,8 +297,8 @@ final class RemixDynamicEntitySession {
                         }, "BetaRT-Skin-Downloader").start();
                     }
 
-                    if (fileExists) {
-                        return "/skins/" + ddsFileName;
+                    if (fileExists || activeSkinPaths.containsKey(normalizedPrimary)) {
+                        return activeSkinPaths.get(normalizedPrimary);
                     }
                 }
             } catch (Exception e) {

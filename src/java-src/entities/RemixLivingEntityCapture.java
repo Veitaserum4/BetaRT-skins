@@ -15,6 +15,7 @@ final class RemixLivingEntityCapture {
     private static Field creeperPreviousFuseTimeField;
     private static Method creeperFuseStateMethod;
     private static volatile boolean enabled = true;
+    private static final java.util.Map<gs, Boolean> seenPlayers = java.util.Collections.synchronizedMap(new java.util.WeakHashMap<gs, Boolean>());
 
     private RemixLivingEntityCapture() {
     }
@@ -32,6 +33,12 @@ final class RemixLivingEntityCapture {
     static void onRenderStart(sn entity, float partialTicks) {
         if (!canCapture() || entity == null) {
             return;
+        }
+        
+        if (entity instanceof gs) {
+            if (seenPlayers.put((gs) entity, Boolean.TRUE) == null) {
+                RemixDynamicEntitySession.clearSkinCache();
+            }
         }
         int hurtStage = isTrackedLivingEntity(entity) ? resolveHurtStage(entity) : 0;
         float fuseProgress = isTrackedCreeper(entity) ? resolveFuseProgress(entity, partialTicks) : 0.0f;
