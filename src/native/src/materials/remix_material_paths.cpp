@@ -227,14 +227,19 @@ std::filesystem::path RemixRenderer::resolveLavaEmissiveTexturePath() {
 }
 
 std::filesystem::path RemixRenderer::resolveDynamicEntityTexturePath(const std::string& texturePath) {
-  if (texturePath.empty()) {
-    return {};
-  }
-
-  std::string normalized = texturePath;
-  if (!normalized.empty() && normalized.front() == '/') {
-    normalized.erase(normalized.begin());
-  }
+    if (texturePath.empty()) {
+      return {};
+    }
+  
+    std::string normalized = texturePath;
+    auto queryPos = normalized.find('?');
+    if (queryPos != std::string::npos) {
+        normalized = normalized.substr(0, queryPos);
+    }
+    
+    if (!normalized.empty() && normalized.front() == '/') {
+      normalized.erase(normalized.begin());
+    }
 
   stripDynamicEntityTextureAliasPrefix(normalized, kFirstPersonShadowTextureAliasPrefix);
   stripDynamicEntityTextureAliasPrefix(normalized, kEntityFireOverlayTextureAliasPrefix);
