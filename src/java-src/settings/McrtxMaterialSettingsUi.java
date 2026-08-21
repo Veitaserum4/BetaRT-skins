@@ -19,6 +19,17 @@ final class McrtxMaterialSettingsUi implements McrtxSettingsCategoryUi {
     private static final int WATER_REFRACTIVE_INDEX_SLIDER_ID = 37;
     private static final int WATER_DIFFUSE_LAYER_BUTTON_ID = 38;
     private static final int WATER_DIFFUSE_LAYER_SCALE_SLIDER_ID = 39;
+    private static final int GLASS_TRANSMITTANCE_COLOR_RESET_BUTTON_ID = 50;
+    private static final int GLASS_PROPERTIES_RESET_BUTTON_ID = 51;
+    private static final int GLASS_TRANSMITTANCE_RED_SLIDER_ID = 52;
+    private static final int GLASS_TRANSMITTANCE_GREEN_SLIDER_ID = 53;
+    private static final int GLASS_TRANSMITTANCE_BLUE_SLIDER_ID = 54;
+    private static final int GLASS_TRANSMITTANCE_DISTANCE_SLIDER_ID = 55;
+    private static final int GLASS_REFRACTIVE_INDEX_SLIDER_ID = 56;
+    private static final int GLASS_THIN_WALL_BUTTON_ID = 57;
+    private static final int GLASS_MATERIAL_THICKNESS_SLIDER_ID = 58;
+    private static final int GLASS_DIFFUSE_LAYER_BUTTON_ID = 59;
+    private static final int GLASS_DIFFUSE_LAYER_SCALE_SLIDER_ID = 60;
     private static final int RESET_DEFAULTS_BUTTON_ID = 308;
 
     public String getName() { return "Material"; }
@@ -37,6 +48,18 @@ final class McrtxMaterialSettingsUi implements McrtxSettingsCategoryUi {
         addSlider(screen, WATER_REFRACTIVE_INDEX_SLIDER_ID, Slider.WATER_IOR);
         screen.addControl(button(screen, WATER_DIFFUSE_LAYER_BUTTON_ID, getWaterDiffuseLabel()));
         if (McrtxMaterialSettings.isWaterDiffuseLayerEnabled()) addSlider(screen, WATER_DIFFUSE_LAYER_SCALE_SLIDER_ID, Slider.WATER_DIFFUSE_SCALE);
+
+        screen.addControl(button(screen, GLASS_TRANSMITTANCE_COLOR_RESET_BUTTON_ID, "Reset Color"));
+        screen.addControl(button(screen, GLASS_PROPERTIES_RESET_BUTTON_ID, "Reset Properties"));
+        addSlider(screen, GLASS_TRANSMITTANCE_RED_SLIDER_ID, Slider.GLASS_RED);
+        addSlider(screen, GLASS_TRANSMITTANCE_GREEN_SLIDER_ID, Slider.GLASS_GREEN);
+        addSlider(screen, GLASS_TRANSMITTANCE_BLUE_SLIDER_ID, Slider.GLASS_BLUE);
+        addSlider(screen, GLASS_TRANSMITTANCE_DISTANCE_SLIDER_ID, Slider.GLASS_DISTANCE);
+        addSlider(screen, GLASS_REFRACTIVE_INDEX_SLIDER_ID, Slider.GLASS_IOR);
+        screen.addControl(button(screen, GLASS_DIFFUSE_LAYER_BUTTON_ID, getGlassDiffuseLabel()));
+        if (McrtxMaterialSettings.isGlassDiffuseLayerEnabled()) addSlider(screen, GLASS_DIFFUSE_LAYER_SCALE_SLIDER_ID, Slider.GLASS_DIFFUSE_SCALE);
+        screen.addControl(button(screen, GLASS_THIN_WALL_BUTTON_ID, getGlassModeLabel()));
+        if (!McrtxMaterialSettings.isGlassThinWalledEnabled()) addSlider(screen, GLASS_MATERIAL_THICKNESS_SLIDER_ID, Slider.GLASS_THICKNESS);
         screen.addControl(button(screen, WATER_THIN_WALL_BUTTON_ID, getWaterModeLabel()));
         if (McrtxMaterialSettings.isWaterThinWalledEnabled()) addSlider(screen, WATER_MATERIAL_THICKNESS_SLIDER_ID, Slider.WATER_THICKNESS);
         screen.addControl(button(screen, RESET_DEFAULTS_BUTTON_ID, "Reset Material Defaults"));
@@ -86,9 +109,11 @@ final class McrtxMaterialSettingsUi implements McrtxSettingsCategoryUi {
     private static ke button(McrtxQuickSettingsScreen screen, int id, String label) { return new ke(id, screen.getControlX(), screen.takeNextRowY(), screen.getControlWidth(), McrtxQuickSettingsScreen.CONTROL_HEIGHT, label); }
     private static void setLabel(McrtxQuickSettingsScreen screen, int id, String label) { ke button = screen.findButton(id); if (button != null) button.e = label; }
     private static String toggle(boolean enabled) { return enabled ? "ON" : "OFF"; }
-    private static String getDiffusionLabel() { return "SSS Diffusion: " + toggle(McrtxMaterialSettings.isSubsurfaceDiffusionProfileEnabled()); }
+    private static String getWaterModeLabel() { return "Water Mode: " + (McrtxMaterialSettings.isWaterThinWalledEnabled() ? "Thin Walled" : "Volumetric"); }
     private static String getWaterDiffuseLabel() { return "Water Diffuse Layer: " + toggle(McrtxMaterialSettings.isWaterDiffuseLayerEnabled()); }
-    private static String getWaterModeLabel() { return McrtxMaterialSettings.isWaterThinWalledEnabled() ? "Water Mode: Thin-Walled" : "Water Mode: Refractive"; }
+    private static String getGlassModeLabel() { return "Glass Mode: " + (McrtxMaterialSettings.isGlassThinWalledEnabled() ? "Thin Walled" : "Volumetric"); }
+    private static String getGlassDiffuseLabel() { return "Glass Diffuse Layer: " + toggle(McrtxMaterialSettings.isGlassDiffuseLayerEnabled()); }
+    private static String getDiffusionLabel() { return "SSS Diffusion: " + toggle(McrtxMaterialSettings.isSubsurfaceDiffusionProfileEnabled()); }
 
     private static void setValue(int mode, int value) {
         if (mode == Slider.DISPLACEMENT) { McrtxMaterialSettings.setDisplacementFactorHundredths(value); McrtxMaterialSettingsNative.setDisplacementFactor(McrtxMaterialSettings.getDisplacementFactor()); }
@@ -122,6 +147,19 @@ final class McrtxMaterialSettingsUi implements McrtxSettingsCategoryUi {
                 McrtxMaterialSettings.getWaterDiffuseLayerScale(),
                 McrtxMaterialSettings.isWaterThinWalledEnabled(),
                 McrtxMaterialSettings.getWaterMaterialThickness());
+    }
+
+    private static void applyGlass() {
+        McrtxMaterialSettingsNative.setGlassTransmissionSettings(
+                McrtxMaterialSettings.getGlassTransmittanceRed(),
+                McrtxMaterialSettings.getGlassTransmittanceGreen(),
+                McrtxMaterialSettings.getGlassTransmittanceBlue(),
+                McrtxMaterialSettings.getGlassTransmittanceDistance(),
+                McrtxMaterialSettings.getGlassRefractiveIndex(),
+                McrtxMaterialSettings.isGlassDiffuseLayerEnabled(),
+                McrtxMaterialSettings.getGlassDiffuseLayerScale(),
+                McrtxMaterialSettings.isGlassThinWalledEnabled(),
+                McrtxMaterialSettings.getGlassMaterialThickness());
     }
 
     private static void resetDefaults() {
@@ -158,6 +196,13 @@ final class McrtxMaterialSettingsUi implements McrtxSettingsCategoryUi {
         static final int WATER_IOR = 9;
         static final int WATER_THICKNESS = 10;
         static final int WATER_DIFFUSE_SCALE = 11;
+        static final int GLASS_RED = 12;
+        static final int GLASS_GREEN = 13;
+        static final int GLASS_BLUE = 14;
+        static final int GLASS_DISTANCE = 15;
+        static final int GLASS_IOR = 16;
+        static final int GLASS_THICKNESS = 17;
+        static final int GLASS_DIFFUSE_SCALE = 18;
 
         private final int mode;
         private final int minimum;
