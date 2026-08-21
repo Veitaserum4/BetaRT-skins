@@ -639,7 +639,7 @@ void RemixRenderer::reconcileParticleLights(const WorldRenderOrigin& renderOrigi
 
   // Create or update lights
   for (std::size_t i = 0; i < flameParticleLightPositions_.size(); ++i) {
-    const WorldRenderPosition& pos = flameParticleLightPositions_[i];
+    const WorldRenderPosition pos = rebaseWorldPosition(flameParticleLightPositions_[i].x, flameParticleLightPositions_[i].y, flameParticleLightPositions_[i].z, renderOrigin);
 
     if (i >= activeFlameParticleLights_.size()) {
       TorchLightState newState {};
@@ -684,6 +684,8 @@ void RemixRenderer::reconcileParticleLights(const WorldRenderOrigin& renderOrigi
 }
 
 }  // namespace mcrtx
+
+
 
 
 
