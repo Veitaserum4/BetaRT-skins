@@ -49,15 +49,7 @@ final class McrtxMaterialSettingsUi implements McrtxSettingsCategoryUi {
         screen.addControl(button(screen, WATER_DIFFUSE_LAYER_BUTTON_ID, getWaterDiffuseLabel()));
         if (McrtxMaterialSettings.isWaterDiffuseLayerEnabled()) addSlider(screen, WATER_DIFFUSE_LAYER_SCALE_SLIDER_ID, Slider.WATER_DIFFUSE_SCALE);
 
-        screen.addControl(button(screen, GLASS_TRANSMITTANCE_COLOR_RESET_BUTTON_ID, "Reset Color"));
-        screen.addControl(button(screen, GLASS_PROPERTIES_RESET_BUTTON_ID, "Reset Properties"));
-        addSlider(screen, GLASS_TRANSMITTANCE_RED_SLIDER_ID, Slider.GLASS_RED);
-        addSlider(screen, GLASS_TRANSMITTANCE_GREEN_SLIDER_ID, Slider.GLASS_GREEN);
-        addSlider(screen, GLASS_TRANSMITTANCE_BLUE_SLIDER_ID, Slider.GLASS_BLUE);
-        addSlider(screen, GLASS_TRANSMITTANCE_DISTANCE_SLIDER_ID, Slider.GLASS_DISTANCE);
         addSlider(screen, GLASS_REFRACTIVE_INDEX_SLIDER_ID, Slider.GLASS_IOR);
-        screen.addControl(button(screen, GLASS_DIFFUSE_LAYER_BUTTON_ID, getGlassDiffuseLabel()));
-        if (McrtxMaterialSettings.isGlassDiffuseLayerEnabled()) addSlider(screen, GLASS_DIFFUSE_LAYER_SCALE_SLIDER_ID, Slider.GLASS_DIFFUSE_SCALE);
         screen.addControl(button(screen, GLASS_THIN_WALL_BUTTON_ID, getGlassModeLabel()));
         if (!McrtxMaterialSettings.isGlassThinWalledEnabled()) addSlider(screen, GLASS_MATERIAL_THICKNESS_SLIDER_ID, Slider.GLASS_THICKNESS);
         screen.addControl(button(screen, WATER_THIN_WALL_BUTTON_ID, getWaterModeLabel()));
