@@ -224,4 +224,72 @@ void RemixRenderer::setWaterTransmissionSettings(
   rebuildMaterialDependentMeshesLocked();
 }
 
+void RemixRenderer::setGlassTransmissionSettings(
+    float red,
+    float green,
+    float blue,
+    float measurementDistance,
+    float refractiveIndex,
+    bool diffuseLayerEnabled,
+    float diffuseLayerScale,
+    bool thinWalledEnabled,
+    float thickness) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Native, "RemixRenderer::setGlassTransmissionSettings");
+  std::scoped_lock lock(mutex_);
+
+  const auto normalize = [](float value, float fallback, float minimum, float maximum) {
+    return std::clamp(std::isfinite(value) ? value : fallback, minimum, maximum);
+  };
+
+  red = normalize(red, kGlassTransmittanceColor.x, kGlassMinTransmittanceColor, kGlassMaxTransmittanceColor);
+  green = normalize(green, kGlassTransmittanceColor.y, kGlassMinTransmittanceColor, kGlassMaxTransmittanceColor);
+  blue = normalize(blue, kGlassTransmittanceColor.z, kGlassMinTransmittanceColor, kGlassMaxTransmittanceColor);
+  measurementDistance = normalize(
+      measurementDistance,
+      kGlassTransmittanceDistance,
+      kGlassMinTransmittanceDistance,
+      kGlassMaxTransmittanceDistance);
+  refractiveIndex = normalize(
+      refractiveIndex,
+      kGlassRefractiveIndex,
+      kGlassMinRefractiveIndex,
+      kGlassMaxRefractiveIndex);
+  diffuseLayerScale = normalize(
+      diffuseLayerScale,
+      kGlassDiffuseLayerScale,
+      kGlassMinDiffuseLayerScale,
+      kGlassMaxDiffuseLayerScale);
+  thickness = normalize(
+      thickness,
+      kGlassDefaultThinWallThickness,
+      kGlassThinWallThickness,
+      kGlassMaxThinWallThickness);
+
+  const bool unchanged =
+      std::abs(glassTransmittanceColor_.x - red) < 0.0001f
+      && std::abs(glassTransmittanceColor_.y - green) < 0.0001f
+      && std::abs(glassTransmittanceColor_.z - blue) < 0.0001f
+      && std::abs(glassTransmittanceDistance_ - measurementDistance) < 0.0001f
+      && std::abs(glassRefractiveIndex_ - refractiveIndex) < 0.0001f
+      && glassDiffuseLayerEnabled_ == diffuseLayerEnabled
+      && std::abs(glassDiffuseLayerScale_ - diffuseLayerScale) < 0.0001f
+      && glassThinWalledEnabled_ == thinWalledEnabled
+      && std::abs(glassMaterialThickness_ - thickness) < 0.0001f;
+  if (unchanged) {
+    return;
+  }
+
+  glassTransmittanceColor_ = {red, green, blue};
+  glassTransmittanceDistance_ = measurementDistance;
+  glassRefractiveIndex_ = refractiveIndex;
+  glassDiffuseLayerEnabled_ = diffuseLayerEnabled;
+  glassDiffuseLayerScale_ = diffuseLayerScale;
+  glassThinWalledEnabled_ = thinWalledEnabled;
+  glassMaterialThickness_ = thickness;
+  if (!initialized_) {
+    return;
+  }
+
+  rebuildMaterialDependentMeshesLocked();
+}
 }  // namespace mcrtx

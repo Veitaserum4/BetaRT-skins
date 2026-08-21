@@ -92,6 +92,16 @@ public:
       float diffuseLayerScale,
       bool thinWalledEnabled,
       float thickness);
+  void setGlassTransmissionSettings(
+      float red,
+      float green,
+      float blue,
+      float measurementDistance,
+      float refractiveIndex,
+      bool diffuseLayerEnabled,
+      float diffuseLayerScale,
+      bool thinWalledEnabled,
+      float thickness);
   void setViewModelFovDegrees(float fovYDegrees);
   void setRtQuality(int rtQuality);
   void setUpscalerConfig(
@@ -581,6 +591,13 @@ private:
   float waterDiffuseLayerScale_ {1.0f};
   bool waterThinWalledEnabled_ {true};
   float waterMaterialThickness_ {1.0f};
+remixapi_Float3D glassTransmittanceColor_ {0.74f, 0.9f, 1.0f};
+  float glassTransmittanceDistance_ {1.5f};
+  float glassRefractiveIndex_ {1.333f};
+  bool glassDiffuseLayerEnabled_ {true};
+  float glassDiffuseLayerScale_ {1.0f};
+  bool glassThinWalledEnabled_ {true};
+  float glassMaterialThickness_ {1.0f};
   static constexpr int kRtQualityLow = 0;
   static constexpr int kRtQualityMedium = 1;
   static constexpr int kRtQualityHigh = 2;

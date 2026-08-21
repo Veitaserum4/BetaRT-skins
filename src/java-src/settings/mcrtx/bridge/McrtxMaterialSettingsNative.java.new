@@ -12,6 +12,7 @@ public final class McrtxMaterialSettingsNative {
     public static void setSubsurfaceDiffusionProfileEnabled(boolean enabled) { if (ready()) nSetSubsurfaceDiffusionProfileEnabled(enabled); }
 
     public static void setWaterTransmissionSettings(
+    public static void setGlassTransmissionSettings(
             float red,
             float green,
             float blue,
@@ -23,28 +24,6 @@ public final class McrtxMaterialSettingsNative {
             float thickness) {
         if (ready()) {
             nSetWaterTransmissionSettings(
-                    red,
-                    green,
-                    blue,
-                    measurementDistance,
-                    refractiveIndex,
-                    diffuseLayerEnabled,
-                    diffuseLayerScale,
-                    thinWalledEnabled,
-                    thickness);
-        }
-
-public static void setGlassTransmissionSettings(
-            float red,
-            float green,
-            float blue,
-            float measurementDistance,
-            float refractiveIndex,
-            boolean diffuseLayerEnabled,
-            float diffuseLayerScale,
-            boolean thinWalledEnabled,
-            float thickness) {
-        if (ready()) {
             nSetGlassTransmissionSettings(
                     red,
                     green,
@@ -69,15 +48,6 @@ public static void setGlassTransmissionSettings(
     private static native void nSetSubsurfaceVolumetricAnisotropy(float anisotropy);
     private static native void nSetSubsurfaceDiffusionProfileEnabled(boolean enabled);
     private static native void nSetWaterTransmissionSettings(
-            float red,
-            float green,
-            float blue,
-            float measurementDistance,
-            float refractiveIndex,
-            boolean diffuseLayerEnabled,
-            float diffuseLayerScale,
-            boolean thinWalledEnabled,
-            float thickness);
     private static native void nSetGlassTransmissionSettings(
             float red,
             float green,
