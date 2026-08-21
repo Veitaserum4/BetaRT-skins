@@ -80,6 +80,33 @@ final class McrtxMaterialSettingsUi implements McrtxSettingsCategoryUi {
             applyWater();
             return UPDATE_REBUILD;
         }
+        if (id == GLASS_THIN_WALL_BUTTON_ID) {
+            McrtxMaterialSettings.setGlassThinWalledEnabled(!McrtxMaterialSettings.isGlassThinWalledEnabled());
+            applyGlass();
+            return UPDATE_REBUILD;
+        }
+        if (id == GLASS_DIFFUSE_LAYER_BUTTON_ID) {
+            McrtxMaterialSettings.setGlassDiffuseLayerEnabled(!McrtxMaterialSettings.isGlassDiffuseLayerEnabled());
+            applyGlass();
+            return UPDATE_REBUILD;
+        }
+        if (id == GLASS_TRANSMITTANCE_COLOR_RESET_BUTTON_ID) {
+            McrtxMaterialSettings.setGlassTransmittanceRedHundredths(McrtxMaterialSettings.DEFAULT_GLASS_TRANSMITTANCE_RED_HUNDREDTHS);
+            McrtxMaterialSettings.setGlassTransmittanceGreenHundredths(McrtxMaterialSettings.DEFAULT_GLASS_TRANSMITTANCE_GREEN_HUNDREDTHS);
+            McrtxMaterialSettings.setGlassTransmittanceBlueHundredths(McrtxMaterialSettings.DEFAULT_GLASS_TRANSMITTANCE_BLUE_HUNDREDTHS);
+            applyGlass();
+            return UPDATE_REBUILD;
+        }
+        if (id == GLASS_PROPERTIES_RESET_BUTTON_ID) {
+            McrtxMaterialSettings.setGlassTransmittanceDistanceHundredths(McrtxMaterialSettings.DEFAULT_GLASS_TRANSMITTANCE_DISTANCE_HUNDREDTHS);
+            McrtxMaterialSettings.setGlassRefractiveIndexThousandths(McrtxMaterialSettings.DEFAULT_GLASS_REFRACTIVE_INDEX_THOUSANDTHS);
+            McrtxMaterialSettings.setGlassDiffuseLayerEnabled(McrtxMaterialSettings.DEFAULT_GLASS_DIFFUSE_LAYER_ENABLED);
+            McrtxMaterialSettings.setGlassDiffuseLayerScaleHundredths(McrtxMaterialSettings.DEFAULT_GLASS_DIFFUSE_LAYER_SCALE_HUNDREDTHS);
+            McrtxMaterialSettings.setGlassThinWalledEnabled(McrtxMaterialSettings.DEFAULT_GLASS_THIN_WALLED_ENABLED);
+            McrtxMaterialSettings.setGlassMaterialThicknessThousandths(McrtxMaterialSettings.DEFAULT_GLASS_MATERIAL_THICKNESS_THOUSANDTHS);
+            applyGlass();
+            return UPDATE_REBUILD;
+        }
         if (id == RESET_DEFAULTS_BUTTON_ID) {
             resetDefaults();
             return UPDATE_REBUILD;
@@ -91,6 +118,8 @@ final class McrtxMaterialSettingsUi implements McrtxSettingsCategoryUi {
         setLabel(screen, SUBSURFACE_DIFFUSION_PROFILE_BUTTON_ID, getDiffusionLabel());
         setLabel(screen, WATER_THIN_WALL_BUTTON_ID, getWaterModeLabel());
         setLabel(screen, WATER_DIFFUSE_LAYER_BUTTON_ID, getWaterDiffuseLabel());
+        setLabel(screen, GLASS_THIN_WALL_BUTTON_ID, getGlassModeLabel());
+        setLabel(screen, GLASS_DIFFUSE_LAYER_BUTTON_ID, getGlassDiffuseLabel());
     }
 
     public void applySavedSettings() {
@@ -101,6 +130,7 @@ final class McrtxMaterialSettingsUi implements McrtxSettingsCategoryUi {
         McrtxMaterialSettingsNative.setSubsurfaceVolumetricAnisotropy(McrtxMaterialSettings.getSubsurfaceVolumetricAnisotropy());
         McrtxMaterialSettingsNative.setSubsurfaceDiffusionProfileEnabled(McrtxMaterialSettings.isSubsurfaceDiffusionProfileEnabled());
         applyWater();
+        applyGlass();
     }
 
     private static void addSlider(McrtxQuickSettingsScreen screen, int id, int mode) {
@@ -127,8 +157,17 @@ final class McrtxMaterialSettingsUi implements McrtxSettingsCategoryUi {
         else if (mode == Slider.WATER_DISTANCE) McrtxMaterialSettings.setWaterTransmittanceDistanceHundredths(value);
         else if (mode == Slider.WATER_IOR) McrtxMaterialSettings.setWaterRefractiveIndexThousandths(value);
         else if (mode == Slider.WATER_DIFFUSE_SCALE) McrtxMaterialSettings.setWaterDiffuseLayerScaleHundredths(value);
-        else McrtxMaterialSettings.setWaterMaterialThicknessThousandths(value);
-        if (mode >= Slider.WATER_RED) applyWater();
+        else if (mode == Slider.WATER_THICKNESS) McrtxMaterialSettings.setWaterMaterialThicknessThousandths(value);
+        else if (mode == Slider.GLASS_RED) McrtxMaterialSettings.setGlassTransmittanceRedHundredths(value);
+        else if (mode == Slider.GLASS_GREEN) McrtxMaterialSettings.setGlassTransmittanceGreenHundredths(value);
+        else if (mode == Slider.GLASS_BLUE) McrtxMaterialSettings.setGlassTransmittanceBlueHundredths(value);
+        else if (mode == Slider.GLASS_DISTANCE) McrtxMaterialSettings.setGlassTransmittanceDistanceHundredths(value);
+        else if (mode == Slider.GLASS_IOR) McrtxMaterialSettings.setGlassRefractiveIndexThousandths(value);
+        else if (mode == Slider.GLASS_DIFFUSE_SCALE) McrtxMaterialSettings.setGlassDiffuseLayerScaleHundredths(value);
+        else if (mode == Slider.GLASS_THICKNESS) McrtxMaterialSettings.setGlassMaterialThicknessThousandths(value);
+
+        if (mode >= Slider.WATER_RED && mode <= Slider.WATER_THICKNESS) applyWater();
+        if (mode >= Slider.GLASS_RED && mode <= Slider.GLASS_THICKNESS) applyGlass();
     }
 
     private static void setSubsurfaceDiffusionEnabled(boolean enabled) {
@@ -177,7 +216,17 @@ final class McrtxMaterialSettingsUi implements McrtxSettingsCategoryUi {
         McrtxMaterialSettings.setWaterDiffuseLayerScaleHundredths(McrtxMaterialSettings.DEFAULT_WATER_DIFFUSE_LAYER_SCALE_HUNDREDTHS);
         McrtxMaterialSettings.setWaterThinWalledEnabled(McrtxMaterialSettings.DEFAULT_WATER_THIN_WALLED_ENABLED);
         McrtxMaterialSettings.setWaterMaterialThicknessThousandths(McrtxMaterialSettings.DEFAULT_WATER_MATERIAL_THICKNESS_THOUSANDTHS);
+        McrtxMaterialSettings.setGlassTransmittanceRedHundredths(McrtxMaterialSettings.DEFAULT_GLASS_TRANSMITTANCE_RED_HUNDREDTHS);
+        McrtxMaterialSettings.setGlassTransmittanceGreenHundredths(McrtxMaterialSettings.DEFAULT_GLASS_TRANSMITTANCE_GREEN_HUNDREDTHS);
+        McrtxMaterialSettings.setGlassTransmittanceBlueHundredths(McrtxMaterialSettings.DEFAULT_GLASS_TRANSMITTANCE_BLUE_HUNDREDTHS);
+        McrtxMaterialSettings.setGlassTransmittanceDistanceHundredths(McrtxMaterialSettings.DEFAULT_GLASS_TRANSMITTANCE_DISTANCE_HUNDREDTHS);
+        McrtxMaterialSettings.setGlassRefractiveIndexThousandths(McrtxMaterialSettings.DEFAULT_GLASS_REFRACTIVE_INDEX_THOUSANDTHS);
+        McrtxMaterialSettings.setGlassDiffuseLayerEnabled(McrtxMaterialSettings.DEFAULT_GLASS_DIFFUSE_LAYER_ENABLED);
+        McrtxMaterialSettings.setGlassDiffuseLayerScaleHundredths(McrtxMaterialSettings.DEFAULT_GLASS_DIFFUSE_LAYER_SCALE_HUNDREDTHS);
+        McrtxMaterialSettings.setGlassThinWalledEnabled(McrtxMaterialSettings.DEFAULT_GLASS_THIN_WALLED_ENABLED);
+        McrtxMaterialSettings.setGlassMaterialThicknessThousandths(McrtxMaterialSettings.DEFAULT_GLASS_MATERIAL_THICKNESS_THOUSANDTHS);
         applyWater();
+        applyGlass();
     }
 
     private static String formatHundredths(int value) { int absolute = Math.abs(value); String result = Integer.toString(absolute / 100) + "." + (absolute % 100 < 10 ? "0" : "") + Integer.toString(absolute % 100); return value < 0 ? "-" + result : result; }
@@ -222,7 +271,12 @@ final class McrtxMaterialSettingsUi implements McrtxSettingsCategoryUi {
             else if (mode == WATER_IOR) { minimum = McrtxMaterialSettings.MIN_WATER_REFRACTIVE_INDEX_THOUSANDTHS; maximum = McrtxMaterialSettings.MAX_WATER_REFRACTIVE_INDEX_THOUSANDTHS; }
             else if (mode == WATER_THICKNESS) { minimum = McrtxMaterialSettings.MIN_WATER_MATERIAL_THICKNESS_THOUSANDTHS; maximum = McrtxMaterialSettings.MAX_WATER_MATERIAL_THICKNESS_THOUSANDTHS; }
             else if (mode == WATER_DIFFUSE_SCALE) { minimum = McrtxMaterialSettings.MIN_WATER_DIFFUSE_LAYER_SCALE_HUNDREDTHS; maximum = McrtxMaterialSettings.MAX_WATER_DIFFUSE_LAYER_SCALE_HUNDREDTHS; }
-            else { minimum = McrtxMaterialSettings.MIN_WATER_TRANSMITTANCE_COLOR_HUNDREDTHS; maximum = McrtxMaterialSettings.MAX_WATER_TRANSMITTANCE_COLOR_HUNDREDTHS; }
+            else if (mode >= WATER_RED && mode <= WATER_BLUE) { minimum = McrtxMaterialSettings.MIN_WATER_TRANSMITTANCE_COLOR_HUNDREDTHS; maximum = McrtxMaterialSettings.MAX_WATER_TRANSMITTANCE_COLOR_HUNDREDTHS; }
+            else if (mode == GLASS_DISTANCE) { minimum = McrtxMaterialSettings.MIN_GLASS_TRANSMITTANCE_DISTANCE_HUNDREDTHS; maximum = McrtxMaterialSettings.MAX_GLASS_TRANSMITTANCE_DISTANCE_HUNDREDTHS; }
+            else if (mode == GLASS_IOR) { minimum = McrtxMaterialSettings.MIN_GLASS_REFRACTIVE_INDEX_THOUSANDTHS; maximum = McrtxMaterialSettings.MAX_GLASS_REFRACTIVE_INDEX_THOUSANDTHS; }
+            else if (mode == GLASS_THICKNESS) { minimum = McrtxMaterialSettings.MIN_GLASS_MATERIAL_THICKNESS_THOUSANDTHS; maximum = McrtxMaterialSettings.MAX_GLASS_MATERIAL_THICKNESS_THOUSANDTHS; }
+            else if (mode == GLASS_DIFFUSE_SCALE) { minimum = McrtxMaterialSettings.MIN_GLASS_DIFFUSE_LAYER_SCALE_HUNDREDTHS; maximum = McrtxMaterialSettings.MAX_GLASS_DIFFUSE_LAYER_SCALE_HUNDREDTHS; }
+            else { minimum = McrtxMaterialSettings.MIN_GLASS_TRANSMITTANCE_COLOR_HUNDREDTHS; maximum = McrtxMaterialSettings.MAX_GLASS_TRANSMITTANCE_COLOR_HUNDREDTHS; }
             sync();
         }
 
@@ -243,7 +297,14 @@ final class McrtxMaterialSettingsUi implements McrtxSettingsCategoryUi {
             if (mode == WATER_DISTANCE) return McrtxMaterialSettings.getWaterTransmittanceDistanceHundredths();
             if (mode == WATER_IOR) return McrtxMaterialSettings.getWaterRefractiveIndexThousandths();
             if (mode == WATER_DIFFUSE_SCALE) return McrtxMaterialSettings.getWaterDiffuseLayerScaleHundredths();
-            return McrtxMaterialSettings.getWaterMaterialThicknessThousandths();
+            if (mode == WATER_THICKNESS) return McrtxMaterialSettings.getWaterMaterialThicknessThousandths();
+            if (mode == GLASS_RED) return McrtxMaterialSettings.getGlassTransmittanceRedHundredths();
+            if (mode == GLASS_GREEN) return McrtxMaterialSettings.getGlassTransmittanceGreenHundredths();
+            if (mode == GLASS_BLUE) return McrtxMaterialSettings.getGlassTransmittanceBlueHundredths();
+            if (mode == GLASS_DISTANCE) return McrtxMaterialSettings.getGlassTransmittanceDistanceHundredths();
+            if (mode == GLASS_IOR) return McrtxMaterialSettings.getGlassRefractiveIndexThousandths();
+            if (mode == GLASS_DIFFUSE_SCALE) return McrtxMaterialSettings.getGlassDiffuseLayerScaleHundredths();
+            return McrtxMaterialSettings.getGlassMaterialThicknessThousandths();
         }
         private void sync() { int value = value(); position = (float) (value - minimum) / (float) (maximum - minimum); label(value); }
         private void update(int mouseX) { float next = (float) (mouseX - (this.c + 4)) / (float) (this.a - 8); if (next < 0) next = 0; if (next > 1) next = 1; int value = minimum + Math.round(next * (float) (maximum - minimum)); position = (float) (value - minimum) / (float) (maximum - minimum); setValue(mode, value); label(value); }
@@ -259,7 +320,14 @@ final class McrtxMaterialSettingsUi implements McrtxSettingsCategoryUi {
             else if (mode == WATER_DISTANCE) this.e = "Water Distance: " + formatHundredths(value);
             else if (mode == WATER_IOR) this.e = "Water IOR: " + formatThousandths(value);
             else if (mode == WATER_DIFFUSE_SCALE) this.e = "Water Diffuse Scale: " + formatHundredths(value) + "x";
-            else this.e = "Water Thickness: " + formatThousandths(value);
+            else if (mode == WATER_THICKNESS) this.e = "Water Thickness: " + formatThousandths(value);
+            else if (mode == GLASS_RED) this.e = "Glass Red: " + formatHundredths(value);
+            else if (mode == GLASS_GREEN) this.e = "Glass Green: " + formatHundredths(value);
+            else if (mode == GLASS_BLUE) this.e = "Glass Blue: " + formatHundredths(value);
+            else if (mode == GLASS_DISTANCE) this.e = "Glass Distance: " + formatHundredths(value);
+            else if (mode == GLASS_IOR) this.e = "Glass IOR: " + formatThousandths(value);
+            else if (mode == GLASS_DIFFUSE_SCALE) this.e = "Glass Diffuse Scale: " + formatHundredths(value) + "x";
+            else this.e = "Glass Thickness: " + formatThousandths(value);
         }
     }
 }
