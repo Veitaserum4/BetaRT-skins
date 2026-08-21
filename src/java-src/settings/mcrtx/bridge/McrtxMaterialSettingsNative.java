@@ -33,29 +33,6 @@ public final class McrtxMaterialSettingsNative {
                     thinWalledEnabled,
                     thickness);
         }
-
-public static void setGlassTransmissionSettings(
-            float red,
-            float green,
-            float blue,
-            float measurementDistance,
-            float refractiveIndex,
-            boolean diffuseLayerEnabled,
-            float diffuseLayerScale,
-            boolean thinWalledEnabled,
-            float thickness) {
-        if (ready()) {
-            nSetGlassTransmissionSettings(
-                    red,
-                    green,
-                    blue,
-                    measurementDistance,
-                    refractiveIndex,
-                    diffuseLayerEnabled,
-                    diffuseLayerScale,
-                    thinWalledEnabled,
-                    thickness);
-        }
     }
 
     private static boolean ready() {
@@ -69,16 +46,6 @@ public static void setGlassTransmissionSettings(
     private static native void nSetSubsurfaceVolumetricAnisotropy(float anisotropy);
     private static native void nSetSubsurfaceDiffusionProfileEnabled(boolean enabled);
     private static native void nSetWaterTransmissionSettings(
-            float red,
-            float green,
-            float blue,
-            float measurementDistance,
-            float refractiveIndex,
-            boolean diffuseLayerEnabled,
-            float diffuseLayerScale,
-            boolean thinWalledEnabled,
-            float thickness);
-    private static native void nSetGlassTransmissionSettings(
             float red,
             float green,
             float blue,

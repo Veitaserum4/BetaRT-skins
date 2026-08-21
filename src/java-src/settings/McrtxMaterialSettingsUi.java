@@ -159,14 +159,6 @@ final class McrtxMaterialSettingsUi implements McrtxSettingsCategoryUi {
         static final int WATER_THICKNESS = 10;
         static final int WATER_DIFFUSE_SCALE = 11;
 
-        static final int GLASS_RED = 12;
-        static final int GLASS_GREEN = 13;
-        static final int GLASS_BLUE = 14;
-        static final int GLASS_DISTANCE = 15;
-        static final int GLASS_IOR = 16;
-        static final int GLASS_THICKNESS = 17;
-        static final int GLASS_DIFFUSE_SCALE = 18;
-
         private final int mode;
         private final int minimum;
         private final int maximum;
@@ -185,8 +177,7 @@ final class McrtxMaterialSettingsUi implements McrtxSettingsCategoryUi {
             else if (mode == WATER_IOR) { minimum = McrtxMaterialSettings.MIN_WATER_REFRACTIVE_INDEX_THOUSANDTHS; maximum = McrtxMaterialSettings.MAX_WATER_REFRACTIVE_INDEX_THOUSANDTHS; }
             else if (mode == WATER_THICKNESS) { minimum = McrtxMaterialSettings.MIN_WATER_MATERIAL_THICKNESS_THOUSANDTHS; maximum = McrtxMaterialSettings.MAX_WATER_MATERIAL_THICKNESS_THOUSANDTHS; }
             else if (mode == WATER_DIFFUSE_SCALE) { minimum = McrtxMaterialSettings.MIN_WATER_DIFFUSE_LAYER_SCALE_HUNDREDTHS; maximum = McrtxMaterialSettings.MAX_WATER_DIFFUSE_LAYER_SCALE_HUNDREDTHS; }
-            else if (mode >= GLASS_RED && mode <= GLASS_DIFFUSE_SCALE) { minimum = McrtxMaterialSettings.MIN_GLASS_TRANSMITTANCE_COLOR_HUNDREDTHS; maximum = McrtxMaterialSettings.MAX_GLASS_TRANSMITTANCE_COLOR_HUNDREDTHS; }
-else { minimum = McrtxMaterialSettings.MIN_WATER_TRANSMITTANCE_COLOR_HUNDREDTHS; maximum = McrtxMaterialSettings.MAX_WATER_TRANSMITTANCE_COLOR_HUNDREDTHS; }
+            else { minimum = McrtxMaterialSettings.MIN_WATER_TRANSMITTANCE_COLOR_HUNDREDTHS; maximum = McrtxMaterialSettings.MAX_WATER_TRANSMITTANCE_COLOR_HUNDREDTHS; }
             sync();
         }
 
