@@ -1,6 +1,7 @@
 // Particle capture, material grouping, geometry, and mesh lifecycle.
 
 #include "mcrtx/core/remix_renderer.hpp"
+#include <fstream>
 #include "mcrtx/core/remix_geometry_common.hpp"
 #include "mcrtx/core/remix_render_common.hpp"
 #include "mcrtx/lifecycle/perf_log.hpp"
@@ -222,6 +223,9 @@ bool RemixRenderer::rebuildParticleMesh(const WorldRenderOrigin& renderOrigin) {
 }
 
 }  // namespace mcrtx
+
+
+
 
 
 
