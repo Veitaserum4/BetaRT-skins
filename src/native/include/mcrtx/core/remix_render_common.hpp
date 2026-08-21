@@ -17,7 +17,8 @@ namespace detail {
 
 // ---- Shared constants -----------------------------------------------------
 
-constexpr std::size_t kTerrainMaterialClassCount = 8;
+constexpr std::size_t kTerrainMaterialClassCount = 9;
+constexpr std::uint8_t kGlassTerrainMaterialClass = 8;
 constexpr std::uint8_t kOpaqueTerrainMaterialClass = 0;
 constexpr std::uint8_t kCutoutTerrainMaterialClass = 1;
 constexpr std::uint8_t kWaterTerrainMaterialClass = 2;
@@ -150,6 +151,7 @@ constexpr std::uint64_t kPoweredRedstoneTerrainMaterialHash = 0x4D43525458524453
 constexpr std::uint64_t kPortalTerrainMaterialHash = 0x4D43525458505254ull;
 constexpr std::uint64_t kIceTerrainMaterialHash = 0x4D43525458494345ull;
 constexpr std::uint64_t kUnlitRedstoneOreTerrainMaterialHash = 0x4D4352545855524Full;
+constexpr std::uint64_t kGlassTerrainMaterialHash = 0x4D43525458474C53ull;
 constexpr std::uint64_t kDestroyOverlayMaterialHash = 0x4D43525458444F4Dull;
 constexpr std::uint64_t kBlockOutlineGlowMaterialHash = 0x4D4352545842474Cull;
 constexpr std::uint64_t kBlockOutlineRgbMaterialHashSeed = 0x4D43525458425200ull;

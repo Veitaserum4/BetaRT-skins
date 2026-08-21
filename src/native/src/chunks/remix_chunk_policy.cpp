@@ -257,6 +257,10 @@ bool usesCutoutMaterialForBlock(int blockId, int renderType) {
 }
 
 std::uint8_t materialClassForBlock(int blockId, int blockMetadata, int renderType) {
+
+    if (blockId == 20) {
+      return kGlassTerrainMaterialClass;
+    }
   if (isWaterBlock(blockId)) {
     return kWaterTerrainMaterialClass;
   }

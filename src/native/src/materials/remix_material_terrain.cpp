@@ -70,17 +70,18 @@ bool RemixRenderer::initializeTerrainMaterials() {
     remixapi_MaterialInfoOpaqueSubsurfaceEXT subsurfaceInfo {};
     remixapi_MaterialInfoTranslucentEXT translucentInfo {};
     void* pNext = nullptr;
+      if (isTranslucent) {
+        const bool isWaterMaterial = materialHash == kWaterTerrainMaterialHash;
+        const bool isGlassMaterial = materialHash == kGlassTerrainMaterialHash;
+        const bool useThinWalledTranslucency = (isWaterMaterial && waterThinWalledEnabled_) || (isGlassMaterial && glassThinWalledEnabled_);
+        translucentInfo.sType = REMIXAPI_STRUCT_TYPE_MATERIAL_INFO_TRANSLUCENT_EXT;
+        translucentInfo.refractiveIndex = refractiveIndex;
+        translucentInfo.transmittanceColor = transmittanceColor;
+        translucentInfo.transmittanceMeasurementDistance = transmittanceMeasurementDistance;
+        translucentInfo.thinWallThickness_hasvalue = useThinWalledTranslucency ? TRUE : FALSE;
+        translucentInfo.thinWallThickness_value = isWaterMaterial ? waterMaterialThickness_ : (isGlassMaterial ? glassMaterialThickness_ : kWaterThinWallThickness);
+        translucentInfo.useDiffuseLayer = isWaterMaterial ? waterDiffuseLayerEnabled_ : (isGlassMaterial ? glassDiffuseLayerEnabled_ : TRUE);
 
-    if (isTranslucent) {
-      const bool isWaterMaterial = materialHash == kWaterTerrainMaterialHash;
-      const bool useThinWalledTranslucency = isWaterMaterial && waterThinWalledEnabled_;
-      translucentInfo.sType = REMIXAPI_STRUCT_TYPE_MATERIAL_INFO_TRANSLUCENT_EXT;
-      translucentInfo.refractiveIndex = refractiveIndex;
-      translucentInfo.transmittanceColor = transmittanceColor;
-      translucentInfo.transmittanceMeasurementDistance = transmittanceMeasurementDistance;
-      translucentInfo.thinWallThickness_hasvalue = useThinWalledTranslucency ? TRUE : FALSE;
-      translucentInfo.thinWallThickness_value = useThinWalledTranslucency ? waterMaterialThickness_ : kWaterThinWallThickness;
-      translucentInfo.useDiffuseLayer = isWaterMaterial ? waterDiffuseLayerEnabled_ : TRUE;
       translucentInfo.transmittanceTexture = texturePath.c_str();
       pNext = &translucentInfo;
     } else {
@@ -407,6 +408,13 @@ bool RemixRenderer::initializeTerrainMaterials() {
   } else {
     log("Initialized ice material from " + terrainAtlasPath_.string());
   }
+  if (!glassCreated) {
+    log("Glass terrain material unavailable; glass will fall back to cutout terrain");
+    terrainMaterialHandles_[kGlassTerrainMaterialClass] = terrainMaterialHandles_[kCutoutTerrainMaterialClass];
+  } else {
+    log("Initialized glass material from " + terrainAtlasPath_.string());
+  }
+
   if (portalTexturePath_.empty()) {
     log("Portal texture asset not found; portals will fall back to cutout terrain");
     terrainMaterialHandles_[kPortalTerrainMaterialClass] = terrainMaterialHandles_[kCutoutTerrainMaterialClass];
