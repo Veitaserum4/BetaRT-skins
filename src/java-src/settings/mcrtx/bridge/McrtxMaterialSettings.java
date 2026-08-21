@@ -18,15 +18,6 @@ public final class McrtxMaterialSettings {
     public static final String WATER_REFRACTIVE_INDEX_KEY = "MCRTX_WATER_REFRACTIVE_INDEX";
     public static final String WATER_DIFFUSE_LAYER_ENABLED_KEY = "MCRTX_WATER_USE_DIFFUSE_LAYER";
     public static final String WATER_DIFFUSE_LAYER_SCALE_KEY = "MCRTX_WATER_DIFFUSE_LAYER_SCALE";
-    public static final String GLASS_THIN_WALLED_ENABLED_KEY = "MCRTX_GLASS_THIN_WALLED_ENABLED";
-    public static final String GLASS_MATERIAL_THICKNESS_KEY = "MCRTX_GLASS_MATERIAL_THICKNESS";
-    public static final String GLASS_TRANSMITTANCE_RED_KEY = "MCRTX_GLASS_TRANSMITTANCE_COLOR_R";
-    public static final String GLASS_TRANSMITTANCE_GREEN_KEY = "MCRTX_GLASS_TRANSMITTANCE_COLOR_G";
-    public static final String GLASS_TRANSMITTANCE_BLUE_KEY = "MCRTX_GLASS_TRANSMITTANCE_COLOR_B";
-    public static final String GLASS_TRANSMITTANCE_DISTANCE_KEY = "MCRTX_GLASS_TRANSMITTANCE_MEASUREMENT_DISTANCE";
-    public static final String GLASS_REFRACTIVE_INDEX_KEY = "MCRTX_GLASS_REFRACTIVE_INDEX";
-    public static final String GLASS_DIFFUSE_LAYER_ENABLED_KEY = "MCRTX_GLASS_USE_DIFFUSE_LAYER";
-    public static final String GLASS_DIFFUSE_LAYER_SCALE_KEY = "MCRTX_GLASS_DIFFUSE_LAYER_SCALE";
     private static final String WATER_MATERIAL_THICKNESS_MIGRATION_KEY = "MCRTX_WATER_MATERIAL_THICKNESS_MIGRATED";
 
     public static final int MIN_DISPLACEMENT_FACTOR_HUNDREDTHS = 0;
@@ -48,8 +39,6 @@ public final class McrtxMaterialSettings {
     public static final boolean DEFAULT_WATER_THIN_WALLED_ENABLED = true;
     public static final int MIN_WATER_MATERIAL_THICKNESS_THOUSANDTHS = 1;
     public static final int MAX_WATER_MATERIAL_THICKNESS_THOUSANDTHS = 5000;
-    public static final int MIN_GLASS_MATERIAL_THICKNESS_THOUSANDTHS = 1;
-    public static final int MAX_GLASS_MATERIAL_THICKNESS_THOUSANDTHS = 5000;
     public static final int DEFAULT_WATER_MATERIAL_THICKNESS_THOUSANDTHS = 1000;
     public static final int MIN_WATER_TRANSMITTANCE_COLOR_HUNDREDTHS = 1;
     public static final int MAX_WATER_TRANSMITTANCE_COLOR_HUNDREDTHS = 100;
@@ -66,67 +55,6 @@ public final class McrtxMaterialSettings {
     public static final int MIN_WATER_DIFFUSE_LAYER_SCALE_HUNDREDTHS = 0;
     public static final int MAX_WATER_DIFFUSE_LAYER_SCALE_HUNDREDTHS = 100;
     public static final int DEFAULT_WATER_DIFFUSE_LAYER_SCALE_HUNDREDTHS = 100;
-    public static final String DISPLACEMENT_FACTOR_KEY = "MCRTX_DISPLACEMENT_FACTOR";
-    public static final String SUBSURFACE_MEASUREMENT_DISTANCE_KEY = "MCRTX_SUBSURFACE_MEASUREMENT_DISTANCE";
-    public static final String SUBSURFACE_RADIUS_SCALE_KEY = "MCRTX_SUBSURFACE_RADIUS_SCALE";
-    public static final String SUBSURFACE_MAX_SAMPLE_RADIUS_KEY = "MCRTX_SUBSURFACE_MAX_SAMPLE_RADIUS";
-    public static final String SUBSURFACE_VOLUMETRIC_ANISOTROPY_KEY = "MCRTX_SUBSURFACE_VOLUMETRIC_ANISOTROPY";
-    public static final String SUBSURFACE_DIFFUSION_PROFILE_ENABLED_KEY = "MCRTX_SUBSURFACE_DIFFUSION_PROFILE_ENABLED";
-    public static final String GLASS_THIN_WALLED_ENABLED_KEY = "MCRTX_GLASS_THIN_WALLED_ENABLED";
-    public static final String GLASS_MATERIAL_THICKNESS_KEY = "MCRTX_GLASS_MATERIAL_THICKNESS";
-    public static final String GLASS_TRANSMITTANCE_RED_KEY = "MCRTX_GLASS_TRANSMITTANCE_COLOR_R";
-    public static final String GLASS_TRANSMITTANCE_GREEN_KEY = "MCRTX_GLASS_TRANSMITTANCE_COLOR_G";
-    public static final String GLASS_TRANSMITTANCE_BLUE_KEY = "MCRTX_GLASS_TRANSMITTANCE_COLOR_B";
-    public static final String GLASS_TRANSMITTANCE_DISTANCE_KEY = "MCRTX_GLASS_TRANSMITTANCE_MEASUREMENT_DISTANCE";
-    public static final String GLASS_REFRACTIVE_INDEX_KEY = "MCRTX_GLASS_REFRACTIVE_INDEX";
-    public static final String GLASS_DIFFUSE_LAYER_ENABLED_KEY = "MCRTX_GLASS_USE_DIFFUSE_LAYER";
-    public static final String GLASS_DIFFUSE_LAYER_SCALE_KEY = "MCRTX_GLASS_DIFFUSE_LAYER_SCALE";
-    public static final String GLASS_THIN_WALLED_ENABLED_KEY = "MCRTX_GLASS_THIN_WALLED_ENABLED";
-    public static final String GLASS_MATERIAL_THICKNESS_KEY = "MCRTX_GLASS_MATERIAL_THICKNESS";
-    public static final String GLASS_TRANSMITTANCE_RED_KEY = "MCRTX_GLASS_TRANSMITTANCE_COLOR_R";
-    public static final String GLASS_TRANSMITTANCE_GREEN_KEY = "MCRTX_GLASS_TRANSMITTANCE_COLOR_G";
-    public static final String GLASS_TRANSMITTANCE_BLUE_KEY = "MCRTX_GLASS_TRANSMITTANCE_COLOR_B";
-    public static final String GLASS_TRANSMITTANCE_DISTANCE_KEY = "MCRTX_GLASS_TRANSMITTANCE_MEASUREMENT_DISTANCE";
-    public static final String GLASS_REFRACTIVE_INDEX_KEY = "MCRTX_GLASS_REFRACTIVE_INDEX";
-    public static final String GLASS_DIFFUSE_LAYER_ENABLED_KEY = "MCRTX_GLASS_USE_DIFFUSE_LAYER";
-    public static final String GLASS_DIFFUSE_LAYER_SCALE_KEY = "MCRTX_GLASS_DIFFUSE_LAYER_SCALE";
-    private static final String GLASS_MATERIAL_THICKNESS_MIGRATION_KEY = "MCRTX_GLASS_MATERIAL_THICKNESS_MIGRATED";
-
-    public static final int MIN_DISPLACEMENT_FACTOR_HUNDREDTHS = 0;
-    public static final int MAX_DISPLACEMENT_FACTOR_HUNDREDTHS = 400;
-    public static final int DEFAULT_DISPLACEMENT_FACTOR_HUNDREDTHS = 100;
-    public static final int MIN_SUBSURFACE_MEASUREMENT_DISTANCE_HUNDREDTHS = 0;
-    public static final int MAX_SUBSURFACE_MEASUREMENT_DISTANCE_HUNDREDTHS = 2500;
-    public static final int DEFAULT_SUBSURFACE_MEASUREMENT_DISTANCE_HUNDREDTHS = 100;
-    public static final int MIN_SUBSURFACE_RADIUS_SCALE_HUNDREDTHS = 0;
-    public static final int MAX_SUBSURFACE_RADIUS_SCALE_HUNDREDTHS = 2500;
-    public static final int DEFAULT_SUBSURFACE_RADIUS_SCALE_HUNDREDTHS = 100;
-    public static final int MIN_SUBSURFACE_MAX_SAMPLE_RADIUS_HUNDREDTHS = 0;
-    public static final int MAX_SUBSURFACE_MAX_SAMPLE_RADIUS_HUNDREDTHS = 25600;
-    public static final int DEFAULT_SUBSURFACE_MAX_SAMPLE_RADIUS_HUNDREDTHS = 1600;
-    public static final int MIN_SUBSURFACE_VOLUMETRIC_ANISOTROPY_HUNDREDTHS = -100;
-    public static final int MAX_SUBSURFACE_VOLUMETRIC_ANISOTROPY_HUNDREDTHS = 99;
-    public static final int DEFAULT_SUBSURFACE_VOLUMETRIC_ANISOTROPY_HUNDREDTHS = 0;
-    public static final boolean DEFAULT_SUBSURFACE_DIFFUSION_PROFILE_ENABLED = true;
-    public static final boolean DEFAULT_GLASS_THIN_WALLED_ENABLED = true;
-    public static final int MIN_GLASS_MATERIAL_THICKNESS_THOUSANDTHS = 1;
-    public static final int MAX_GLASS_MATERIAL_THICKNESS_THOUSANDTHS = 5000;
-    public static final int DEFAULT_GLASS_MATERIAL_THICKNESS_THOUSANDTHS = 1000;
-    public static final int MIN_GLASS_TRANSMITTANCE_COLOR_HUNDREDTHS = 1;
-    public static final int MAX_GLASS_TRANSMITTANCE_COLOR_HUNDREDTHS = 100;
-    public static final int DEFAULT_GLASS_TRANSMITTANCE_RED_HUNDREDTHS = 74;
-    public static final int DEFAULT_GLASS_TRANSMITTANCE_GREEN_HUNDREDTHS = 90;
-    public static final int DEFAULT_GLASS_TRANSMITTANCE_BLUE_HUNDREDTHS = 100;
-    public static final int MIN_GLASS_TRANSMITTANCE_DISTANCE_HUNDREDTHS = 1;
-    public static final int MAX_GLASS_TRANSMITTANCE_DISTANCE_HUNDREDTHS = 2500;
-    public static final int DEFAULT_GLASS_TRANSMITTANCE_DISTANCE_HUNDREDTHS = 150;
-    public static final int MIN_GLASS_REFRACTIVE_INDEX_THOUSANDTHS = 1000;
-    public static final int MAX_GLASS_REFRACTIVE_INDEX_THOUSANDTHS = 3000;
-    public static final int DEFAULT_GLASS_REFRACTIVE_INDEX_THOUSANDTHS = 1333;
-    public static final boolean DEFAULT_GLASS_DIFFUSE_LAYER_ENABLED = true;
-    public static final int MIN_GLASS_DIFFUSE_LAYER_SCALE_HUNDREDTHS = 0;
-    public static final int MAX_GLASS_DIFFUSE_LAYER_SCALE_HUNDREDTHS = 100;
-    public static final int DEFAULT_GLASS_DIFFUSE_LAYER_SCALE_HUNDREDTHS = 100;
     private static final int LEGACY_DEFAULT_WATER_MATERIAL_THICKNESS_THOUSANDTHS = 1;
 
     private static int displacementFactorHundredths = DEFAULT_DISPLACEMENT_FACTOR_HUNDREDTHS;
@@ -145,16 +73,6 @@ public final class McrtxMaterialSettings {
     private static boolean waterDiffuseLayerEnabled = DEFAULT_WATER_DIFFUSE_LAYER_ENABLED;
     private static int waterDiffuseLayerScaleHundredths = DEFAULT_WATER_DIFFUSE_LAYER_SCALE_HUNDREDTHS;
 
-    private static boolean glassThinWalledEnabled = DEFAULT_GLASS_THIN_WALLED_ENABLED;
-    private static int glassMaterialThicknessThousandths = DEFAULT_GLASS_MATERIAL_THICKNESS_THOUSANDTHS;
-    private static int glassTransmittanceRedHundredths = DEFAULT_GLASS_TRANSMITTANCE_RED_HUNDREDTHS;
-    private static int glassTransmittanceGreenHundredths = DEFAULT_GLASS_TRANSMITTANCE_GREEN_HUNDREDTHS;
-    private static int glassTransmittanceBlueHundredths = DEFAULT_GLASS_TRANSMITTANCE_BLUE_HUNDREDTHS;
-    private static int glassTransmittanceDistanceHundredths = DEFAULT_GLASS_TRANSMITTANCE_DISTANCE_HUNDREDTHS;
-    private static int glassRefractiveIndexThousandths = DEFAULT_GLASS_REFRACTIVE_INDEX_THOUSANDTHS;
-    private static boolean glassDiffuseLayerEnabled = DEFAULT_GLASS_DIFFUSE_LAYER_ENABLED;
-    private static int glassDiffuseLayerScaleHundredths = DEFAULT_GLASS_DIFFUSE_LAYER_SCALE_HUNDREDTHS;
-
     private McrtxMaterialSettings() {
     }
 
@@ -169,7 +87,7 @@ public final class McrtxMaterialSettings {
     public static int getSubsurfaceVolumetricAnisotropyHundredths() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return subsurfaceVolumetricAnisotropyHundredths; } }
     public static float getSubsurfaceVolumetricAnisotropy() { return (float) getSubsurfaceVolumetricAnisotropyHundredths() / 100.0f; }
     public static boolean isSubsurfaceDiffusionProfileEnabled() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return subsurfaceDiffusionProfileEnabled; } }
-    public static boolean isWaterpublic static boolean isGlassThinWalledEnabled() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return waterThinWalledEnabled; } }
+    public static boolean isWaterThinWalledEnabled() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return waterThinWalledEnabled; } }
     public static int getWaterMaterialThicknessThousandths() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return waterMaterialThicknessThousandths; } }
     public static float getWaterMaterialThickness() { return (float) getWaterMaterialThicknessThousandths() / 1000.0f; }
     public static int getWaterTransmittanceRedHundredths() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return waterTransmittanceRedHundredths; } }
@@ -191,7 +109,7 @@ public final class McrtxMaterialSettings {
     public static void setSubsurfaceRadiusScaleHundredths(int value) { setHundredths(2, value); }
     public static void setSubsurfaceMaxSampleRadiusHundredths(int value) { setHundredths(3, value); }
     public static void setSubsurfaceVolumetricAnisotropyHundredths(int value) { setHundredths(4, value); }
-    public static void setWaterpublic static void setGlassTransmittanceRedHundredths(int value) { setHundredths(5, value); }
+    public static void setWaterTransmittanceRedHundredths(int value) { setHundredths(5, value); }
     public static void setWaterTransmittanceGreenHundredths(int value) { setHundredths(6, value); }
     public static void setWaterTransmittanceBlueHundredths(int value) { setHundredths(7, value); }
     public static void setWaterTransmittanceDistanceHundredths(int value) { setHundredths(8, value); }
@@ -244,115 +162,6 @@ public final class McrtxMaterialSettings {
         if (migrationNeeded) {
             waterMaterialThicknessThousandths = DEFAULT_WATER_MATERIAL_THICKNESS_THOUSANDTHS;
         }
-glassThinWalledEnabled = DEFAULT_GLASS_THIN_WALLED_ENABLED;
-    private static int glassMaterialThicknessThousandths = DEFAULT_GLASS_MATERIAL_THICKNESS_THOUSANDTHS;
-    private static int glassTransmittanceRedHundredths = DEFAULT_GLASS_TRANSMITTANCE_RED_HUNDREDTHS;
-    private static int glassTransmittanceGreenHundredths = DEFAULT_GLASS_TRANSMITTANCE_GREEN_HUNDREDTHS;
-    private static int glassTransmittanceBlueHundredths = DEFAULT_GLASS_TRANSMITTANCE_BLUE_HUNDREDTHS;
-    private static int glassTransmittanceDistanceHundredths = DEFAULT_GLASS_TRANSMITTANCE_DISTANCE_HUNDREDTHS;
-    private static int glassRefractiveIndexThousandths = DEFAULT_GLASS_REFRACTIVE_INDEX_THOUSANDTHS;
-    private static boolean glassDiffuseLayerEnabled = DEFAULT_GLASS_DIFFUSE_LAYER_ENABLED;
-    private static int glassDiffuseLayerScaleHundredths = DEFAULT_GLASS_DIFFUSE_LAYER_SCALE_HUNDREDTHS;
-
-    private static boolean glassThinWalledEnabled = DEFAULT_GLASS_THIN_WALLED_ENABLED;
-    private static int glassMaterialThicknessThousandths = DEFAULT_GLASS_MATERIAL_THICKNESS_THOUSANDTHS;
-    private static int glassTransmittanceRedHundredths = DEFAULT_GLASS_TRANSMITTANCE_RED_HUNDREDTHS;
-    private static int glassTransmittanceGreenHundredths = DEFAULT_GLASS_TRANSMITTANCE_GREEN_HUNDREDTHS;
-    private static int glassTransmittanceBlueHundredths = DEFAULT_GLASS_TRANSMITTANCE_BLUE_HUNDREDTHS;
-    private static int glassTransmittanceDistanceHundredths = DEFAULT_GLASS_TRANSMITTANCE_DISTANCE_HUNDREDTHS;
-    private static int glassRefractiveIndexThousandths = DEFAULT_GLASS_REFRACTIVE_INDEX_THOUSANDTHS;
-    private static boolean glassDiffuseLayerEnabled = DEFAULT_GLASS_DIFFUSE_LAYER_ENABLED;
-    private static int glassDiffuseLayerScaleHundredths = DEFAULT_GLASS_DIFFUSE_LAYER_SCALE_HUNDREDTHS;
-
-    private McrtxMaterialSettings() {
-    }
-
-    public static int getDisplacementFactorHundredths() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return displacementFactorHundredths; } }
-    public static float getDisplacementFactor() { return (float) getDisplacementFactorHundredths() / 100.0f; }
-    public static int getSubsurfaceMeasurementDistanceHundredths() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return subsurfaceMeasurementDistanceHundredths; } }
-    public static float getSubsurfaceMeasurementDistance() { return (float) getSubsurfaceMeasurementDistanceHundredths() / 100.0f; }
-    public static int getSubsurfaceRadiusScaleHundredths() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return subsurfaceRadiusScaleHundredths; } }
-    public static float getSubsurfaceRadiusScale() { return (float) getSubsurfaceRadiusScaleHundredths() / 100.0f; }
-    public static int getSubsurfaceMaxSampleRadiusHundredths() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return subsurfaceMaxSampleRadiusHundredths; } }
-    public static float getSubsurfaceMaxSampleRadius() { return (float) getSubsurfaceMaxSampleRadiusHundredths() / 100.0f; }
-    public static int getSubsurfaceVolumetricAnisotropyHundredths() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return subsurfaceVolumetricAnisotropyHundredths; } }
-    public static float getSubsurfaceVolumetricAnisotropy() { return (float) getSubsurfaceVolumetricAnisotropyHundredths() / 100.0f; }
-    public static boolean isSubsurfaceDiffusionProfileEnabled() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return subsurfaceDiffusionProfileEnabled; } }
-    public static boolean isGlasspublic static boolean isGlassThinWalledEnabled() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return glassThinWalledEnabled; } }
-    public static int getGlassMaterialThicknessThousandths() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return glassMaterialThicknessThousandths; } }
-    public static float getGlassMaterialThickness() { return (float) getGlassMaterialThicknessThousandths() / 1000.0f; }
-    public static int getGlassTransmittanceRedHundredths() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return glassTransmittanceRedHundredths; } }
-    public static float getGlassTransmittanceRed() { return (float) getGlassTransmittanceRedHundredths() / 100.0f; }
-    public static int getGlassTransmittanceGreenHundredths() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return glassTransmittanceGreenHundredths; } }
-    public static float getGlassTransmittanceGreen() { return (float) getGlassTransmittanceGreenHundredths() / 100.0f; }
-    public static int getGlassTransmittanceBlueHundredths() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return glassTransmittanceBlueHundredths; } }
-    public static float getGlassTransmittanceBlue() { return (float) getGlassTransmittanceBlueHundredths() / 100.0f; }
-    public static int getGlassTransmittanceDistanceHundredths() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return glassTransmittanceDistanceHundredths; } }
-    public static float getGlassTransmittanceDistance() { return (float) getGlassTransmittanceDistanceHundredths() / 100.0f; }
-    public static int getGlassRefractiveIndexThousandths() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return glassRefractiveIndexThousandths; } }
-    public static float getGlassRefractiveIndex() { return (float) getGlassRefractiveIndexThousandths() / 1000.0f; }
-    public static boolean isGlassDiffuseLayerEnabled() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return glassDiffuseLayerEnabled; } }
-    public static int getGlassDiffuseLayerScaleHundredths() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return glassDiffuseLayerScaleHundredths; } }
-    public static float getGlassDiffuseLayerScale() { return (float) getGlassDiffuseLayerScaleHundredths() / 100.0f; }
-
-    public static void setDisplacementFactorHundredths(int value) { setHundredths(0, value); }
-    public static void setSubsurfaceMeasurementDistanceHundredths(int value) { setHundredths(1, value); }
-    public static void setSubsurfaceRadiusScaleHundredths(int value) { setHundredths(2, value); }
-    public static void setSubsurfaceMaxSampleRadiusHundredths(int value) { setHundredths(3, value); }
-    public static void setSubsurfaceVolumetricAnisotropyHundredths(int value) { setHundredths(4, value); }
-    public static void setGlasspublic static void setGlassTransmittanceRedHundredths(int value) { setHundredths(5, value); }
-    public static void setGlassTransmittanceGreenHundredths(int value) { setHundredths(6, value); }
-    public static void setGlassTransmittanceBlueHundredths(int value) { setHundredths(7, value); }
-    public static void setGlassTransmittanceDistanceHundredths(int value) { setHundredths(8, value); }
-    public static void setGlassDiffuseLayerScaleHundredths(int value) { setHundredths(9, value); }
-
-    public static void setSubsurfaceDiffusionProfileEnabled(boolean enabled) { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); if (subsurfaceDiffusionProfileEnabled == enabled) return; subsurfaceDiffusionProfileEnabled = enabled; McrtxSettingsStore.saveLocked(); } }
-    public static void setGlassThinWalledEnabled(boolean enabled) { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); if (glassThinWalledEnabled == enabled) return; glassThinWalledEnabled = enabled; McrtxSettingsStore.saveLocked(); } }
-    public static void setGlassDiffuseLayerEnabled(boolean enabled) { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); if (glassDiffuseLayerEnabled == enabled) return; glassDiffuseLayerEnabled = enabled; McrtxSettingsStore.saveLocked(); } }
-
-    public static void setGlassMaterialThicknessThousandths(int value) {
-        synchronized (McrtxSettingsStore.LOCK) {
-            McrtxSettingsStore.ensureLoadedLocked();
-            int normalized = McrtxRuntimeSettingParser.clamp(value, MIN_GLASS_MATERIAL_THICKNESS_THOUSANDTHS, MAX_GLASS_MATERIAL_THICKNESS_THOUSANDTHS);
-            if (glassMaterialThicknessThousandths == normalized) return;
-            glassMaterialThicknessThousandths = normalized;
-            McrtxSettingsStore.saveLocked();
-        }
-    }
-
-    public static void setGlassRefractiveIndexThousandths(int value) {
-        synchronized (McrtxSettingsStore.LOCK) {
-            McrtxSettingsStore.ensureLoadedLocked();
-            int normalized = McrtxRuntimeSettingParser.clamp(value, MIN_GLASS_REFRACTIVE_INDEX_THOUSANDTHS, MAX_GLASS_REFRACTIVE_INDEX_THOUSANDTHS);
-            if (glassRefractiveIndexThousandths == normalized) return;
-            glassRefractiveIndexThousandths = normalized;
-            McrtxSettingsStore.saveLocked();
-        }
-    }
-
-    static boolean loadLocked(Map<String, String> values) {
-        displacementFactorHundredths = readDisplacementFactor(values);
-        subsurfaceMeasurementDistanceHundredths = readHundredths(values, SUBSURFACE_MEASUREMENT_DISTANCE_KEY, DEFAULT_SUBSURFACE_MEASUREMENT_DISTANCE_HUNDREDTHS, MIN_SUBSURFACE_MEASUREMENT_DISTANCE_HUNDREDTHS, MAX_SUBSURFACE_MEASUREMENT_DISTANCE_HUNDREDTHS);
-        subsurfaceRadiusScaleHundredths = readHundredths(values, SUBSURFACE_RADIUS_SCALE_KEY, DEFAULT_SUBSURFACE_RADIUS_SCALE_HUNDREDTHS, MIN_SUBSURFACE_RADIUS_SCALE_HUNDREDTHS, MAX_SUBSURFACE_RADIUS_SCALE_HUNDREDTHS);
-        subsurfaceMaxSampleRadiusHundredths = readHundredths(values, SUBSURFACE_MAX_SAMPLE_RADIUS_KEY, DEFAULT_SUBSURFACE_MAX_SAMPLE_RADIUS_HUNDREDTHS, MIN_SUBSURFACE_MAX_SAMPLE_RADIUS_HUNDREDTHS, MAX_SUBSURFACE_MAX_SAMPLE_RADIUS_HUNDREDTHS);
-        subsurfaceVolumetricAnisotropyHundredths = readHundredths(values, SUBSURFACE_VOLUMETRIC_ANISOTROPY_KEY, DEFAULT_SUBSURFACE_VOLUMETRIC_ANISOTROPY_HUNDREDTHS, MIN_SUBSURFACE_VOLUMETRIC_ANISOTROPY_HUNDREDTHS, MAX_SUBSURFACE_VOLUMETRIC_ANISOTROPY_HUNDREDTHS);
-        subsurfaceDiffusionProfileEnabled = McrtxRuntimeSettingParser.readBooleanSetting(values, SUBSURFACE_DIFFUSION_PROFILE_ENABLED_KEY, DEFAULT_SUBSURFACE_DIFFUSION_PROFILE_ENABLED);
-        glassThinWalledEnabled = McrtxRuntimeSettingParser.readBooleanSetting(values, GLASS_THIN_WALLED_ENABLED_KEY, DEFAULT_GLASS_THIN_WALLED_ENABLED);
-        glassMaterialThicknessThousandths = McrtxRuntimeSettingParser.readScaledIntSetting(values, GLASS_MATERIAL_THICKNESS_KEY, DEFAULT_GLASS_MATERIAL_THICKNESS_THOUSANDTHS, MIN_GLASS_MATERIAL_THICKNESS_THOUSANDTHS, MAX_GLASS_MATERIAL_THICKNESS_THOUSANDTHS, 1000);
-        glassTransmittanceRedHundredths = readHundredths(values, GLASS_TRANSMITTANCE_RED_KEY, DEFAULT_GLASS_TRANSMITTANCE_RED_HUNDREDTHS, MIN_GLASS_TRANSMITTANCE_COLOR_HUNDREDTHS, MAX_GLASS_TRANSMITTANCE_COLOR_HUNDREDTHS);
-        glassTransmittanceGreenHundredths = readHundredths(values, GLASS_TRANSMITTANCE_GREEN_KEY, DEFAULT_GLASS_TRANSMITTANCE_GREEN_HUNDREDTHS, MIN_GLASS_TRANSMITTANCE_COLOR_HUNDREDTHS, MAX_GLASS_TRANSMITTANCE_COLOR_HUNDREDTHS);
-        glassTransmittanceBlueHundredths = readHundredths(values, GLASS_TRANSMITTANCE_BLUE_KEY, DEFAULT_GLASS_TRANSMITTANCE_BLUE_HUNDREDTHS, MIN_GLASS_TRANSMITTANCE_COLOR_HUNDREDTHS, MAX_GLASS_TRANSMITTANCE_COLOR_HUNDREDTHS);
-        glassTransmittanceDistanceHundredths = readHundredths(values, GLASS_TRANSMITTANCE_DISTANCE_KEY, DEFAULT_GLASS_TRANSMITTANCE_DISTANCE_HUNDREDTHS, MIN_GLASS_TRANSMITTANCE_DISTANCE_HUNDREDTHS, MAX_GLASS_TRANSMITTANCE_DISTANCE_HUNDREDTHS);
-        glassRefractiveIndexThousandths = McrtxRuntimeSettingParser.readScaledIntSetting(values, GLASS_REFRACTIVE_INDEX_KEY, DEFAULT_GLASS_REFRACTIVE_INDEX_THOUSANDTHS, MIN_GLASS_REFRACTIVE_INDEX_THOUSANDTHS, MAX_GLASS_REFRACTIVE_INDEX_THOUSANDTHS, 1000);
-        glassDiffuseLayerEnabled = McrtxRuntimeSettingParser.readBooleanSetting(values, GLASS_DIFFUSE_LAYER_ENABLED_KEY, DEFAULT_GLASS_DIFFUSE_LAYER_ENABLED);
-        glassDiffuseLayerScaleHundredths = readHundredths(values, GLASS_DIFFUSE_LAYER_SCALE_KEY, DEFAULT_GLASS_DIFFUSE_LAYER_SCALE_HUNDREDTHS, MIN_GLASS_DIFFUSE_LAYER_SCALE_HUNDREDTHS, MAX_GLASS_DIFFUSE_LAYER_SCALE_HUNDREDTHS);
-
-        boolean migrationNeeded = !McrtxRuntimeSettingParser.readBooleanSetting(values, GLASS_MATERIAL_THICKNESS_MIGRATION_KEY, false)
-                && values.containsKey(GLASS_MATERIAL_THICKNESS_KEY)
-                && glassMaterialThicknessThousandths == LEGACY_DEFAULT_GLASS_MATERIAL_THICKNESS_THOUSANDTHS;
-        if (migrationNeeded) {
-            glassMaterialThicknessThousandths = DEFAULT_GLASS_MATERIAL_THICKNESS_THOUSANDTHS;
-        }
         return migrationNeeded;
     }
 
@@ -373,16 +182,6 @@ glassThinWalledEnabled = DEFAULT_GLASS_THIN_WALLED_ENABLED;
         values.put(WATER_DIFFUSE_LAYER_ENABLED_KEY, McrtxRuntimeSettingFormatter.formatBoolean(waterDiffuseLayerEnabled));
         values.put(WATER_DIFFUSE_LAYER_SCALE_KEY, McrtxRuntimeSettingFormatter.formatHundredthsValue(waterDiffuseLayerScaleHundredths));
         values.put(WATER_MATERIAL_THICKNESS_MIGRATION_KEY, McrtxRuntimeSettingFormatter.formatBoolean(true));
-values.put(GLASS_THIN_WALLED_ENABLED_KEY, McrtxRuntimeSettingFormatter.formatBoolean(glassThinWalledEnabled));
-        values.put(GLASS_MATERIAL_THICKNESS_KEY, McrtxRuntimeSettingFormatter.formatThousandthsValue(glassMaterialThicknessThousandths));
-        values.put(GLASS_TRANSMITTANCE_RED_KEY, McrtxRuntimeSettingFormatter.formatHundredthsValue(glassTransmittanceRedHundredths));
-        values.put(GLASS_TRANSMITTANCE_GREEN_KEY, McrtxRuntimeSettingFormatter.formatHundredthsValue(glassTransmittanceGreenHundredths));
-        values.put(GLASS_TRANSMITTANCE_BLUE_KEY, McrtxRuntimeSettingFormatter.formatHundredthsValue(glassTransmittanceBlueHundredths));
-        values.put(GLASS_TRANSMITTANCE_DISTANCE_KEY, McrtxRuntimeSettingFormatter.formatHundredthsValue(glassTransmittanceDistanceHundredths));
-        values.put(GLASS_REFRACTIVE_INDEX_KEY, McrtxRuntimeSettingFormatter.formatThousandthsValue(glassRefractiveIndexThousandths));
-        values.put(GLASS_DIFFUSE_LAYER_ENABLED_KEY, McrtxRuntimeSettingFormatter.formatBoolean(glassDiffuseLayerEnabled));
-        values.put(GLASS_DIFFUSE_LAYER_SCALE_KEY, McrtxRuntimeSettingFormatter.formatHundredthsValue(glassDiffuseLayerScaleHundredths));
-        values.put(GLASS_MATERIAL_THICKNESS_MIGRATION_KEY, McrtxRuntimeSettingFormatter.formatBoolean(true));
     }
 
     private static int readHundredths(Map<String, String> values, String key, int defaultValue, int minimum, int maximum) {
@@ -420,9 +219,6 @@ values.put(GLASS_THIN_WALLED_ENABLED_KEY, McrtxRuntimeSettingFormatter.formatBoo
             else if (setting >= 5 && setting <= 7) { minimum = MIN_WATER_TRANSMITTANCE_COLOR_HUNDREDTHS; maximum = MAX_WATER_TRANSMITTANCE_COLOR_HUNDREDTHS; current = setting == 5 ? waterTransmittanceRedHundredths : setting == 6 ? waterTransmittanceGreenHundredths : waterTransmittanceBlueHundredths; }
             else if (setting == 8) { minimum = MIN_WATER_TRANSMITTANCE_DISTANCE_HUNDREDTHS; maximum = MAX_WATER_TRANSMITTANCE_DISTANCE_HUNDREDTHS; current = waterTransmittanceDistanceHundredths; }
             else { minimum = MIN_WATER_DIFFUSE_LAYER_SCALE_HUNDREDTHS; maximum = MAX_WATER_DIFFUSE_LAYER_SCALE_HUNDREDTHS; current = waterDiffuseLayerScaleHundredths; }
-else if (setting >= 10 && setting <= 12) { minimum = MIN_GLASS_TRANSMITTANCE_COLOR_HUNDREDTHS; maximum = MAX_GLASS_TRANSMITTANCE_COLOR_HUNDREDTHS; current = setting == 10 ? glassTransmittanceRedHundredths : setting == 11 ? glassTransmittanceGreenHundredths : glassTransmittanceBlueHundredths; }
-            else if (setting == 13) { minimum = MIN_GLASS_TRANSMITTANCE_DISTANCE_HUNDREDTHS; maximum = MAX_GLASS_TRANSMITTANCE_DISTANCE_HUNDREDTHS; current = glassTransmittanceDistanceHundredths; }
-            else { minimum = MIN_GLASS_DIFFUSE_LAYER_SCALE_HUNDREDTHS; maximum = MAX_GLASS_DIFFUSE_LAYER_SCALE_HUNDREDTHS; current = glassDiffuseLayerScaleHundredths; }
             int normalized = McrtxRuntimeSettingParser.clamp(value, minimum, maximum);
             if (current == normalized) return;
             if (setting == 0) displacementFactorHundredths = normalized;
@@ -435,11 +231,6 @@ else if (setting >= 10 && setting <= 12) { minimum = MIN_GLASS_TRANSMITTANCE_COL
             else if (setting == 7) waterTransmittanceBlueHundredths = normalized;
             else if (setting == 8) waterTransmittanceDistanceHundredths = normalized;
             else waterDiffuseLayerScaleHundredths = normalized;
-else if (setting == 10) glassTransmittanceRedHundredths = normalized;
-            else if (setting == 11) glassTransmittanceGreenHundredths = normalized;
-            else if (setting == 12) glassTransmittanceBlueHundredths = normalized;
-            else if (setting == 13) glassTransmittanceDistanceHundredths = normalized;
-            else glassDiffuseLayerScaleHundredths = normalized;
             McrtxSettingsStore.saveLocked();
         }
     }
