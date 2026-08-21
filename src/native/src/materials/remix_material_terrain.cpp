@@ -288,6 +288,26 @@ bool RemixRenderer::initializeTerrainMaterials() {
       kLiquidAnimationFramesPerSecond,
         waterPbrTextures,
         {});
+
+    const bool glassCreated = createTerrainMaterial(
+      kGlassTerrainMaterialClass,
+      false,
+      false,
+      true,
+      glassTransmittanceColor_,
+      glassTransmittanceDistance_,
+      glassRefractiveIndex_,
+      terrainAtlasPath_,
+      kGlassTerrainMaterialHash,
+      terrainEmissiveTexturePath_.empty() ? nullptr : terrainEmissiveTexturePath_.c_str(),
+      1.0f,
+      {1.0f, 1.0f, 1.0f},
+      1,
+      1,
+      1,
+      terrainPbrTextures,
+      terrainSssTextures);
+
   const bool lavaCreated = !lavaTexturePath_.empty() && createTerrainMaterial(
       kLavaTerrainMaterialClass,
       false,
