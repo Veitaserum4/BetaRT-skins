@@ -54,7 +54,7 @@ remixapi_MaterialHandle RemixRenderer::acquireParticleMaterial(std::uint32_t tex
   materialInfo.albedoTexture = resolvedTexturePath.c_str();
   if (!emissivePath.empty()) {
     materialInfo.emissiveTexture = emissivePath.c_str();
-    materialInfo.emissiveIntensity = 50.0f;
+    materialInfo.emissiveIntensity = 3.0f;
     materialInfo.emissiveColorConstant = {1.0f, 1.0f, 1.0f};
   } else {
     materialInfo.emissiveTexture = nullptr;
@@ -88,6 +88,7 @@ remixapi_MaterialHandle RemixRenderer::acquireParticleMaterial(std::uint32_t tex
 }
 
 }  // namespace mcrtx
+
 
 
 
