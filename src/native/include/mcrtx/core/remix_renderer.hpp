@@ -578,7 +578,7 @@ private:
   float waterDiffuseLayerScale_ {1.0f};
   bool waterThinWalledEnabled_ {true};
   float waterMaterialThickness_ {1.0f};
-remixapi_Float3D glassTransmittanceColor_ {0.74f, 0.9f, 1.0f};
+remixapi_Float3D glassTransmittanceColor_ {1.0f, 1.0f, 1.0f};
   float glassTransmittanceDistance_ {1.5f};
   float glassRefractiveIndex_ {1.333f};
   bool glassDiffuseLayerEnabled_ {true};
