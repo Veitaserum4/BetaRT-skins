@@ -33,16 +33,9 @@ final class RemixHeldItemCapture {
         net.minecraft.client.Minecraft mc = RemixLifecycleBridge.getRememberedMinecraft();
         if (mc != null && mc.f != null && mc.h != null) {
             gs player = (gs) mc.h;
-            int spawnX = 0;
-            int spawnZ = 0;
-            try {
-                java.lang.reflect.Field fieldX = mc.f.x.getClass().getDeclaredField("a");
-                fieldX.setAccessible(true);
-                spawnX = fieldX.getInt(mc.f.x);
-                java.lang.reflect.Field fieldZ = mc.f.x.getClass().getDeclaredField("c");
-                fieldZ.setAccessible(true);
-                spawnZ = fieldZ.getInt(mc.f.x);
-            } catch (Exception e) {}
+            br spawn = mc.f.u();
+            int spawnX = spawn.a;
+            int spawnZ = spawn.c;
             double dx = (double)spawnX - player.aM;
             double dz = (double)spawnZ - player.aO;
             double targetAngle = (Math.atan2(dz, dx) * 180.0 / Math.PI) - (player.aS + 90.0);
