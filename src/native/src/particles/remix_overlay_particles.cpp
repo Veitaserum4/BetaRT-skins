@@ -86,6 +86,12 @@ void RemixRenderer::captureParticleQuad(
 
   const std::uint32_t realTextureKind = textureKind & 0xFFFF;
   const std::uint32_t textureIndex = (textureKind >> 16) & 0xFFFF;
+  
+  static std::unordered_set<std::uint32_t> seenParticles;
+  if (seenParticles.insert(textureIndex).second) {
+    log("Saw particle texture: " + std::to_string(textureIndex) + " on layer " + std::to_string(realTextureKind));
+  }
+
   if (realTextureKind == 0 && textureIndex == 48) {
       flameParticleLightPositions_.push_back({
           (x0 + x1 + x2 + x3) * 0.25f,
@@ -216,6 +222,7 @@ bool RemixRenderer::rebuildParticleMesh(const WorldRenderOrigin& renderOrigin) {
 }
 
 }  // namespace mcrtx
+
 
 
 

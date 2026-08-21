@@ -651,7 +651,7 @@ void RemixRenderer::reconcileParticleLights(const WorldRenderOrigin& renderOrigi
     remixapi_LightInfoSphereEXT sphereInfo {};
     sphereInfo.sType = REMIXAPI_STRUCT_TYPE_LIGHT_INFO_SPHERE_EXT;
     sphereInfo.position = {pos.x, pos.y, pos.z};
-    sphereInfo.radius = 0.05f; // Small radius for particles
+    sphereInfo.radius = 0.2f; // Increased radius for visibility
     sphereInfo.shaping_hasvalue = FALSE;
     sphereInfo.volumetricRadianceScale = 1.0f;
 
@@ -661,7 +661,7 @@ void RemixRenderer::reconcileParticleLights(const WorldRenderOrigin& renderOrigi
     lightInfo.sType = REMIXAPI_STRUCT_TYPE_LIGHT_INFO;
     lightInfo.pNext = &originInfo;
     lightInfo.hash = 0x4D43525458464C00ull + i; // Stable hash per index
-    lightInfo.radiance = {400.0f, 100.0f, 20.0f}; // Nice orange pointlight
+    lightInfo.radiance = {1500.0f, 500.0f, 100.0f}; // Brighter orange pointlight
     lightInfo.isDynamic = TRUE; // Fast moving
     lightInfo.ignoreViewModel = FALSE;
     lightInfo.ignoreFirstPersonPlayerShadow = FALSE;
@@ -684,4 +684,5 @@ void RemixRenderer::reconcileParticleLights(const WorldRenderOrigin& renderOrigi
 }
 
 }  // namespace mcrtx
+
 

@@ -218,3 +218,4 @@ bool RemixRenderer::prepareFrameSnapshotLocked(FrameRenderSnapshot& snapshot, bo
 
 }  // namespace mcrtx
 
+
