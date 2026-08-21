@@ -83,18 +83,6 @@ bool RemixRenderer::initializeTerrainMaterials() {
         translucentInfo.useDiffuseLayer = isWaterMaterial ? waterDiffuseLayerEnabled_ : (isGlassMaterial ? glassDiffuseLayerEnabled_ : TRUE);
 
       translucentInfo.transmittanceTexture = texturePath.c_str();
-      
-      opaqueInfo.sType = REMIXAPI_STRUCT_TYPE_MATERIAL_INFO_OPAQUE_EXT;
-      opaqueInfo.albedoConstant = {1.0f, 1.0f, 1.0f};
-      opaqueInfo.opacityConstant = 1.0f;
-      opaqueInfo.roughnessConstant = 1.0f;
-      opaqueInfo.metallicConstant = 0.0f;
-      // Preserve opaque pixels using the opaque extension struct if desired
-      opaqueInfo.useDrawCallAlphaState = useDrawCallAlphaState ? TRUE : FALSE;
-      opaqueInfo.alphaTestType = cutout ? 4 : 7;
-      opaqueInfo.alphaReferenceValue = cutout ? 1 : 0;
-      
-      translucentInfo.pNext = &opaqueInfo;
       pNext = &translucentInfo;
     } else {
       opaqueInfo.sType = REMIXAPI_STRUCT_TYPE_MATERIAL_INFO_OPAQUE_EXT;
@@ -303,7 +291,7 @@ bool RemixRenderer::initializeTerrainMaterials() {
 
     const bool glassCreated = createTerrainMaterial(
       kGlassTerrainMaterialClass,
-      true, // cutout = true (to preserve opaque pixels via alpha test)
+      false,
       false,
       true,
       glassTransmittanceColor_,
