@@ -618,7 +618,6 @@ void RemixRenderer::destroyChunkTorchLights(ChunkMeshData& meshData) {
 
 void RemixRenderer::reconcileParticleLights(const WorldRenderOrigin& renderOrigin) {
   MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Native, "RemixRenderer::reconcileParticleLights");
-  std::scoped_lock lock(mutex_);
 
   if (remix_.CreateLight == nullptr) {
     for (auto& light : activeFlameParticleLights_) {
@@ -685,3 +684,4 @@ void RemixRenderer::reconcileParticleLights(const WorldRenderOrigin& renderOrigi
 }
 
 }  // namespace mcrtx
+
