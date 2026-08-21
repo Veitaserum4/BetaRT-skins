@@ -81,7 +81,7 @@ void RemixRenderer::captureParticleQuad(
       u3, v3,
   };
   quad.color = colorRgba;
-  quad.textureKind = textureKind;
+  quad.textureKind = textureKind & 0xFFFF;
   particleQuads_.push_back(std::move(quad));
 
   const std::uint32_t realTextureKind = textureKind & 0xFFFF;
@@ -216,5 +216,6 @@ bool RemixRenderer::rebuildParticleMesh(const WorldRenderOrigin& renderOrigin) {
 }
 
 }  // namespace mcrtx
+
 
 
