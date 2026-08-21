@@ -34,6 +34,8 @@ remixapi_MaterialHandle RemixRenderer::acquireParticleMaterial(std::uint32_t tex
       subsurfaceVolumetricAnisotropy_,
       subsurfaceDiffusionProfileEnabled_};
 
+  const std::filesystem::path emissivePath = resolveOptionalPbrSibling(resolvedTexturePath, L"_emissive");
+
   remixapi_MaterialInfoOpaqueEXT opaqueInfo {};
   remixapi_MaterialInfoOpaqueSubsurfaceEXT subsurfaceInfo {};
   opaqueInfo.sType = REMIXAPI_STRUCT_TYPE_MATERIAL_INFO_OPAQUE_EXT;
@@ -50,8 +52,15 @@ remixapi_MaterialHandle RemixRenderer::acquireParticleMaterial(std::uint32_t tex
   materialInfo.pNext = &opaqueInfo;
   materialInfo.hash = kParticleMaterialHashSeed ^ static_cast<std::uint64_t>(textureKind);
   materialInfo.albedoTexture = resolvedTexturePath.c_str();
-  materialInfo.emissiveIntensity = 0.0f;
-  materialInfo.emissiveColorConstant = {0.0f, 0.0f, 0.0f};
+  if (!emissivePath.empty()) {
+    materialInfo.emissiveTexture = emissivePath.c_str();
+    materialInfo.emissiveIntensity = 1.0f;
+    materialInfo.emissiveColorConstant = {1.0f, 1.0f, 1.0f};
+  } else {
+    materialInfo.emissiveTexture = nullptr;
+    materialInfo.emissiveIntensity = 0.0f;
+    materialInfo.emissiveColorConstant = {0.0f, 0.0f, 0.0f};
+  }
   materialInfo.filterMode = 0;
   materialInfo.wrapModeU = 1;
   materialInfo.wrapModeV = 1;
@@ -79,3 +88,6 @@ remixapi_MaterialHandle RemixRenderer::acquireParticleMaterial(std::uint32_t tex
 }
 
 }  // namespace mcrtx
+
+
+
