@@ -129,6 +129,8 @@ public final class RemixParticleCapture {
         float originZ = (float) (particle.aL + (particle.aO - particle.aL) * (double) partialTicks);
         int colorRgba = ColorMath.packColor(particle.i, particle.j, particle.k, 1.0f);
 
+        int packedTextureKind = textureKind | (particle.b << 16);
+
         RemixParticleOverlayBridge.captureParticleQuad(
                 originX - f3 * particleScale - f6 * particleScale,
                 originY - f4 * particleScale,
@@ -150,8 +152,8 @@ public final class RemixParticleCapture {
                 originZ + f5 * particleScale - f7 * particleScale,
             p3u,
             p3v,
-                colorRgba,
-                textureKind);
+            colorRgba,
+            packedTextureKind);
     }
 
     public static void onWeatherTextureBind(String texturePath) {
@@ -284,3 +286,4 @@ public final class RemixParticleCapture {
         return isEastWestSheet == keepEastWestSheet;
     }
 }
+

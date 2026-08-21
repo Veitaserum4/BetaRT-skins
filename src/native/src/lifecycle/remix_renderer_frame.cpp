@@ -158,6 +158,8 @@ bool RemixRenderer::prepareFrameSnapshotLocked(FrameRenderSnapshot& snapshot, bo
         return false;
       }
 
+      reconcileParticleLights(snapshot.renderOrigin);
+
       for (auto lightIt = entityHeldTorchLights_.begin(); lightIt != entityHeldTorchLights_.end(); ) {
         if (entityHeldTorchLightsSeenThisFrame_.find(lightIt->first) != entityHeldTorchLightsSeenThisFrame_.end()) {
           ++lightIt;
@@ -215,3 +217,4 @@ bool RemixRenderer::prepareFrameSnapshotLocked(FrameRenderSnapshot& snapshot, bo
 }
 
 }  // namespace mcrtx
+

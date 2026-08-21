@@ -329,6 +329,7 @@ private:
   bool updateTorchLight(const TorchLightPlacement& placement, const WorldRenderOrigin& renderOrigin);
   bool reconcileChunkTorchLights(ChunkMeshData& meshData, const std::vector<TorchLightPlacement>& desiredTorchLights);
   bool reconcileHeldItemTorchLight(const WorldRenderOrigin& renderOrigin);
+  void reconcileParticleLights(const WorldRenderOrigin& renderOrigin);
   bool refreshTorchLightDefinitions(const WorldRenderOrigin& renderOrigin);
   bool updateEntityLight(int entityId, EntityHeldTorchLightState& state, const WorldRenderOrigin& renderOrigin);
   void updateEntityLightsLocked(const WorldRenderOrigin& renderOrigin);
@@ -538,6 +539,8 @@ private:
   remixapi_LightHandle heldItemTorchLightHandle_ {nullptr};
   WorldRenderOrigin heldItemTorchLightRenderOrigin_ {};
   std::unordered_map<int, EntityHeldTorchLightState> entityHeldTorchLights_ {};
+  std::vector<WorldRenderPosition> flameParticleLightPositions_ {};
+  std::vector<TorchLightState> activeFlameParticleLights_ {};
   std::unordered_set<int> entityHeldTorchLightsSeenThisFrame_ {};
   int heldItemId_ {-1};
   bool playerShadowsEnabled_ {true};
@@ -590,3 +593,6 @@ private:
 };
 
 }  // namespace mcrtx
+
+
+
