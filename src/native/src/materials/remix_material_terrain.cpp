@@ -81,6 +81,8 @@ bool RemixRenderer::initializeTerrainMaterials() {
         translucentInfo.thinWallThickness_hasvalue = useThinWalledTranslucency ? TRUE : FALSE;
         translucentInfo.thinWallThickness_value = isWaterMaterial ? waterMaterialThickness_ : (isGlassMaterial ? glassMaterialThickness_ : kWaterThinWallThickness);
         translucentInfo.useDiffuseLayer = isWaterMaterial ? waterDiffuseLayerEnabled_ : (isGlassMaterial ? glassDiffuseLayerEnabled_ : TRUE);
+        // For glass, enable the transmission mask so the texture alpha channel preserves opaque pixels (e.g. the glass frame)
+        translucentInfo.enableTransmissionMask = isGlassMaterial ? TRUE : FALSE;
 
       translucentInfo.transmittanceTexture = texturePath.c_str();
       pNext = &translucentInfo;

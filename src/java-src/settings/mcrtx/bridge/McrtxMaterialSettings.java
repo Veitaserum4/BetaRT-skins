@@ -338,7 +338,10 @@ public final class McrtxMaterialSettings {
             else if (setting == 4) { minimum = MIN_SUBSURFACE_VOLUMETRIC_ANISOTROPY_HUNDREDTHS; maximum = MAX_SUBSURFACE_VOLUMETRIC_ANISOTROPY_HUNDREDTHS; current = subsurfaceVolumetricAnisotropyHundredths; }
             else if (setting >= 5 && setting <= 7) { minimum = MIN_WATER_TRANSMITTANCE_COLOR_HUNDREDTHS; maximum = MAX_WATER_TRANSMITTANCE_COLOR_HUNDREDTHS; current = setting == 5 ? waterTransmittanceRedHundredths : setting == 6 ? waterTransmittanceGreenHundredths : waterTransmittanceBlueHundredths; }
             else if (setting == 8) { minimum = MIN_WATER_TRANSMITTANCE_DISTANCE_HUNDREDTHS; maximum = MAX_WATER_TRANSMITTANCE_DISTANCE_HUNDREDTHS; current = waterTransmittanceDistanceHundredths; }
-            else { minimum = MIN_WATER_DIFFUSE_LAYER_SCALE_HUNDREDTHS; maximum = MAX_WATER_DIFFUSE_LAYER_SCALE_HUNDREDTHS; current = waterDiffuseLayerScaleHundredths; }
+            else if (setting == 9) { minimum = MIN_WATER_DIFFUSE_LAYER_SCALE_HUNDREDTHS; maximum = MAX_WATER_DIFFUSE_LAYER_SCALE_HUNDREDTHS; current = waterDiffuseLayerScaleHundredths; }
+            else if (setting >= 10 && setting <= 12) { minimum = MIN_GLASS_TRANSMITTANCE_COLOR_HUNDREDTHS; maximum = MAX_GLASS_TRANSMITTANCE_COLOR_HUNDREDTHS; current = setting == 10 ? glassTransmittanceRedHundredths : setting == 11 ? glassTransmittanceGreenHundredths : glassTransmittanceBlueHundredths; }
+            else if (setting == 13) { minimum = MIN_GLASS_TRANSMITTANCE_DISTANCE_HUNDREDTHS; maximum = MAX_GLASS_TRANSMITTANCE_DISTANCE_HUNDREDTHS; current = glassTransmittanceDistanceHundredths; }
+            else { minimum = MIN_GLASS_DIFFUSE_LAYER_SCALE_HUNDREDTHS; maximum = MAX_GLASS_DIFFUSE_LAYER_SCALE_HUNDREDTHS; current = glassDiffuseLayerScaleHundredths; }
             int normalized = McrtxRuntimeSettingParser.clamp(value, minimum, maximum);
             if (current == normalized) return;
             if (setting == 0) displacementFactorHundredths = normalized;
@@ -350,7 +353,12 @@ public final class McrtxMaterialSettings {
             else if (setting == 6) waterTransmittanceGreenHundredths = normalized;
             else if (setting == 7) waterTransmittanceBlueHundredths = normalized;
             else if (setting == 8) waterTransmittanceDistanceHundredths = normalized;
-            else waterDiffuseLayerScaleHundredths = normalized;
+            else if (setting == 9) waterDiffuseLayerScaleHundredths = normalized;
+            else if (setting == 10) glassTransmittanceRedHundredths = normalized;
+            else if (setting == 11) glassTransmittanceGreenHundredths = normalized;
+            else if (setting == 12) glassTransmittanceBlueHundredths = normalized;
+            else if (setting == 13) glassTransmittanceDistanceHundredths = normalized;
+            else glassDiffuseLayerScaleHundredths = normalized;
             McrtxSettingsStore.saveLocked();
         }
     }
