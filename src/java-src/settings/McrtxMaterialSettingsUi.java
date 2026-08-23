@@ -49,11 +49,12 @@ final class McrtxMaterialSettingsUi implements McrtxSettingsCategoryUi {
         screen.addControl(button(screen, WATER_DIFFUSE_LAYER_BUTTON_ID, getWaterDiffuseLabel()));
         if (McrtxMaterialSettings.isWaterDiffuseLayerEnabled()) addSlider(screen, WATER_DIFFUSE_LAYER_SCALE_SLIDER_ID, Slider.WATER_DIFFUSE_SCALE);
 
+        screen.addControl(button(screen, WATER_THIN_WALL_BUTTON_ID, getWaterModeLabel()));
+        if (McrtxMaterialSettings.isWaterThinWalledEnabled()) addSlider(screen, WATER_MATERIAL_THICKNESS_SLIDER_ID, Slider.WATER_THICKNESS);
+
         addSlider(screen, GLASS_REFRACTIVE_INDEX_SLIDER_ID, Slider.GLASS_IOR);
         screen.addControl(button(screen, GLASS_THIN_WALL_BUTTON_ID, getGlassModeLabel()));
         if (!McrtxMaterialSettings.isGlassThinWalledEnabled()) addSlider(screen, GLASS_MATERIAL_THICKNESS_SLIDER_ID, Slider.GLASS_THICKNESS);
-        screen.addControl(button(screen, WATER_THIN_WALL_BUTTON_ID, getWaterModeLabel()));
-        if (McrtxMaterialSettings.isWaterThinWalledEnabled()) addSlider(screen, WATER_MATERIAL_THICKNESS_SLIDER_ID, Slider.WATER_THICKNESS);
         screen.addControl(button(screen, RESET_DEFAULTS_BUTTON_ID, "Reset Material Defaults"));
     }
 
