@@ -57,6 +57,7 @@ add_library(mcrtx_jni SHARED
   src/settings/jni_settings_material.cpp
   src/scene/celestial_textures.cpp
   src/scene/remix_cloud_mode.cpp
+  src/scene/remix_aerial_perspective.cpp
   src/lifecycle/remix_renderer_frame.cpp
   src/lifecycle/remix_renderer_present.cpp
   src/scene/remix_renderer_scene.cpp
@@ -193,6 +194,22 @@ if(MCRTX_BUILD_TESTS)
     target_compile_options(mcrtx_remix_cloud_mode_tests PRIVATE -Wall -Wextra -Wpedantic)
   endif()
   add_test(NAME mcrtx_remix_cloud_mode_tests COMMAND mcrtx_remix_cloud_mode_tests)
+
+  add_executable(mcrtx_remix_aerial_perspective_tests
+    src/scene/remix_aerial_perspective.cpp
+    tests/scene/remix_aerial_perspective_tests.cpp
+  )
+  target_include_directories(mcrtx_remix_aerial_perspective_tests
+    PRIVATE
+      ${CMAKE_CURRENT_SOURCE_DIR}/include
+  )
+  target_compile_features(mcrtx_remix_aerial_perspective_tests PRIVATE cxx_std_20)
+  if(MSVC)
+    target_compile_options(mcrtx_remix_aerial_perspective_tests PRIVATE /W4 /EHsc)
+  else()
+    target_compile_options(mcrtx_remix_aerial_perspective_tests PRIVATE -Wall -Wextra -Wpedantic)
+  endif()
+  add_test(NAME mcrtx_remix_aerial_perspective_tests COMMAND mcrtx_remix_aerial_perspective_tests)
 
   add_executable(mcrtx_celestial_texture_tests
     src/scene/celestial_textures.cpp

@@ -13,6 +13,9 @@ final class McrtxGraphicsSettingsUi implements McrtxSettingsCategoryUi {
     private static final int REMIX_ATMOSPHERE_CLOUDS_BUTTON_ID = 30;
     private static final int GAME_RAIN_PARTICLES_BUTTON_ID = 31;
     private static final int SPARSE_RENDERING_BUTTON_ID = 32;
+    private static final int AERIAL_PERSPECTIVE_BUTTON_ID = 33;
+    private static final int AERIAL_PERSPECTIVE_STRENGTH_BUTTON_ID = 34;
+    private static final int AERIAL_PERSPECTIVE_SHADOW_BUTTON_ID = 35;
 
     public String getName() { return "Graphics"; }
 
@@ -26,6 +29,11 @@ final class McrtxGraphicsSettingsUi implements McrtxSettingsCategoryUi {
         screen.addControl(button(screen, RT_QUALITY_BUTTON_ID, getRtQualityLabel()));
         screen.addControl(button(screen, REMIX_ATMOSPHERE_CLOUDS_BUTTON_ID, McrtxGraphicsSettings.formatCloudButtonLabel(McrtxGraphicsSettings.isRemixAtmosphereCloudsEnabled())));
         screen.addControl(button(screen, GAME_RAIN_PARTICLES_BUTTON_ID, getGameRainLabel()));
+        screen.addControl(button(screen, AERIAL_PERSPECTIVE_BUTTON_ID, getAerialPerspectiveLabel()));
+        if (McrtxGraphicsSettings.isAerialPerspectiveEnabled()) {
+            screen.addControl(button(screen, AERIAL_PERSPECTIVE_STRENGTH_BUTTON_ID, getAerialPerspectiveStrengthLabel()));
+            screen.addControl(button(screen, AERIAL_PERSPECTIVE_SHADOW_BUTTON_ID, getAerialPerspectiveShadowLabel()));
+        }
         screen.addControl(new NoCullSlider(NO_CULL_DISTANCE_SLIDER_ID, screen.getControlX(), screen.takeNextRowY(), screen.getControlWidth(), McrtxQuickSettingsScreen.CONTROL_HEIGHT));
     }
 
@@ -43,6 +51,23 @@ final class McrtxGraphicsSettingsUi implements McrtxSettingsCategoryUi {
             McrtxGraphicsSettings.setGameRainParticlesEnabled(!McrtxGraphicsSettings.isGameRainParticlesEnabled());
             return UPDATE_REFRESH;
         }
+        if (buttonId == AERIAL_PERSPECTIVE_BUTTON_ID) {
+            boolean enabled = !McrtxGraphicsSettings.isAerialPerspectiveEnabled();
+            McrtxGraphicsSettings.setAerialPerspectiveEnabled(enabled);
+            McrtxGraphicsSettingsNative.setAerialPerspectiveEnabled(enabled);
+            // The strength and shadow rows only exist while it is on.
+            return UPDATE_REBUILD;
+        }
+        if (buttonId == AERIAL_PERSPECTIVE_STRENGTH_BUTTON_ID) {
+            cycleAerialPerspectiveStrength();
+            return UPDATE_REFRESH;
+        }
+        if (buttonId == AERIAL_PERSPECTIVE_SHADOW_BUTTON_ID) {
+            boolean enabled = !McrtxGraphicsSettings.isAerialPerspectiveSceneShadowEnabled();
+            McrtxGraphicsSettings.setAerialPerspectiveSceneShadowEnabled(enabled);
+            McrtxGraphicsSettingsNative.setAerialPerspectiveSceneShadowEnabled(enabled);
+            return UPDATE_REFRESH;
+        }
         return UPDATE_NONE;
     }
 
@@ -54,11 +79,15 @@ final class McrtxGraphicsSettingsUi implements McrtxSettingsCategoryUi {
         setLabel(screen, RT_QUALITY_BUTTON_ID, getRtQualityLabel());
         setLabel(screen, REMIX_ATMOSPHERE_CLOUDS_BUTTON_ID, McrtxGraphicsSettings.formatCloudButtonLabel(McrtxGraphicsSettings.isRemixAtmosphereCloudsEnabled()));
         setLabel(screen, GAME_RAIN_PARTICLES_BUTTON_ID, getGameRainLabel());
+        setLabel(screen, AERIAL_PERSPECTIVE_BUTTON_ID, getAerialPerspectiveLabel());
+        setLabel(screen, AERIAL_PERSPECTIVE_STRENGTH_BUTTON_ID, getAerialPerspectiveStrengthLabel());
+        setLabel(screen, AERIAL_PERSPECTIVE_SHADOW_BUTTON_ID, getAerialPerspectiveShadowLabel());
     }
 
     public void applySavedSettings() {
         McrtxGraphicsSettingsNative.setRemixAtmosphereCloudsEnabled(McrtxGraphicsSettings.isRemixAtmosphereCloudsEnabled());
         RemixCameraState.setNoCullDistanceBlocks(McrtxGraphicsSettings.getNoCullDistanceBlocks());
+        applyAerialPerspective();
         applyRtQuality();
         applyUpscaler();
     }
@@ -74,6 +103,25 @@ final class McrtxGraphicsSettingsUi implements McrtxSettingsCategoryUi {
     private static String getSparseRenderingLabel() { return "Sparse Rendering: " + toggle(McrtxGraphicsSettings.isSparseRenderingEnabled()); }
     private static String getRtQualityLabel() { return "PT Quality: " + describeRtQuality(McrtxGraphicsSettings.getRtQuality()); }
     private static String getGameRainLabel() { return "Game Rain: " + toggle(McrtxGraphicsSettings.isGameRainParticlesEnabled()); }
+    private static String getAerialPerspectiveLabel() { return "Aerial Perspective: " + toggle(McrtxGraphicsSettings.isAerialPerspectiveEnabled()); }
+    private static String getAerialPerspectiveStrengthLabel() { return "  Haze Strength: " + McrtxGraphicsSettings.formatAerialPerspectiveStrength(McrtxGraphicsSettings.getAerialPerspectiveStrength()); }
+    private static String getAerialPerspectiveShadowLabel() { return "  Haze Shadowing: " + toggle(McrtxGraphicsSettings.isAerialPerspectiveSceneShadowEnabled()); }
+
+    private static void applyAerialPerspective() {
+        McrtxGraphicsSettingsNative.setAerialPerspectiveStrength(McrtxGraphicsSettings.getAerialPerspectiveStrength());
+        McrtxGraphicsSettingsNative.setAerialPerspectiveSceneShadowEnabled(McrtxGraphicsSettings.isAerialPerspectiveSceneShadowEnabled());
+        McrtxGraphicsSettingsNative.setAerialPerspectiveEnabled(McrtxGraphicsSettings.isAerialPerspectiveEnabled());
+    }
+
+    private static void cycleAerialPerspectiveStrength() {
+        int value = McrtxGraphicsSettings.getAerialPerspectiveStrength();
+        if (value == McrtxGraphicsSettings.AERIAL_PERSPECTIVE_SUBTLE) value = McrtxGraphicsSettings.AERIAL_PERSPECTIVE_NORMAL;
+        else if (value == McrtxGraphicsSettings.AERIAL_PERSPECTIVE_NORMAL) value = McrtxGraphicsSettings.AERIAL_PERSPECTIVE_STRONG;
+        else if (value == McrtxGraphicsSettings.AERIAL_PERSPECTIVE_STRONG) value = McrtxGraphicsSettings.AERIAL_PERSPECTIVE_EXTREME;
+        else value = McrtxGraphicsSettings.AERIAL_PERSPECTIVE_SUBTLE;
+        McrtxGraphicsSettings.setAerialPerspectiveStrength(value);
+        McrtxGraphicsSettingsNative.setAerialPerspectiveStrength(value);
+    }
 
     private static String getUpscalerPresetLabel() {
         int type = McrtxGraphicsSettings.getUpscalerType();

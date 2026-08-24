@@ -39,4 +39,23 @@ JNIEXPORT void JNICALL Java_mcrtx_bridge_McrtxGraphicsSettingsNative_nSetRemixAt
   RemixRenderer::instance().setRemixAtmosphereCloudsEnabled(enabled == JNI_TRUE);
 }
 
+JNIEXPORT void JNICALL Java_mcrtx_bridge_McrtxGraphicsSettingsNative_nSetAerialPerspectiveEnabled(
+    JNIEnv*, jclass, jboolean enabled) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Jni, "nSetAerialPerspectiveEnabled");
+  RemixRenderer::instance().setAerialPerspectiveEnabled(enabled == JNI_TRUE);
+}
+
+JNIEXPORT void JNICALL Java_mcrtx_bridge_McrtxGraphicsSettingsNative_nSetAerialPerspectiveStrength(
+    JNIEnv*, jclass, jint strength) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Jni, "nSetAerialPerspectiveStrength");
+  RemixRenderer::instance().setAerialPerspectiveStrength(static_cast<int>(strength));
+}
+
+JNIEXPORT void JNICALL
+Java_mcrtx_bridge_McrtxGraphicsSettingsNative_nSetAerialPerspectiveSceneShadowEnabled(
+    JNIEnv*, jclass, jboolean enabled) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Jni, "nSetAerialPerspectiveSceneShadowEnabled");
+  RemixRenderer::instance().setAerialPerspectiveSceneShadowEnabled(enabled == JNI_TRUE);
+}
+
 }  // extern "C"

@@ -13,6 +13,9 @@ public final class McrtxGraphicsSettings {
     public static final String RAY_RECONSTRUCTION_ENABLED_KEY = "MCRTX_RAY_RECONSTRUCTION_ENABLED";
     public static final String SPARSE_RENDERING_ENABLED_KEY = "MCRTX_SPARSE_RENDERING_ENABLED";
     public static final String RT_QUALITY_KEY = "MCRTX_RT_QUALITY";
+    public static final String AERIAL_PERSPECTIVE_ENABLED_KEY = "MCRTX_AERIAL_PERSPECTIVE_ENABLED";
+    public static final String AERIAL_PERSPECTIVE_STRENGTH_KEY = "MCRTX_AERIAL_PERSPECTIVE_STRENGTH";
+    public static final String AERIAL_PERSPECTIVE_SCENE_SHADOW_KEY = "MCRTX_AERIAL_PERSPECTIVE_SCENE_SHADOW";
 
     public static final int MIN_NO_CULL_DISTANCE_BLOCKS = 0;
     public static final int MAX_NO_CULL_DISTANCE_BLOCKS = 200;
@@ -20,6 +23,8 @@ public final class McrtxGraphicsSettings {
     public static final boolean DEFAULT_REMIX_ATMOSPHERE_CLOUDS_ENABLED = false;
     public static final boolean DEFAULT_GAME_RAIN_PARTICLES_ENABLED = true;
     public static final boolean DEFAULT_SPARSE_RENDERING_ENABLED = true;
+    public static final boolean DEFAULT_AERIAL_PERSPECTIVE_ENABLED = true;
+    public static final boolean DEFAULT_AERIAL_PERSPECTIVE_SCENE_SHADOW = true;
 
     public static final int UPSCALER_TYPE_NONE = 0;
     public static final int UPSCALER_TYPE_DLSS = 1;
@@ -53,6 +58,15 @@ public final class McrtxGraphicsSettings {
     public static final int RT_QUALITY_ULTRA = 3;
     public static final int RT_QUALITY_POTATO = 4;
 
+    // How many metres of atmosphere a block is told to stand for. Minecraft
+    // draws at most 256 blocks and submits one block as one metre, and clear
+    // air over 256 m extinguishes almost nothing, so an honest scale leaves
+    // aerial perspective invisible. See remix_aerial_perspective.cpp.
+    public static final int AERIAL_PERSPECTIVE_SUBTLE = 0;
+    public static final int AERIAL_PERSPECTIVE_NORMAL = 1;
+    public static final int AERIAL_PERSPECTIVE_STRONG = 2;
+    public static final int AERIAL_PERSPECTIVE_EXTREME = 3;
+
     private static boolean remixAtmosphereCloudsEnabled = DEFAULT_REMIX_ATMOSPHERE_CLOUDS_ENABLED;
     private static boolean gameRainParticlesEnabled = DEFAULT_GAME_RAIN_PARTICLES_ENABLED;
     private static int noCullDistanceBlocks = DEFAULT_NO_CULL_DISTANCE_BLOCKS;
@@ -63,6 +77,9 @@ public final class McrtxGraphicsSettings {
     private static boolean rayReconstructionEnabled = true;
     private static boolean sparseRenderingEnabled = DEFAULT_SPARSE_RENDERING_ENABLED;
     private static int rtQuality = RT_QUALITY_HIGH;
+    private static boolean aerialPerspectiveEnabled = DEFAULT_AERIAL_PERSPECTIVE_ENABLED;
+    private static int aerialPerspectiveStrength = AERIAL_PERSPECTIVE_NORMAL;
+    private static boolean aerialPerspectiveSceneShadow = DEFAULT_AERIAL_PERSPECTIVE_SCENE_SHADOW;
 
     private McrtxGraphicsSettings() {
     }
@@ -77,6 +94,9 @@ public final class McrtxGraphicsSettings {
     public static boolean isRayReconstructionEnabled() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return rayReconstructionEnabled; } }
     public static boolean isSparseRenderingEnabled() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return sparseRenderingEnabled; } }
     public static int getRtQuality() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return rtQuality; } }
+    public static boolean isAerialPerspectiveEnabled() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return aerialPerspectiveEnabled; } }
+    public static int getAerialPerspectiveStrength() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return aerialPerspectiveStrength; } }
+    public static boolean isAerialPerspectiveSceneShadowEnabled() { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); return aerialPerspectiveSceneShadow; } }
 
     public static void setRemixAtmosphereCloudsEnabled(boolean enabled) { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); if (remixAtmosphereCloudsEnabled == enabled) return; remixAtmosphereCloudsEnabled = enabled; McrtxSettingsStore.saveLocked(); } }
     public static void setGameRainParticlesEnabled(boolean enabled) { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); if (gameRainParticlesEnabled == enabled) return; gameRainParticlesEnabled = enabled; McrtxSettingsStore.saveLocked(); } }
@@ -88,6 +108,9 @@ public final class McrtxGraphicsSettings {
     public static void setRayReconstructionEnabled(boolean enabled) { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); if (rayReconstructionEnabled == enabled) return; rayReconstructionEnabled = enabled; McrtxSettingsStore.saveLocked(); } }
     public static void setSparseRenderingEnabled(boolean enabled) { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); if (sparseRenderingEnabled == enabled) return; sparseRenderingEnabled = enabled; McrtxSettingsStore.saveLocked(); } }
     public static void setRtQuality(int quality) { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); int value = normalizeRtQuality(quality); if (rtQuality == value) return; rtQuality = value; McrtxSettingsStore.saveLocked(); } }
+    public static void setAerialPerspectiveEnabled(boolean enabled) { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); if (aerialPerspectiveEnabled == enabled) return; aerialPerspectiveEnabled = enabled; McrtxSettingsStore.saveLocked(); } }
+    public static void setAerialPerspectiveStrength(int strength) { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); int value = normalizeAerialPerspectiveStrength(strength); if (aerialPerspectiveStrength == value) return; aerialPerspectiveStrength = value; McrtxSettingsStore.saveLocked(); } }
+    public static void setAerialPerspectiveSceneShadowEnabled(boolean enabled) { synchronized (McrtxSettingsStore.LOCK) { McrtxSettingsStore.ensureLoadedLocked(); if (aerialPerspectiveSceneShadow == enabled) return; aerialPerspectiveSceneShadow = enabled; McrtxSettingsStore.saveLocked(); } }
 
     public static boolean shouldSubmitGameCloudLayer(boolean initialized, boolean remixCloudsEnabled) {
         return initialized && !remixCloudsEnabled;
@@ -158,6 +181,16 @@ public final class McrtxGraphicsSettings {
         }
     }
 
+    public static String formatAerialPerspectiveStrength(int strength) {
+        switch (normalizeAerialPerspectiveStrength(strength)) {
+            case AERIAL_PERSPECTIVE_SUBTLE: return "Subtle";
+            case AERIAL_PERSPECTIVE_STRONG: return "Strong";
+            case AERIAL_PERSPECTIVE_EXTREME: return "Extreme";
+            case AERIAL_PERSPECTIVE_NORMAL:
+            default: return "Normal";
+        }
+    }
+
     static void loadLocked(Map<String, String> fileValues) {
         remixAtmosphereCloudsEnabled = McrtxRuntimeSettingParser.readBooleanSetting(
                 fileValues, REMIX_ATMOSPHERE_CLOUDS_ENABLED_KEY, DEFAULT_REMIX_ATMOSPHERE_CLOUDS_ENABLED);
@@ -173,6 +206,11 @@ public final class McrtxGraphicsSettings {
         rayReconstructionEnabled = McrtxRuntimeSettingParser.readBooleanSetting(fileValues, RAY_RECONSTRUCTION_ENABLED_KEY, true);
         sparseRenderingEnabled = McrtxRuntimeSettingParser.readBooleanSetting(fileValues, SPARSE_RENDERING_ENABLED_KEY, DEFAULT_SPARSE_RENDERING_ENABLED);
         rtQuality = readRtQuality(fileValues, RT_QUALITY_HIGH);
+        aerialPerspectiveEnabled = McrtxRuntimeSettingParser.readBooleanSetting(
+                fileValues, AERIAL_PERSPECTIVE_ENABLED_KEY, DEFAULT_AERIAL_PERSPECTIVE_ENABLED);
+        aerialPerspectiveStrength = readAerialPerspectiveStrength(fileValues, AERIAL_PERSPECTIVE_NORMAL);
+        aerialPerspectiveSceneShadow = McrtxRuntimeSettingParser.readBooleanSetting(
+                fileValues, AERIAL_PERSPECTIVE_SCENE_SHADOW_KEY, DEFAULT_AERIAL_PERSPECTIVE_SCENE_SHADOW);
     }
 
     static void writeLocked(Map<String, String> fileValues) {
@@ -186,6 +224,9 @@ public final class McrtxGraphicsSettings {
         fileValues.put(RAY_RECONSTRUCTION_ENABLED_KEY, McrtxRuntimeSettingFormatter.formatBoolean(rayReconstructionEnabled));
         fileValues.put(SPARSE_RENDERING_ENABLED_KEY, McrtxRuntimeSettingFormatter.formatBoolean(sparseRenderingEnabled));
         fileValues.put(RT_QUALITY_KEY, formatRtQuality(rtQuality));
+        fileValues.put(AERIAL_PERSPECTIVE_ENABLED_KEY, McrtxRuntimeSettingFormatter.formatBoolean(aerialPerspectiveEnabled));
+        fileValues.put(AERIAL_PERSPECTIVE_STRENGTH_KEY, formatAerialPerspectiveStrength(aerialPerspectiveStrength));
+        fileValues.put(AERIAL_PERSPECTIVE_SCENE_SHADOW_KEY, McrtxRuntimeSettingFormatter.formatBoolean(aerialPerspectiveSceneShadow));
     }
 
     private static String configured(Map<String, String> values, String key) {
@@ -246,6 +287,15 @@ public final class McrtxGraphicsSettings {
         return defaultValue;
     }
 
+    private static int readAerialPerspectiveStrength(Map<String, String> values, int defaultValue) {
+        String value = configured(values, AERIAL_PERSPECTIVE_STRENGTH_KEY);
+        if (value.equalsIgnoreCase("subtle") || value.equals("0")) return AERIAL_PERSPECTIVE_SUBTLE;
+        if (value.equalsIgnoreCase("normal") || value.equals("1")) return AERIAL_PERSPECTIVE_NORMAL;
+        if (value.equalsIgnoreCase("strong") || value.equals("2")) return AERIAL_PERSPECTIVE_STRONG;
+        if (value.equalsIgnoreCase("extreme") || value.equals("3")) return AERIAL_PERSPECTIVE_EXTREME;
+        return defaultValue;
+    }
+
     private static int deriveDefaultUpscalerType(Map<String, String> fileValues) {
         String legacyDlssSetting = fileValues.get(DLSS_PRESET_KEY);
         if (legacyDlssSetting != null && legacyDlssSetting.trim().equalsIgnoreCase("off")) {
@@ -262,4 +312,5 @@ public final class McrtxGraphicsSettings {
     private static int normalizeXessPreset(int preset) { return preset >= XESS_PRESET_ULTRA_PERFORMANCE && preset <= XESS_PRESET_NATIVE_AA ? preset : XESS_PRESET_BALANCED; }
     private static int normalizeTaauPreset(int preset) { return preset >= TAAU_PRESET_ULTRA_PERFORMANCE && preset <= TAAU_PRESET_FULLSCREEN ? preset : TAAU_PRESET_BALANCED; }
     private static int normalizeRtQuality(int quality) { return (quality >= RT_QUALITY_LOW && quality <= RT_QUALITY_ULTRA) || quality == RT_QUALITY_POTATO ? quality : RT_QUALITY_HIGH; }
+    private static int normalizeAerialPerspectiveStrength(int strength) { return strength >= AERIAL_PERSPECTIVE_SUBTLE && strength <= AERIAL_PERSPECTIVE_EXTREME ? strength : AERIAL_PERSPECTIVE_NORMAL; }
 }

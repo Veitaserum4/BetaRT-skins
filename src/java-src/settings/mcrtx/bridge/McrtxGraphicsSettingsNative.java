@@ -30,6 +30,24 @@ public final class McrtxGraphicsSettingsNative {
         }
     }
 
+    public static void setAerialPerspectiveEnabled(boolean enabled) {
+        if (ready()) {
+            nSetAerialPerspectiveEnabled(enabled);
+        }
+    }
+
+    public static void setAerialPerspectiveStrength(int strength) {
+        if (ready()) {
+            nSetAerialPerspectiveStrength(strength);
+        }
+    }
+
+    public static void setAerialPerspectiveSceneShadowEnabled(boolean enabled) {
+        if (ready()) {
+            nSetAerialPerspectiveSceneShadowEnabled(enabled);
+        }
+    }
+
     private static boolean ready() {
         return RemixBridgeNative.isAvailable() && RemixLifecycleBridge.isInitialized();
     }
@@ -43,4 +61,7 @@ public final class McrtxGraphicsSettingsNative {
             boolean rayReconstructionEnabled,
             boolean sparseRenderingEnabled);
     private static native void nSetRemixAtmosphereCloudsEnabled(boolean enabled);
+    private static native void nSetAerialPerspectiveEnabled(boolean enabled);
+    private static native void nSetAerialPerspectiveStrength(int strength);
+    private static native void nSetAerialPerspectiveSceneShadowEnabled(boolean enabled);
 }
