@@ -73,16 +73,14 @@ bool RemixRenderer::initializeTerrainMaterials() {
       if (isTranslucent) {
         const bool isWaterMaterial = materialHash == kWaterTerrainMaterialHash;
         const bool isGlassMaterial = materialHash == kGlassTerrainMaterialHash;
-        const bool useThinWalledTranslucency = (isWaterMaterial && waterThinWalledEnabled_) || isGlassMaterial; // glass is always thin-walled for opaque frame pixel preservation
+        const bool useThinWalledTranslucency = (isWaterMaterial && waterThinWalledEnabled_) || (isGlassMaterial && glassThinWalledEnabled_);
         translucentInfo.sType = REMIXAPI_STRUCT_TYPE_MATERIAL_INFO_TRANSLUCENT_EXT;
         translucentInfo.refractiveIndex = refractiveIndex;
         translucentInfo.transmittanceColor = transmittanceColor;
         translucentInfo.transmittanceMeasurementDistance = transmittanceMeasurementDistance;
         translucentInfo.thinWallThickness_hasvalue = useThinWalledTranslucency ? TRUE : FALSE;
         translucentInfo.thinWallThickness_value = isWaterMaterial ? waterMaterialThickness_ : (isGlassMaterial ? glassMaterialThickness_ : kWaterThinWallThickness);
-        // Glass: always enable the diffuse layer so the texture alpha channel controls per-pixel opacity (opaque frame pixels)
-        translucentInfo.useDiffuseLayer = isWaterMaterial ? waterDiffuseLayerEnabled_ : TRUE;
-        translucentInfo.enableTransmissionMask = isGlassMaterial ? TRUE : FALSE;
+        translucentInfo.useDiffuseLayer = isWaterMaterial ? waterDiffuseLayerEnabled_ : (isGlassMaterial ? glassDiffuseLayerEnabled_ : TRUE);
 
       translucentInfo.transmittanceTexture = texturePath.c_str();
       pNext = &translucentInfo;
