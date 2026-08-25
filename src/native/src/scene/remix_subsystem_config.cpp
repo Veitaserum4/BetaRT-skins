@@ -331,6 +331,11 @@ void RemixRenderer::applyRemixConfigPostStartupLocked() {
       playerShadowsEnabled_ ? "True" : "False",
       true,
       true);
+  setConfigVariableLocked(
+      "rtx.playerModel.enableInPrimarySpace",
+      firstPersonBodyEnabled_ ? "True" : "False",
+      true,
+      true);
 }
 
 void RemixRenderer::publishCelestialTexturePathsLocked() {
