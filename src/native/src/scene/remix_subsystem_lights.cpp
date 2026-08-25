@@ -629,9 +629,6 @@ void RemixRenderer::destroyChunkTorchLights(ChunkMeshData& meshData) {
   meshData.torchLights.clear();
 }
 
-
-
-
 bool RemixRenderer::createPortalLight(const PortalLightPlacement& placement, const WorldRenderOrigin& renderOrigin) {
   MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Native, "RemixRenderer::createPortalLight");
   const WorldRenderPosition lightPosition = rebaseWorldPosition(
@@ -861,7 +858,79 @@ void RemixRenderer::destroyChunkPortalLights(ChunkMeshData& meshData) {
   meshData.portalLights.clear();
 }
 
+void RemixRenderer::reconcileParticleLights(const WorldRenderOrigin& renderOrigin) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Native, "RemixRenderer::reconcileParticleLights");
+
+  if (remix_.CreateLight == nullptr) {
+    for (auto& light : activeFlameParticleLights_) {
+      if (light.handle != nullptr) {
+        destroyLightHandle(light.handle);
+      }
+    }
+    activeFlameParticleLights_.clear();
+    return;
+  }
+
+  // Destroy excess lights
+  while (activeFlameParticleLights_.size() > flameParticleLightPositions_.size()) {
+    if (activeFlameParticleLights_.back().handle != nullptr) {
+      destroyLightHandle(activeFlameParticleLights_.back().handle);
+    }
+    activeFlameParticleLights_.pop_back();
+  }
+
+  // Create or update lights
+  for (std::size_t i = 0; i < flameParticleLightPositions_.size(); ++i) {
+    const WorldRenderPosition pos = rebaseWorldPosition(flameParticleLightPositions_[i].x, flameParticleLightPositions_[i].y, flameParticleLightPositions_[i].z, renderOrigin);
+
+    if (i >= activeFlameParticleLights_.size()) {
+      TorchLightState newState {};
+      activeFlameParticleLights_.push_back(newState);
+    }
+
+    TorchLightState& state = activeFlameParticleLights_[i];
+
+    remixapi_LightInfoSphereEXT sphereInfo {};
+    sphereInfo.sType = REMIXAPI_STRUCT_TYPE_LIGHT_INFO_SPHERE_EXT;
+    sphereInfo.position = {pos.x, pos.y, pos.z};
+    sphereInfo.radius = 0.04f; // Increased radius for visibility
+    sphereInfo.shaping_hasvalue = FALSE;
+    sphereInfo.volumetricRadianceScale = 1.0f;
+
+    remixapi_LightInfoLocalOriginEXT originInfo = makeLightLocalOriginInfo(renderOrigin, &sphereInfo);
+
+    remixapi_LightInfo lightInfo {};
+    lightInfo.sType = REMIXAPI_STRUCT_TYPE_LIGHT_INFO;
+    lightInfo.pNext = &originInfo;
+    lightInfo.hash = 0x4D43525458464C00ull + i; // Stable hash per index
+    lightInfo.radiance = {500.0f, 125.0f, 25.0f}; // Brighter orange pointlight
+    lightInfo.isDynamic = TRUE; // Fast moving
+    lightInfo.ignoreViewModel = FALSE;
+    lightInfo.ignoreFirstPersonPlayerShadow = FALSE;
+
+    if (state.handle == nullptr) {
+      remix_.CreateLight(&lightInfo, &state.handle);
+    } else {
+      if (remix_.UpdateLightDefinition != nullptr) {
+        remix_.UpdateLightDefinition(state.handle, &lightInfo);
+      } else {
+        destroyLightHandle(state.handle);
+        remix_.CreateLight(&lightInfo, &state.handle);
+      }
+    }
+
+    state.renderOrigin = renderOrigin;
+    state.apiHash = lightInfo.hash;
+    state.submittedPosition = pos;
+  }
+}
+
 }  // namespace mcrtx
+
+
+
+
+
 
 
 

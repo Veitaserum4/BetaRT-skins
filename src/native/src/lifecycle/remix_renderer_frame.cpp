@@ -164,7 +164,7 @@ bool RemixRenderer::prepareFrameSnapshotLocked(FrameRenderSnapshot& snapshot, bo
 
   {
     MCRTX_TRACY_SCOPE("prepareFrameSnapshot.reconcileTorchLights");
-    MCRTX_TRACY_VALUE(torchLights_.size() + entityHeldTorchLights_.size());
+    MCRTX_TRACY_VALUE(torchLights_.size() + entityHeldTorchLights_.size() + activeFlameParticleLights_.size());
     if (heldTorchLightsEnabled_) {
       if (!reconcileHeldItemTorchLight(snapshot.renderOrigin)) {
         return false;
@@ -186,6 +186,8 @@ bool RemixRenderer::prepareFrameSnapshotLocked(FrameRenderSnapshot& snapshot, bo
       clearHeldTorchLightsLocked();
     }
 
+    reconcileParticleLights(snapshot.renderOrigin);
+
     if (!refreshTorchLightDefinitions(snapshot.renderOrigin)) {
       return false;
     }
@@ -194,7 +196,7 @@ bool RemixRenderer::prepareFrameSnapshotLocked(FrameRenderSnapshot& snapshot, bo
   {
     MCRTX_TRACY_SCOPE("prepareFrameSnapshot.collectTorchLights");
     snapshot.torchLights.reserve(
-        torchLights_.size() + entityHeldTorchLights_.size() + (heldItemTorchLightHandle_ != nullptr ? 1 : 0));
+        torchLights_.size() + entityHeldTorchLights_.size() + activeFlameParticleLights_.size() + (heldItemTorchLightHandle_ != nullptr ? 1 : 0));
     for (const auto& [position, lightState] : torchLights_) {
       (void)position;
       if (lightState.handle != nullptr) {
@@ -203,6 +205,11 @@ bool RemixRenderer::prepareFrameSnapshotLocked(FrameRenderSnapshot& snapshot, bo
     }
     for (const auto& [entityId, lightState] : entityHeldTorchLights_) {
       (void)entityId;
+      if (lightState.handle != nullptr) {
+        snapshot.torchLights.push_back(lightState.handle);
+      }
+    }
+    for (const auto& lightState : activeFlameParticleLights_) {
       if (lightState.handle != nullptr) {
         snapshot.torchLights.push_back(lightState.handle);
       }
@@ -227,3 +234,6 @@ bool RemixRenderer::prepareFrameSnapshotLocked(FrameRenderSnapshot& snapshot, bo
 }
 
 }  // namespace mcrtx
+
+
+
