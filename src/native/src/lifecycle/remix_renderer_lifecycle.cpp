@@ -375,6 +375,12 @@ void RemixRenderer::shutdownLocked() {
     while (!entityHeldTorchLights_.empty()) {
       destroyEntityHeldTorchLight(entityHeldTorchLights_.begin()->first);
     }
+    for (auto& light : activeFlameParticleLights_) {
+      if (light.handle != nullptr) {
+        destroyLightHandle(light.handle);
+      }
+    }
+    activeFlameParticleLights_.clear();
     destroyTerrainMaterials();
     {
       MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Remix, "Shutdown");
@@ -398,6 +404,7 @@ void RemixRenderer::shutdownLocked() {
   destroyOverlayInstances_.clear();
   blockOutlineInstances_.clear();
   particleQuads_.clear();
+  flameParticleLightPositions_.clear();
   dynamicEntityMaterialHandles_.clear();
   activeDynamicEntity_ = {};
   torchLights_.clear();
@@ -512,3 +519,5 @@ void RemixRenderer::log(const std::string& message) {
 
 
 }  // namespace mcrtx
+
+
