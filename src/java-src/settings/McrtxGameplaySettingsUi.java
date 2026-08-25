@@ -21,7 +21,9 @@ final class McrtxGameplaySettingsUi implements McrtxSettingsCategoryUi {
         screen.addControl(new Slider(GAMEPLAY_FOV_SLIDER_ID, screen.getControlX(), screen.takeNextRowY(), screen.getControlWidth(), McrtxQuickSettingsScreen.CONTROL_HEIGHT, Slider.MODE_GAMEPLAY_FOV));
         screen.addControl(new Slider(VIEW_MODEL_FOV_SLIDER_ID, screen.getControlX(), screen.takeNextRowY(), screen.getControlWidth(), McrtxQuickSettingsScreen.CONTROL_HEIGHT, Slider.MODE_VIEW_MODEL_FOV));
         screen.addControl(button(screen, PLAYER_SHADOWS_BUTTON_ID, getPlayerShadowsLabel()));
-        screen.addControl(button(screen, FIRST_PERSON_BODY_BUTTON_ID, getFirstPersonBodyLabel()));
+        if (McrtxGameplaySettings.isPlayerShadowsEnabled()) {
+            screen.addControl(button(screen, FIRST_PERSON_BODY_BUTTON_ID, getFirstPersonBodyLabel()));
+        }
         screen.addControl(button(screen, HELD_TORCH_LIGHTS_BUTTON_ID, getHeldTorchLightsLabel()));
         screen.addControl(button(screen, BLOCK_OUTLINE_BUTTON_ID, getBlockOutlineLabel()));
         if (McrtxGameplaySettings.isBlockOutlineEnabled()) {
@@ -34,8 +36,12 @@ final class McrtxGameplaySettingsUi implements McrtxSettingsCategoryUi {
 
     public int handleButton(int buttonId) {
         if (buttonId == PLAYER_SHADOWS_BUTTON_ID) {
-            setPlayerShadowsEnabled(!McrtxGameplaySettings.isPlayerShadowsEnabled());
-            return UPDATE_REFRESH;
+            boolean enabled = !McrtxGameplaySettings.isPlayerShadowsEnabled();
+            setPlayerShadowsEnabled(enabled);
+            if (!enabled && McrtxGameplaySettings.isFirstPersonBodyEnabled()) {
+                setFirstPersonBodyEnabled(false);
+            }
+            return UPDATE_REBUILD;
         }
         if (buttonId == FIRST_PERSON_BODY_BUTTON_ID) {
             setFirstPersonBodyEnabled(!McrtxGameplaySettings.isFirstPersonBodyEnabled());
