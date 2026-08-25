@@ -110,6 +110,10 @@ public final class RemixDynamicEntityCapture {
         RemixFirstPersonCapture.setPlayerShadowsEnabled(enabled);
     }
 
+    public static void setFirstPersonBodyEnabled(boolean enabled) {
+        RemixFirstPersonCapture.setFirstPersonBodyEnabled(enabled);
+    }
+
     public static void setHeldTorchLightsEnabled(boolean enabled) {
         RemixHeldItemCapture.setHeldTorchLightsEnabled(enabled);
     }

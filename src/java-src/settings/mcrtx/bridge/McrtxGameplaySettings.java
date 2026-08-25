@@ -4,6 +4,7 @@ import java.util.Map;
 
 public final class McrtxGameplaySettings {
     public static final String PLAYER_SHADOWS_ENABLED_KEY = "MCRTX_PLAYER_SHADOWS_ENABLED";
+    public static final String FIRST_PERSON_BODY_ENABLED_KEY = "MCRTX_FIRST_PERSON_BODY_ENABLED";
     public static final String HELD_TORCH_LIGHTS_ENABLED_KEY = "MCRTX_HELD_TORCH_LIGHTS_ENABLED";
     public static final String GAMEPLAY_FOV_KEY = "MCRTX_GAMEPLAY_FOV";
     public static final String VIEW_MODEL_FOV_KEY = "MCRTX_VIEWMODEL_FOV";
@@ -29,6 +30,7 @@ public final class McrtxGameplaySettings {
     public static final int BLOCK_OUTLINE_STYLE_THIN = 5;
 
     private static boolean playerShadowsEnabled = true;
+    private static boolean firstPersonBodyEnabled = false;
     private static boolean heldTorchLightsEnabled = true;
     private static int gameplayFovDegrees = DEFAULT_GAMEPLAY_FOV_DEGREES;
     private static int viewModelFovDegrees = DEFAULT_VIEW_MODEL_FOV_DEGREES;
@@ -53,6 +55,24 @@ public final class McrtxGameplaySettings {
                 return;
             }
             playerShadowsEnabled = enabled;
+            McrtxSettingsStore.saveLocked();
+        }
+    }
+
+    public static boolean isFirstPersonBodyEnabled() {
+        synchronized (McrtxSettingsStore.LOCK) {
+            McrtxSettingsStore.ensureLoadedLocked();
+            return firstPersonBodyEnabled;
+        }
+    }
+
+    public static void setFirstPersonBodyEnabled(boolean enabled) {
+        synchronized (McrtxSettingsStore.LOCK) {
+            McrtxSettingsStore.ensureLoadedLocked();
+            if (firstPersonBodyEnabled == enabled) {
+                return;
+            }
+            firstPersonBodyEnabled = enabled;
             McrtxSettingsStore.saveLocked();
         }
     }
@@ -180,6 +200,7 @@ public final class McrtxGameplaySettings {
 
     static void loadLocked(Map<String, String> fileValues) {
         playerShadowsEnabled = McrtxRuntimeSettingParser.readBooleanSetting(fileValues, PLAYER_SHADOWS_ENABLED_KEY, true);
+        firstPersonBodyEnabled = McrtxRuntimeSettingParser.readBooleanSetting(fileValues, FIRST_PERSON_BODY_ENABLED_KEY, false);
         heldTorchLightsEnabled = McrtxRuntimeSettingParser.readBooleanSetting(fileValues, HELD_TORCH_LIGHTS_ENABLED_KEY, true);
         gameplayFovDegrees = McrtxRuntimeSettingParser.readRoundedIntSetting(
                 fileValues, GAMEPLAY_FOV_KEY, DEFAULT_GAMEPLAY_FOV_DEGREES,
@@ -200,6 +221,7 @@ public final class McrtxGameplaySettings {
 
     static void writeLocked(Map<String, String> fileValues) {
         fileValues.put(PLAYER_SHADOWS_ENABLED_KEY, McrtxRuntimeSettingFormatter.formatBoolean(playerShadowsEnabled));
+        fileValues.put(FIRST_PERSON_BODY_ENABLED_KEY, McrtxRuntimeSettingFormatter.formatBoolean(firstPersonBodyEnabled));
         fileValues.put(HELD_TORCH_LIGHTS_ENABLED_KEY, McrtxRuntimeSettingFormatter.formatBoolean(heldTorchLightsEnabled));
         fileValues.put(GAMEPLAY_FOV_KEY, Integer.toString(gameplayFovDegrees));
         fileValues.put(VIEW_MODEL_FOV_KEY, Integer.toString(viewModelFovDegrees));

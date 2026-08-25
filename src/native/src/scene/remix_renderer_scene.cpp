@@ -162,7 +162,7 @@ bool RemixRenderer::drawCapturedGeometry(FrameRenderSnapshot& snapshot) {
 
     const auto dynamicEntityCategoryFlags = [this](int entityId) {
       return entityId == kFirstPersonPlayerShadowEntityId
-        ? (playerShadowsEnabled_
+        ? ((playerShadowsEnabled_ || firstPersonBodyEnabled_)
           ? (REMIXAPI_INSTANCE_CATEGORY_BIT_THIRD_PERSON_PLAYER_MODEL
             | REMIXAPI_INSTANCE_CATEGORY_BIT_FIRST_PERSON_PLAYER_SHADOW)
           : REMIXAPI_INSTANCE_CATEGORY_BIT_THIRD_PERSON_PLAYER_MODEL)

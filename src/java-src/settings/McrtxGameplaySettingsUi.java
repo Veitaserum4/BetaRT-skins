@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL11;
 final class McrtxGameplaySettingsUi implements McrtxSettingsCategoryUi {
     private static final int PLAYER_SHADOWS_BUTTON_ID = 1;
     private static final int HELD_TORCH_LIGHTS_BUTTON_ID = 2;
+    private static final int FIRST_PERSON_BODY_BUTTON_ID = 3;
     private static final int GAMEPLAY_FOV_SLIDER_ID = 7;
     private static final int VIEW_MODEL_FOV_SLIDER_ID = 8;
     private static final int BLOCK_OUTLINE_BUTTON_ID = 10;
@@ -20,6 +21,7 @@ final class McrtxGameplaySettingsUi implements McrtxSettingsCategoryUi {
         screen.addControl(new Slider(GAMEPLAY_FOV_SLIDER_ID, screen.getControlX(), screen.takeNextRowY(), screen.getControlWidth(), McrtxQuickSettingsScreen.CONTROL_HEIGHT, Slider.MODE_GAMEPLAY_FOV));
         screen.addControl(new Slider(VIEW_MODEL_FOV_SLIDER_ID, screen.getControlX(), screen.takeNextRowY(), screen.getControlWidth(), McrtxQuickSettingsScreen.CONTROL_HEIGHT, Slider.MODE_VIEW_MODEL_FOV));
         screen.addControl(button(screen, PLAYER_SHADOWS_BUTTON_ID, getPlayerShadowsLabel()));
+        screen.addControl(button(screen, FIRST_PERSON_BODY_BUTTON_ID, getFirstPersonBodyLabel()));
         screen.addControl(button(screen, HELD_TORCH_LIGHTS_BUTTON_ID, getHeldTorchLightsLabel()));
         screen.addControl(button(screen, BLOCK_OUTLINE_BUTTON_ID, getBlockOutlineLabel()));
         if (McrtxGameplaySettings.isBlockOutlineEnabled()) {
@@ -33,6 +35,10 @@ final class McrtxGameplaySettingsUi implements McrtxSettingsCategoryUi {
     public int handleButton(int buttonId) {
         if (buttonId == PLAYER_SHADOWS_BUTTON_ID) {
             setPlayerShadowsEnabled(!McrtxGameplaySettings.isPlayerShadowsEnabled());
+            return UPDATE_REFRESH;
+        }
+        if (buttonId == FIRST_PERSON_BODY_BUTTON_ID) {
+            setFirstPersonBodyEnabled(!McrtxGameplaySettings.isFirstPersonBodyEnabled());
             return UPDATE_REFRESH;
         }
         if (buttonId == HELD_TORCH_LIGHTS_BUTTON_ID) {
@@ -52,6 +58,7 @@ final class McrtxGameplaySettingsUi implements McrtxSettingsCategoryUi {
 
     public void refreshButtons(McrtxQuickSettingsScreen screen) {
         setLabel(screen, PLAYER_SHADOWS_BUTTON_ID, getPlayerShadowsLabel());
+        setLabel(screen, FIRST_PERSON_BODY_BUTTON_ID, getFirstPersonBodyLabel());
         setLabel(screen, HELD_TORCH_LIGHTS_BUTTON_ID, getHeldTorchLightsLabel());
         setLabel(screen, BLOCK_OUTLINE_BUTTON_ID, getBlockOutlineLabel());
         setLabel(screen, BLOCK_OUTLINE_STYLE_BUTTON_ID, getBlockOutlineStyleLabel());
@@ -59,10 +66,13 @@ final class McrtxGameplaySettingsUi implements McrtxSettingsCategoryUi {
 
     public void applySavedSettings() {
         boolean playerShadows = McrtxGameplaySettings.isPlayerShadowsEnabled();
+        boolean firstPersonBody = McrtxGameplaySettings.isFirstPersonBodyEnabled();
         boolean heldLights = McrtxGameplaySettings.isHeldTorchLightsEnabled();
         RemixDynamicEntityCapture.setPlayerShadowsEnabled(playerShadows);
+        RemixDynamicEntityCapture.setFirstPersonBodyEnabled(firstPersonBody);
         RemixDynamicEntityCapture.setHeldTorchLightsEnabled(heldLights);
         McrtxGameplaySettingsNative.setPlayerShadowsEnabled(playerShadows);
+        McrtxGameplaySettingsNative.setFirstPersonBodyEnabled(firstPersonBody);
         McrtxGameplaySettingsNative.setHeldTorchLightsEnabled(heldLights);
         McrtxGameplaySettingsNative.setBlockOutlineEnabled(McrtxGameplaySettings.isBlockOutlineEnabled());
         McrtxGameplaySettingsNative.setBlockOutlineStyle(McrtxGameplaySettings.getBlockOutlineStyle());
@@ -80,6 +90,7 @@ final class McrtxGameplaySettingsUi implements McrtxSettingsCategoryUi {
     }
 
     private static String getPlayerShadowsLabel() { return "First-Person Player Shadows: " + toggle(McrtxGameplaySettings.isPlayerShadowsEnabled()); }
+    private static String getFirstPersonBodyLabel() { return "First-Person Player Body: " + toggle(McrtxGameplaySettings.isFirstPersonBodyEnabled()); }
     private static String getHeldTorchLightsLabel() { return "Held Torch Lights: " + toggle(McrtxGameplaySettings.isHeldTorchLightsEnabled()); }
     private static String getBlockOutlineLabel() { return "Block Outline: " + toggle(McrtxGameplaySettings.isBlockOutlineEnabled()); }
     private static String getBlockOutlineStyleLabel() { return "Outline Style: " + describeBlockOutlineStyle(McrtxGameplaySettings.getBlockOutlineStyle()); }
@@ -95,6 +106,12 @@ final class McrtxGameplaySettingsUi implements McrtxSettingsCategoryUi {
         McrtxGameplaySettings.setPlayerShadowsEnabled(enabled);
         RemixDynamicEntityCapture.setPlayerShadowsEnabled(enabled);
         McrtxGameplaySettingsNative.setPlayerShadowsEnabled(enabled);
+    }
+
+    private static void setFirstPersonBodyEnabled(boolean enabled) {
+        McrtxGameplaySettings.setFirstPersonBodyEnabled(enabled);
+        RemixDynamicEntityCapture.setFirstPersonBodyEnabled(enabled);
+        McrtxGameplaySettingsNative.setFirstPersonBodyEnabled(enabled);
     }
 
     private static void setHeldTorchLightsEnabled(boolean enabled) {

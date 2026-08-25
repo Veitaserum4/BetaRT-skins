@@ -21,6 +21,22 @@ void RemixRenderer::setPlayerShadowsEnabled(bool enabled) {
       true);
 }
 
+void RemixRenderer::setFirstPersonBodyEnabled(bool enabled) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Native, "RemixRenderer::setFirstPersonBodyEnabled");
+  std::scoped_lock lock(mutex_);
+
+  firstPersonBodyEnabled_ = enabled;
+  if (!initialized_) {
+    return;
+  }
+
+  setConfigVariableLocked(
+      "rtx.playerModel.enableInPrimarySpace",
+      enabled ? "True" : "False",
+      true,
+      true);
+}
+
 void RemixRenderer::setHeldTorchLightsEnabled(bool enabled) {
   MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Native, "RemixRenderer::setHeldTorchLightsEnabled");
   std::scoped_lock lock(mutex_);

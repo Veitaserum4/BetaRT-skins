@@ -14,6 +14,12 @@ JNIEXPORT void JNICALL Java_mcrtx_bridge_McrtxGameplaySettingsNative_nSetPlayerS
   RemixRenderer::instance().setPlayerShadowsEnabled(enabled == JNI_TRUE);
 }
 
+JNIEXPORT void JNICALL Java_mcrtx_bridge_McrtxGameplaySettingsNative_nSetFirstPersonBodyEnabled(
+    JNIEnv*, jclass, jboolean enabled) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Jni, "nSetFirstPersonBodyEnabled");
+  RemixRenderer::instance().setFirstPersonBodyEnabled(enabled == JNI_TRUE);
+}
+
 JNIEXPORT void JNICALL Java_mcrtx_bridge_McrtxGameplaySettingsNative_nSetHeldTorchLightsEnabled(
     JNIEnv*, jclass, jboolean enabled) {
   MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Jni, "nSetHeldTorchLightsEnabled");

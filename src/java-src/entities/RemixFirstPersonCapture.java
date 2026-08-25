@@ -23,6 +23,7 @@ final class RemixFirstPersonCapture {
     private static boolean shadowCaptureActive;
     private static boolean shadowCaptureAvailable = true;
     private static volatile boolean playerShadowsEnabled = true;
+    private static volatile boolean firstPersonBodyEnabled = false;
     private static boolean loggedShadowCaptureFailure;
     private static boolean voxelsGeneratedForCurrentItem;
 
@@ -95,7 +96,7 @@ final class RemixFirstPersonCapture {
 
         updateExtractedSkinUrl(minecraft.h);
 
-        if (!playerShadowsEnabled || !shadowCaptureAvailable) {
+        if ((!playerShadowsEnabled && !firstPersonBodyEnabled) || !shadowCaptureAvailable) {
             return;
         }
 
@@ -205,7 +206,14 @@ final class RemixFirstPersonCapture {
 
     static void setPlayerShadowsEnabled(boolean enabled) {
         playerShadowsEnabled = enabled;
-        if (!enabled) {
+        if (!enabled && !firstPersonBodyEnabled) {
+            shadowCaptureActive = false;
+        }
+    }
+
+    static void setFirstPersonBodyEnabled(boolean enabled) {
+        firstPersonBodyEnabled = enabled;
+        if (!enabled && !playerShadowsEnabled) {
             shadowCaptureActive = false;
         }
     }

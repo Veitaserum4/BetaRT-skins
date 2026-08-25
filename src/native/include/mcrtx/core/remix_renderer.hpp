@@ -70,6 +70,7 @@ public:
   void setFirstPersonHeldItem(int itemId);
   void setEntityLight(int entityId, double worldX, double worldY, double worldZ, int itemId);
   void setPlayerShadowsEnabled(bool enabled);
+  void setFirstPersonBodyEnabled(bool enabled);
   void setHeldTorchLightsEnabled(bool enabled);
   void setDynamicEntityRenderingEnabled(bool enabled);
   void setBlockOutlineEnabled(bool enabled);
@@ -552,6 +553,7 @@ private:
   std::unordered_set<int> entityHeldTorchLightsSeenThisFrame_ {};
   int heldItemId_ {-1};
   bool playerShadowsEnabled_ {true};
+  bool firstPersonBodyEnabled_ {false};
   bool heldTorchLightsEnabled_ {true};
   bool dynamicEntityRenderingEnabled_ {true};
   bool blockOutlineEnabled_ {true};
