@@ -290,7 +290,7 @@ final class RemixDynamicModelCapture {
 
     static void captureTessellatorDraw(int[] rawVertexData, int vertexCount, int drawMode,
             boolean hasTexture, boolean hasColor) {
-        if (RemixFirstPersonCapture.isShadowCaptureActive()) {
+        if (RemixFirstPersonCapture.isShadowCaptureActive() && !RemixFirstPersonCapture.isFirstPersonBodyEnabled()) {
             return;
         }
         String activeTexture = RemixDynamicEntitySession.activeCaptureTexture();
@@ -304,7 +304,9 @@ final class RemixDynamicModelCapture {
         if (RemixFirstPersonCapture.isActive() && vertexCount == 6) {
             RemixFirstPersonCapture.resetVoxelCapture();
         }
-        if (RemixFirstPersonCapture.isActive() && vertexCount == 96) {
+        if ((RemixFirstPersonCapture.isActive()
+                || (RemixFirstPersonCapture.isShadowCaptureActive() && RemixFirstPersonCapture.isFirstPersonBodyEnabled()))
+                && vertexCount == 96) {
             if (!RemixFirstPersonCapture.hasGeneratedVoxels()) {
                 try {
                     float[] modelView = captureModelViewMatrix();
@@ -316,7 +318,9 @@ final class RemixDynamicModelCapture {
                         return;
                     }
                     RemixCameraState.PreciseTransform modelToWorld =
-                            RemixCameraState.buildModelToWorldTransform(modelView);
+                            RemixFirstPersonCapture.isShadowCaptureActive()
+                                    ? RemixFirstPersonCapture.modelToWorldTransform(modelView)
+                                    : RemixCameraState.buildModelToWorldTransform(modelView);
                     int fallbackColorRgba = ColorMath.sanitizePackedColor(ColorMath.packColor(
                             currentColor[0], currentColor[1], currentColor[2], currentColor[3]));
                     int boneIndex = RemixDynamicEntitySession.allocateBoneIndex();
@@ -329,10 +333,6 @@ final class RemixDynamicModelCapture {
                 }
                 RemixFirstPersonCapture.markVoxelsGenerated();
             }
-            return;
-        }
-
-        if (!GL11.glIsEnabled(GL11.GL_TEXTURE_2D)) {
             return;
         }
 
@@ -349,7 +349,9 @@ final class RemixDynamicModelCapture {
             long stateReadEndNanos = System.nanoTime();
 
             RemixCameraState.PreciseTransform modelToWorld =
-                    RemixCameraState.buildModelToWorldTransform(modelView);
+                    RemixFirstPersonCapture.isShadowCaptureActive()
+                            ? RemixFirstPersonCapture.modelToWorldTransform(modelView)
+                            : RemixCameraState.buildModelToWorldTransform(modelView);
             int fallbackColorRgba = ColorMath.sanitizePackedColor(ColorMath.packColor(
                     currentColor[0], currentColor[1], currentColor[2], currentColor[3]));
             int boneIndex = RemixDynamicEntitySession.allocateBoneIndex();

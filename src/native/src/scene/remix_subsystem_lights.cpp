@@ -446,8 +446,8 @@ bool RemixRenderer::updateEntityLight(
   lightInfo.hash = persistentLightHashForRenderOrigin(makeEntityLightHash(entityId), renderOrigin);
   lightInfo.radiance = entityLightRadiance(state.itemId);
   lightInfo.isDynamic = TRUE;
-  lightInfo.ignoreViewModel = FALSE;
-  lightInfo.ignoreFirstPersonPlayerShadow = FALSE;
+  lightInfo.ignoreViewModel = TRUE;
+  lightInfo.ignoreFirstPersonPlayerShadow = TRUE;
 
   if (state.handle == nullptr) {
     const remixapi_ErrorCode result = [&]() {
@@ -488,7 +488,7 @@ bool RemixRenderer::reconcileHeldItemTorchLight(const WorldRenderOrigin& renderO
   MCRTX_TRACY_SCOPE("RemixRenderer::reconcileHeldItemTorchLight");
 
   const bool supportsLightCreation = remix_.CreateLight != nullptr;
-  if (!supportsLightCreation || !isEmissiveEntityItem(heldItemId_)) {
+  if (!supportsLightCreation || !isEmissiveEntityItem(heldItemId_) || firstPersonBodyEnabled_) {
     destroyHeldItemTorchLight();
     return true;
   }
@@ -519,8 +519,8 @@ bool RemixRenderer::reconcileHeldItemTorchLight(const WorldRenderOrigin& renderO
   lightInfo.hash = persistentLightHashForRenderOrigin(kHeldTorchLightHash, renderOrigin);
   lightInfo.radiance = entityLightRadiance(heldItemId_);
   lightInfo.isDynamic = TRUE;
-  lightInfo.ignoreViewModel = TRUE;
-  lightInfo.ignoreFirstPersonPlayerShadow = TRUE;
+  lightInfo.ignoreViewModel = !firstPersonBodyEnabled_;
+  lightInfo.ignoreFirstPersonPlayerShadow = !firstPersonBodyEnabled_;
 
   if (heldItemTorchLightHandle_ == nullptr) {
     MCRTX_TRACY_SCOPE("reconcileHeldItemTorchLight.create");
