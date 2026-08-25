@@ -101,6 +101,9 @@ public:
       bool rayReconstructionEnabled,
       bool sparseRenderingEnabled);
   void setRemixAtmosphereCloudsEnabled(bool enabled);
+  void setAerialPerspectiveEnabled(bool enabled);
+  void setAerialPerspectiveStrength(int strength);
+  void setAerialPerspectiveSceneShadowEnabled(bool enabled);
   void setDynamicEntityBoneTransform(
       std::uint32_t boneIndex,
       const remixapi_Transform& transform,
@@ -298,6 +301,7 @@ private:
   void applyRtQualityConfigLocked();
   void applyUpscalerConfigLocked();
   void applyRemixAtmosphereCloudConfigLocked();
+  void applyAerialPerspectiveConfigLocked();
   void applyRemixConfigPreStartupLocked();
   void applyRemixConfigPostStartupLocked();
   void publishCelestialTexturePathsLocked();
@@ -584,6 +588,13 @@ private:
   bool rayReconstructionEnabled_ {true};
   bool sparseRenderingEnabled_ {true};
   bool remixAtmosphereCloudsEnabled_ {false};
+  bool aerialPerspectiveEnabled_ {true};
+  bool aerialPerspectiveSceneShadowEnabled_ {true};
+  int aerialPerspectiveStrength_ {1};
+  // Render distance in blocks the volume was last calibrated for. The
+  // depth range and shadow bound are sized from it, so a change of the
+  // video setting has to re-push them.
+  float aerialPerspectiveViewDistanceBlocks_ {256.0f};
   int rtQuality_ {kRtQualityHigh};
   std::vector<remixapi_MeshHandle> deferredMeshDestroys_ {};
   std::vector<remixapi_LightHandle> deferredLightDestroys_ {};

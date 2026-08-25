@@ -38,6 +38,18 @@ void RemixRenderer::updateCamera(const CameraState& camera) {
   MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Native, "RemixRenderer::updateCamera");
   std::scoped_lock lock(mutex_);
   camera_ = camera;
+
+  // The aerial perspective volume sizes its depth axis and its scene-shadow
+  // bound from the render distance, which reaches us only as the camera far
+  // plane. Minecraft projects to farPlaneDistance * 2, so half of it is the
+  // distance actually drawn. Re-push only when the video setting has moved -
+  // this runs every frame.
+  const float viewDistanceBlocks = camera_.farPlane * 0.5f;
+  if (initialized_ && viewDistanceBlocks > 0.0f
+      && viewDistanceBlocks != aerialPerspectiveViewDistanceBlocks_) {
+    aerialPerspectiveViewDistanceBlocks_ = viewDistanceBlocks;
+    applyAerialPerspectiveConfigLocked();
+  }
 }
 
 WorldRenderOrigin RemixRenderer::currentRenderOriginLocked() const noexcept {

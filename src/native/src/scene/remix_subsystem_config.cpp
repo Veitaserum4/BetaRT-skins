@@ -1,4 +1,5 @@
 #include "mcrtx/core/remix_renderer.hpp"
+#include "mcrtx/scene/remix_aerial_perspective.hpp"
 #include "mcrtx/scene/remix_cloud_mode.hpp"
 #include "mcrtx/core/remix_render_common.hpp"
 
@@ -310,8 +311,19 @@ void RemixRenderer::applyRemixAtmosphereCloudConfigLocked() {
   }
 }
 
+void RemixRenderer::applyAerialPerspectiveConfigLocked() {
+  for (const AerialPerspectiveConfigEntry& configValue : aerialPerspectiveConfigValues(
+           aerialPerspectiveEnabled_,
+           aerialPerspectiveStrengthFromInt(aerialPerspectiveStrength_),
+           aerialPerspectiveViewDistanceBlocks_,
+           aerialPerspectiveSceneShadowEnabled_)) {
+    setConfigVariableLocked(configValue.key, configValue.value, true, true);
+  }
+}
+
 void RemixRenderer::applyRemixConfigPostStartupLocked() {
   applyRemixAtmosphereCloudConfigLocked();
+  applyAerialPerspectiveConfigLocked();
   applyRtQualityConfigLocked();
   applyUpscalerConfigLocked();
   setConfigVariableLocked(

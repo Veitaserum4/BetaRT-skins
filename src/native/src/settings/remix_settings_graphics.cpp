@@ -68,4 +68,35 @@ void RemixRenderer::setRemixAtmosphereCloudsEnabled(bool enabled) {
   }
 }
 
+void RemixRenderer::setAerialPerspectiveEnabled(bool enabled) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Native, "RemixRenderer::setAerialPerspectiveEnabled");
+  std::scoped_lock lock(mutex_);
+  aerialPerspectiveEnabled_ = enabled;
+  if (!initialized_) {
+    return;
+  }
+  applyAerialPerspectiveConfigLocked();
+}
+
+void RemixRenderer::setAerialPerspectiveStrength(int strength) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Native, "RemixRenderer::setAerialPerspectiveStrength");
+  std::scoped_lock lock(mutex_);
+  aerialPerspectiveStrength_ = strength;
+  if (!initialized_) {
+    return;
+  }
+  applyAerialPerspectiveConfigLocked();
+}
+
+void RemixRenderer::setAerialPerspectiveSceneShadowEnabled(bool enabled) {
+  MCRTX_PERF_SCOPE(
+      ::mcrtx::perf::Side::Native, "RemixRenderer::setAerialPerspectiveSceneShadowEnabled");
+  std::scoped_lock lock(mutex_);
+  aerialPerspectiveSceneShadowEnabled_ = enabled;
+  if (!initialized_) {
+    return;
+  }
+  applyAerialPerspectiveConfigLocked();
+}
+
 }  // namespace mcrtx
