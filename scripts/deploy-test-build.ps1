@@ -12,7 +12,7 @@ param(
     [ValidateSet("platform", "native")]
     [string]$InputBackend = "native",
     [ValidateSet("single", "overlay", "dual", "detached", "separate", "standalone", "single-native")]
-    [string]$WindowMode = "overlay",
+    [string]$WindowMode = "single-native",
     [switch]$UseNoApplet,
     [switch]$Build,
     [switch]$Restore,
@@ -136,9 +136,32 @@ function Write-JsonFile {
     Set-Content -Path $Path -Value $json -Encoding ASCII
 }
 
+function Get-ExistingInstanceWindowMode {
+    param([string]$MinecraftDir)
+
+    if (-not $MinecraftDir -or -not (Test-Path $MinecraftDir)) {
+        return $null
+    }
+
+    foreach ($fileName in @("mcrtx.env", "mcrtx-runtime.env")) {
+        $envPath = Join-Path $MinecraftDir $fileName
+        if (Test-Path $envPath) {
+            $line = Get-Content $envPath -ErrorAction SilentlyContinue | Where-Object { $_ -match '^\s*MCRTX_WINDOW_MODE\s*=\s*(.+)$' } | Select-Object -First 1
+            if ($line -and $line -match '^\s*MCRTX_WINDOW_MODE\s*=\s*(.+)$') {
+                $val = $matches[1].Trim().Trim('"').Trim("'")
+                if (-not [string]::IsNullOrWhiteSpace($val)) {
+                    return $val
+                }
+            }
+        }
+    }
+    return $null
+}
+
 function Resolve-LaunchConfig {
     param(
         [string]$DeploymentInfoPath,
+        [string]$InstanceMinecraftDir,
         [string]$RequestedPlatformBackend,
         [string]$RequestedInputBackend,
         [string]$RequestedWindowMode,
@@ -157,6 +180,11 @@ function Resolve-LaunchConfig {
         VerboseInputLogging = $RequestedVerboseInputLogging
     }
 
+    $existingEnvMode = Get-ExistingInstanceWindowMode -MinecraftDir $InstanceMinecraftDir
+    if ($existingEnvMode -and -not $ForceRequestedConfig) {
+        $resolvedConfig.WindowMode = $existingEnvMode
+    }
+
     if ($ForceRequestedConfig -or -not (Test-Path $DeploymentInfoPath)) {
         return [pscustomobject]$resolvedConfig
     }
@@ -173,7 +201,7 @@ function Resolve-LaunchConfig {
 
     $pinnedPlatformBackend = [string]$lastDeploy.platformBackend
     $pinnedInputBackend = [string]$lastDeploy.inputBackend
-    $pinnedWindowMode = [string]$lastDeploy.windowMode
+    $pinnedWindowMode = if ($existingEnvMode) { $existingEnvMode } else { [string]$lastDeploy.windowMode }
     $pinnedUseNoApplet = [bool]$lastDeploy.useNoApplet
     $pinnedNoCullDistance = $RequestedNoCullDistance
     if ($lastDeploy.PSObject.Properties.Name -contains "noCullDistance") {
@@ -197,7 +225,7 @@ function Resolve-LaunchConfig {
     return [pscustomobject]$resolvedConfig
 }
 
-$resolvedLaunchConfig = Resolve-LaunchConfig -DeploymentInfoPath $deploymentInfo -RequestedPlatformBackend $PlatformBackend -RequestedInputBackend $InputBackend -RequestedWindowMode $WindowMode -RequestedUseNoApplet:$UseNoApplet.IsPresent -RequestedNoCullDistance $NoCullDistance -RequestedVerboseInputLogging:$VerboseInputLogging.IsPresent -ForceRequestedConfig:$ForceRequestedLaunchConfig.IsPresent
+$resolvedLaunchConfig = Resolve-LaunchConfig -DeploymentInfoPath $deploymentInfo -InstanceMinecraftDir $instanceMinecraftDir -RequestedPlatformBackend $PlatformBackend -RequestedInputBackend $InputBackend -RequestedWindowMode $WindowMode -RequestedUseNoApplet:$UseNoApplet.IsPresent -RequestedNoCullDistance $NoCullDistance -RequestedVerboseInputLogging:$VerboseInputLogging.IsPresent -ForceRequestedConfig:$ForceRequestedLaunchConfig.IsPresent
 $PlatformBackend = $resolvedLaunchConfig.PlatformBackend
 $InputBackend = $resolvedLaunchConfig.InputBackend
 $WindowMode = $resolvedLaunchConfig.WindowMode
