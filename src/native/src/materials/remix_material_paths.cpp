@@ -9,12 +9,7 @@
 #include <vector>
 #include <fstream>
 
-namespace mcrtx {
-
-using namespace mcrtx::detail;
-using namespace mcrtx::material;
-
-namespace {
+namespace mcrtx::material {
 
 void pushAssetCandidates(
     std::vector<std::filesystem::path>& attemptedPaths,
@@ -22,17 +17,26 @@ void pushAssetCandidates(
     const std::filesystem::path& relativePath) {
   std::filesystem::path cacheDir = getCurrentTexturePackCacheDir();
   if (!cacheDir.empty()) {
-    attemptedPaths.push_back(cacheDir / relativePath);
+    attemptedPaths.push_back((cacheDir / relativePath).lexically_normal());
   }
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_texturepack_cache" / relativePath);
+  attemptedPaths.push_back((std::filesystem::current_path() / L"mcrtx_texturepack_cache" / relativePath).lexically_normal());
   if (!moduleDirectory.empty()) {
-    attemptedPaths.push_back(moduleDirectory / L"mcrtx_assets" / relativePath);
-    attemptedPaths.push_back(moduleDirectory / relativePath);
+    attemptedPaths.push_back((moduleDirectory / L"mcrtx_assets" / relativePath).lexically_normal());
+    attemptedPaths.push_back((moduleDirectory / relativePath).lexically_normal());
   }
-  attemptedPaths.push_back(std::filesystem::current_path() / L"mcrtx_assets" / relativePath);
-  attemptedPaths.push_back(std::filesystem::current_path() / L".." / L"libraries" / L"mcrtx_assets" / relativePath);
-  attemptedPaths.push_back(std::filesystem::current_path() / relativePath);
+  attemptedPaths.push_back((std::filesystem::current_path() / L"mcrtx_assets" / relativePath).lexically_normal());
+  attemptedPaths.push_back((std::filesystem::current_path() / L".." / L"libraries" / L"mcrtx_assets" / relativePath).lexically_normal());
+  attemptedPaths.push_back((std::filesystem::current_path() / relativePath).lexically_normal());
 }
+
+}  // namespace mcrtx::material
+
+namespace mcrtx {
+
+using namespace mcrtx::detail;
+using namespace mcrtx::material;
+
+namespace {
 
 void appendAtlasCandidates(
     std::vector<std::filesystem::path>& attemptedPaths,
