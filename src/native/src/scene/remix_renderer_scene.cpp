@@ -550,48 +550,40 @@ bool RemixRenderer::drawCapturedGeometry(FrameRenderSnapshot& snapshot) {
     }
   }
 
-  if (!snapshot.torchLights.empty()) {
+  if (remix_.AutoInstancePersistentLights != nullptr) {
+    if (!loggedLightSubmissionPath_) {
+      loggedLightSubmissionPath_ = true;
+      log("Light submission path: AutoInstancePersistentLights (persistent RTXDI reservoirs); CreateLight="
+          + std::string(remix_.CreateLight != nullptr ? "yes" : "no"));
+    }
+    const remixapi_ErrorCode result = [&]() {
+      MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Remix, "AutoInstancePersistentLights");
+      return remix_.AutoInstancePersistentLights();
+    }();
+    if (result != REMIXAPI_ERROR_CODE_SUCCESS) {
+      setError("AutoInstancePersistentLights failed: " + errorCodeToString(result));
+      return false;
+    }
+  } else if (remix_.DrawLightInstance != nullptr && !snapshot.torchLights.empty()) {
     MCRTX_TRACY_SCOPE("drawCapturedGeometry.torchLights");
     MCRTX_TRACY_VALUE(snapshot.torchLights.size());
     if (!loggedLightSubmissionPath_) {
       loggedLightSubmissionPath_ = true;
-      std::ostringstream pathStream;
-      pathStream << "Light submission path: ";
-      if (remix_.AutoInstancePersistentLights != nullptr) {
-        pathStream << "AutoInstancePersistentLights (persistent RTXDI reservoirs)";
-      } else if (remix_.DrawLightInstance != nullptr) {
-        pathStream << "DrawLightInstance per-frame fallback (no persistent reservoirs -- expect boiling)";
-      } else {
-        pathStream << "NONE -- lights will not be rendered";
-      }
-      pathStream << "; CreateLight="
-             << (remix_.CreateLight != nullptr ? "yes" : "no")
-                 << "; torch lights registered=" << snapshot.submittedTorchLights;
-      log(pathStream.str());
+      log("Light submission path: DrawLightInstance per-frame fallback; lights registered="
+          + std::to_string(snapshot.submittedTorchLights));
     }
-    if (remix_.AutoInstancePersistentLights != nullptr) {
+    for (remixapi_LightHandle lightHandle : snapshot.torchLights) {
+      if (lightHandle == nullptr) {
+        continue;
+      }
+
       const remixapi_ErrorCode result = [&]() {
-        MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Remix, "AutoInstancePersistentLights");
-        return remix_.AutoInstancePersistentLights();
+        MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Remix, "DrawLightInstance");
+        return remix_.DrawLightInstance(lightHandle);
       }();
       if (result != REMIXAPI_ERROR_CODE_SUCCESS) {
-        setError("AutoInstancePersistentLights failed: " + errorCodeToString(result));
+        setError("DrawLightInstance failed: " + errorCodeToString(result));
         return false;
-      }
-    } else if (remix_.DrawLightInstance != nullptr) {
-      for (remixapi_LightHandle lightHandle : snapshot.torchLights) {
-        if (lightHandle == nullptr) {
-          continue;
-        }
-
-        const remixapi_ErrorCode result = [&]() {
-          MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Remix, "DrawLightInstance");
-          return remix_.DrawLightInstance(lightHandle);
-        }();
-        if (result != REMIXAPI_ERROR_CODE_SUCCESS) {
-          setError("DrawLightInstance failed: " + errorCodeToString(result));
-          return false;
-        }
       }
     }
   }

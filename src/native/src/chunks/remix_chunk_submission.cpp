@@ -34,8 +34,10 @@ bool RemixRenderer::rebuildChunkMeshFromData(
   auto& surfacesToBuild = build.surfacesToBuild;
   auto& desiredTorchLights = build.desiredTorchLights;
   auto& desiredPortalLights = build.desiredPortalLights;
+  auto& desiredGlowstoneLights = build.desiredGlowstoneLights;
   MCRTX_TRACY_VALUE(desiredTorchLights.size());
   MCRTX_TRACY_VALUE(desiredPortalLights.size());
+  MCRTX_TRACY_VALUE(desiredGlowstoneLights.size());
 
   std::vector<remixapi_MeshInfoSurfaceTriangles> surfaces;
   {
@@ -74,6 +76,9 @@ bool RemixRenderer::rebuildChunkMeshFromData(
     if (!reconcileChunkPortalLights(meshData, desiredPortalLights)) {
       return false;
     }
+    if (!reconcileChunkGlowstoneLights(meshData, desiredGlowstoneLights)) {
+      return false;
+    }
     // Face coverage is already up to date from the previous build.
     return true;
   }
@@ -102,6 +107,10 @@ bool RemixRenderer::rebuildChunkMeshFromData(
       return false;
     }
     if (!reconcileChunkPortalLights(meshData, desiredPortalLights)) {
+      destroyMeshHandle(newMeshHandle);
+      return false;
+    }
+    if (!reconcileChunkGlowstoneLights(meshData, desiredGlowstoneLights)) {
       destroyMeshHandle(newMeshHandle);
       return false;
     }

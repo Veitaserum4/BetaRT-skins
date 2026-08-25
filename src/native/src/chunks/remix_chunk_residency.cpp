@@ -171,6 +171,7 @@ void RemixRenderer::destroyChunkMesh(ChunkMeshData& meshData) {
   destroyChunkMeshHandle(meshData);
   destroyChunkTorchLights(meshData);
   destroyChunkPortalLights(meshData);
+  destroyChunkGlowstoneLights(meshData);
   meshData.meshFingerprint = 0;
   meshData.fireCellIndices.clear();
 }

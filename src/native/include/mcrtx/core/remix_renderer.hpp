@@ -337,9 +337,15 @@ private:
   bool updatePortalLight(const PortalLightPlacement& placement, const WorldRenderOrigin& renderOrigin);
   bool reconcileChunkPortalLights(ChunkMeshData& meshData, const std::vector<PortalLightPlacement>& desiredPortalLights);
   void destroyPortalLight(const WorldBlockPosition& blockPosition);
+  bool createGlowstoneLight(const GlowstoneLightPlacement& placement, const WorldRenderOrigin& renderOrigin);
+  bool updateGlowstoneLight(const GlowstoneLightPlacement& placement, const WorldRenderOrigin& renderOrigin);
+  bool reconcileChunkGlowstoneLights(ChunkMeshData& meshData, const std::vector<GlowstoneLightPlacement>& desiredGlowstoneLights);
+  void destroyGlowstoneLight(const WorldBlockPosition& position);
+  void destroyChunkGlowstoneLights(ChunkMeshData& meshData);
   bool reconcileHeldItemTorchLight(const WorldRenderOrigin& renderOrigin);
   void reconcileParticleLights(const WorldRenderOrigin& renderOrigin);
   bool refreshTorchLightDefinitions(const WorldRenderOrigin& renderOrigin);
+  bool refreshGlowstoneLightDefinitions(const WorldRenderOrigin& renderOrigin);
   bool updateEntityLight(int entityId, EntityHeldTorchLightState& state, const WorldRenderOrigin& renderOrigin);
   void updateEntityLightsLocked(const WorldRenderOrigin& renderOrigin);
   void destroyEntityHeldTorchLight(int entityId);
@@ -548,6 +554,8 @@ private:
   std::unordered_map<WorldBlockPosition, TorchLightPlacement, WorldBlockPositionHash> torchLightPlacements_ {};
   std::unordered_map<WorldBlockPosition, PortalLightState, WorldBlockPositionHash> portalLights_ {};
   std::unordered_map<WorldBlockPosition, PortalLightPlacement, WorldBlockPositionHash> portalLightPlacements_ {};
+  std::unordered_map<WorldBlockPosition, GlowstoneLightState, WorldBlockPositionHash> glowstoneLights_ {};
+  std::unordered_map<WorldBlockPosition, GlowstoneLightPlacement, WorldBlockPositionHash> glowstoneLightPlacements_ {};
   remixapi_LightHandle heldItemTorchLightHandle_ {nullptr};
   WorldRenderOrigin heldItemTorchLightRenderOrigin_ {};
   std::unordered_map<int, EntityHeldTorchLightState> entityHeldTorchLights_ {};

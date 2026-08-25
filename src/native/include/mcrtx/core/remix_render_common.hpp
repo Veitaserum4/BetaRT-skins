@@ -75,6 +75,7 @@ constexpr std::uint8_t kCactusBlockId = 81;
 constexpr std::uint8_t kRailBlockId = 66;
 constexpr std::uint8_t kFenceBlockId = 85;
 constexpr std::uint8_t kNetherPortalBlockId = 90;
+constexpr std::uint8_t kGlowstoneBlockId = 89;
 constexpr std::uint8_t kRepeaterIdleBlockId = 93;
 constexpr std::uint8_t kRepeaterPoweredBlockId = 94;
 constexpr std::uint8_t kStickyPistonBlockId = 29;

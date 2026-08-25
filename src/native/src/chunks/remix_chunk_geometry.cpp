@@ -511,6 +511,8 @@ void RemixRenderer::emitChunkGeometry(
           continue;
         }
 
+        std::uint8_t glowstoneVisibleMask = 0;
+
         for (int faceIndex = 0; faceIndex < 6; ++faceIndex) {
           const int minecraftSide = kNativeFaceToMinecraftSide[faceIndex];
           const int neighborX = localX + kNeighborOffsets[faceIndex][0];
@@ -570,6 +572,8 @@ void RemixRenderer::emitChunkGeometry(
             continue;
           }
 
+          glowstoneVisibleMask |= static_cast<std::uint8_t>(1 << faceIndex);
+
           SurfaceBuildBuffers& faceSurface = acquireSurface(terrainMaterialHandles_[materialClass]);
             appendFaceGeometry(
               faceIndex,
@@ -597,6 +601,17 @@ void RemixRenderer::emitChunkGeometry(
                 kFaceOverlayBias,
                 overlaySurface.vertices,
                 overlaySurface.indices);
+          }
+        }
+
+        if (cell.blockId == kGlowstoneBlockId) {
+          if (glowstoneVisibleMask != 0) {
+            build.desiredGlowstoneLights.push_back(light::makeGlowstoneLightPlacement(
+                cell,
+                chunkKey.originX + localX,
+                chunkKey.originY + localY,
+                chunkKey.originZ + localZ,
+                glowstoneVisibleMask));
           }
         }
       }

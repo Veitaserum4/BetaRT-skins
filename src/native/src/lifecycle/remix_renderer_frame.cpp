@@ -191,12 +191,16 @@ bool RemixRenderer::prepareFrameSnapshotLocked(FrameRenderSnapshot& snapshot, bo
     if (!refreshTorchLightDefinitions(snapshot.renderOrigin)) {
       return false;
     }
+    if (!refreshGlowstoneLightDefinitions(snapshot.renderOrigin)) {
+      return false;
+    }
   }
 
   {
     MCRTX_TRACY_SCOPE("prepareFrameSnapshot.collectTorchLights");
     snapshot.torchLights.reserve(
-        torchLights_.size() + entityHeldTorchLights_.size() + activeFlameParticleLights_.size() + (heldItemTorchLightHandle_ != nullptr ? 1 : 0));
+        torchLights_.size() + entityHeldTorchLights_.size() + activeFlameParticleLights_.size()
+        + (heldItemTorchLightHandle_ != nullptr ? 1 : 0));
     for (const auto& [position, lightState] : torchLights_) {
       (void)position;
       if (lightState.handle != nullptr) {
