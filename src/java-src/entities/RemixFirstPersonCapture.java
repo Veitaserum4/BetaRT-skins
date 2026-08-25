@@ -143,6 +143,13 @@ final class RemixFirstPersonCapture {
             GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
             long setupEndNanos = System.nanoTime();
             long shadowRenderEndNanos;
+            java.util.List<HeadPartState> hiddenHeadParts = new java.util.ArrayList<HeadPartState>();
+            if (firstPersonBodyEnabled) {
+                collectHeadParts(renderer, hiddenHeadParts);
+                for (HeadPartState state : hiddenHeadParts) {
+                    state.hide();
+                }
+            }
             try {
                 GL11.glColorMask(false, false, false, false);
                 GL11.glDepthMask(false);
@@ -150,6 +157,9 @@ final class RemixFirstPersonCapture {
                 ((ds) renderer).a(player, renderX, renderY, renderZ, interpolatedYaw, partialTicks);
                 shadowRenderEndNanos = System.nanoTime();
             } finally {
+                for (HeadPartState state : hiddenHeadParts) {
+                    state.restore();
+                }
                 th.b = previousRenderOriginX;
                 th.c = previousRenderOriginY;
                 th.d = previousRenderOriginZ;
@@ -260,6 +270,65 @@ final class RemixFirstPersonCapture {
         active = false;
         activeTexture = "";
         shadowCaptureActive = false;
+    }
+
+    private static final class HeadPartState {
+        final ps part;
+        final boolean originalShowModel;
+        final boolean originalIsHidden;
+
+        HeadPartState(ps part) {
+            this.part = part;
+            this.originalShowModel = part.h;
+            this.originalIsHidden = part.i;
+        }
+
+        void hide() {
+            part.h = false;
+            part.i = true;
+        }
+
+        void restore() {
+            part.h = originalShowModel;
+            part.i = originalIsHidden;
+        }
+    }
+
+    private static void collectHeadParts(bw renderer, java.util.List<HeadPartState> parts) {
+        if (renderer == null) {
+            return;
+        }
+        Class<?> clazz = renderer.getClass();
+        while (clazz != null && !clazz.getName().equals("java.lang.Object")) {
+            for (java.lang.reflect.Field f : clazz.getDeclaredFields()) {
+                if (ko.class.isAssignableFrom(f.getType())) {
+                    try {
+                        f.setAccessible(true);
+                        Object modelObj = f.get(renderer);
+                        if (modelObj instanceof fh) {
+                            collectBipedHeadParts((fh) modelObj, parts);
+                        }
+                    } catch (Throwable ignored) {
+                    }
+                }
+            }
+            clazz = clazz.getSuperclass();
+        }
+    }
+
+    private static void collectBipedHeadParts(fh model, java.util.List<HeadPartState> parts) {
+        if (model == null) {
+            return;
+        }
+        if (model.a != null) { // head
+            parts.add(new HeadPartState(model.a));
+        }
+        if (model.b != null) { // headwear
+            parts.add(new HeadPartState(model.b));
+        }
+        if (model.h != null) { // ears
+            parts.add(new HeadPartState(model.h));
+        }
     }
 
     private static void disableShadowCapture(RuntimeException exception) {

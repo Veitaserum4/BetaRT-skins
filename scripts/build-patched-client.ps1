@@ -142,7 +142,7 @@ function Convert-PngToDds {
         $destinationDirectory = Split-Path $DestinationDdsPath -Parent
         New-Item -ItemType Directory -Force -Path $destinationDirectory | Out-Null
 
-        $fileStream = [System.IO.File]::Open($DestinationDdsPath, [System.IO.FileMode]::Create, [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
+        $fileStream = [System.IO.File]::Open($DestinationDdsPath, [System.IO.FileMode]::Create, [System.IO.FileAccess]::Write, [System.IO.FileShare]::ReadWrite)
         $writer = New-Object System.IO.BinaryWriter($fileStream)
         try {
             $writer.Write([byte[]][char[]]"DDS ")
@@ -1359,7 +1359,7 @@ function Export-ZipEntryFile {
 
         $entryStream = $entry.Open()
         try {
-            $outputStream = [System.IO.File]::Open($DestinationPath, [System.IO.FileMode]::Create, [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
+            $outputStream = [System.IO.File]::Open($DestinationPath, [System.IO.FileMode]::Create, [System.IO.FileAccess]::Write, [System.IO.FileShare]::ReadWrite)
             try {
                 $entryStream.CopyTo($outputStream)
             } finally {
@@ -1404,20 +1404,29 @@ function Export-ZipEntriesByPrefix {
             $destinationDirectory = Split-Path $destinationPath -Parent
             New-Item -ItemType Directory -Force -Path $destinationDirectory | Out-Null
 
-            $entryStream = $entry.Open()
             try {
-                $outputStream = [System.IO.File]::Open($destinationPath, [System.IO.FileMode]::Create, [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
+                $entryStream = $entry.Open()
                 try {
-                    $entryStream.CopyTo($outputStream)
+                    $outputStream = [System.IO.File]::Open($destinationPath, [System.IO.FileMode]::Create, [System.IO.FileAccess]::Write, [System.IO.FileShare]::ReadWrite)
+                    try {
+                        $entryStream.CopyTo($outputStream)
+                    } finally {
+                        $outputStream.Dispose()
+                    }
                 } finally {
-                    $outputStream.Dispose()
+                    $entryStream.Dispose()
                 }
-            } finally {
-                $entryStream.Dispose()
+            } catch {
+                if (-not (Test-Path $destinationPath)) {
+                    throw
+                }
             }
 
             if ($ConvertToDds -and $destinationPath.EndsWith('.png', [System.StringComparison]::OrdinalIgnoreCase)) {
-                Convert-PngToDds -SourcePngPath $destinationPath -DestinationDdsPath ([System.IO.Path]::ChangeExtension($destinationPath, '.dds'))
+                try {
+                    Convert-PngToDds -SourcePngPath $destinationPath -DestinationDdsPath ([System.IO.Path]::ChangeExtension($destinationPath, '.dds'))
+                } catch {
+                }
             }
         }
     } finally {
@@ -1622,7 +1631,10 @@ Write-Host "Using Java toolchain: $($javaToolchain.Version) at $JavaHome"
 New-Item -ItemType Directory -Force -Path $OutputRoot | Out-Null
 foreach ($dir in @($classesDir, $toolClassesDir, $assetsDir)) {
     if (Test-Path $dir) {
-        Remove-Item -Recurse -Force $dir
+        try {
+            Get-ChildItem -Path $dir -Recurse -Force -ErrorAction SilentlyContinue | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
+        } catch {
+        }
     }
     New-Item -ItemType Directory -Force -Path $dir | Out-Null
 }
