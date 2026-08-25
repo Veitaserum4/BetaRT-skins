@@ -6,7 +6,7 @@
 - CMake 3.24 or newer
 - JDK 9 or newer containing `java`, `javac`, and `jar`, **JDK 21 recommended**
 - PrismLauncher with an existing vanilla Beta 1.7.3 instance
-- [`dxvk-remix-gmod`](https://github.com/sambow23/dxvk-remix-gmod/tree/b173-upd) next to the mc-rtx repository
+- [`dxvk-remix-gmod`](https://github.com/sambow23/dxvk-remix-gmod/tree/betart-numos3) next to the mc-rtx repository
 
 The scripts default to `%APPDATA%\PrismLauncher` and the `b1.7.3` instance. They
 resolve the Minecraft, LWJGL, and ASM jars from PrismLauncher's library tree.
