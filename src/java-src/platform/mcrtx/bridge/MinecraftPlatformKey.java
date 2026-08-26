@@ -4,5 +4,6 @@ public enum MinecraftPlatformKey {
     LEFT_ALT,
     RIGHT_ALT,
     X,
-    B
+    B,
+    F7
 }

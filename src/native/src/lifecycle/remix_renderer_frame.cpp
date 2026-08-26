@@ -84,6 +84,10 @@ bool RemixRenderer::prepareFrameSnapshotLocked(FrameRenderSnapshot& snapshot, bo
       return false;
     }
 
+    if (!rebuildLightLevelOverlayMesh(snapshot.renderOrigin)) {
+      return false;
+    }
+
     if (!rebuildParticleMesh(snapshot.renderOrigin)) {
       return false;
     }
@@ -152,6 +156,7 @@ bool RemixRenderer::prepareFrameSnapshotLocked(FrameRenderSnapshot& snapshot, bo
   snapshot.fireMeshHandle = fireMeshHandle_;
   snapshot.destroyOverlayMeshHandle = destroyOverlayMeshHandle_;
   snapshot.blockOutlineMeshHandle = blockOutlineMeshHandle_;
+  snapshot.lightLevelOverlayMeshHandle = lightLevelOverlayMeshHandle_;
   snapshot.particleMeshHandle = particleMeshHandle_;
   snapshot.cloudTransformX = cloudTransformX_;
   snapshot.cloudTransformY = cloudTransformY_;

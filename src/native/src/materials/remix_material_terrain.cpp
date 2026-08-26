@@ -250,6 +250,7 @@ bool RemixRenderer::initializeTerrainMaterials() {
   }
 
   createBlockOutlineMaterials();
+  createLightLevelOverlayMaterials();
 
       const bool poweredRedstoneCreated = createTerrainMaterial(
         kPoweredRedstoneTerrainMaterialClass,
@@ -548,6 +549,7 @@ void RemixRenderer::destroyTerrainMaterials() {
   }
 
   destroyBlockOutlineMaterials();
+  destroyLightLevelOverlayMaterials();
 
   if (remix_.DestroyMaterial != nullptr && cloudMaterialHandle_ != nullptr) {
     MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Remix, "DestroyMaterial.cloud");

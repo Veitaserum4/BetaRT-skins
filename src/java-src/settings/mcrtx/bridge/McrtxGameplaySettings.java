@@ -11,6 +11,7 @@ public final class McrtxGameplaySettings {
     public static final String BLOCK_OUTLINE_ENABLED_KEY = "MCRTX_BLOCK_OUTLINE_ENABLED";
     public static final String BLOCK_OUTLINE_STYLE_KEY = "MCRTX_BLOCK_OUTLINE_STYLE";
     public static final String BLOCK_OUTLINE_EMISSIVE_INTENSITY_KEY = "MCRTX_BLOCK_OUTLINE_EMISSIVE_INTENSITY";
+    public static final String LIGHT_LEVEL_OVERLAY_ENABLED_KEY = "MCRTX_LIGHT_LEVEL_OVERLAY_ENABLED";
 
     public static final int MIN_GAMEPLAY_FOV_DEGREES = 30;
     public static final int MAX_GAMEPLAY_FOV_DEGREES = 120;
@@ -32,6 +33,7 @@ public final class McrtxGameplaySettings {
     private static boolean playerShadowsEnabled = true;
     private static boolean firstPersonBodyEnabled = false;
     private static boolean heldTorchLightsEnabled = true;
+    private static boolean lightLevelOverlayEnabled = false;
     private static int gameplayFovDegrees = DEFAULT_GAMEPLAY_FOV_DEGREES;
     private static int viewModelFovDegrees = DEFAULT_VIEW_MODEL_FOV_DEGREES;
     private static boolean blockOutlineEnabled = true;
@@ -91,6 +93,24 @@ public final class McrtxGameplaySettings {
                 return;
             }
             heldTorchLightsEnabled = enabled;
+            McrtxSettingsStore.saveLocked();
+        }
+    }
+
+    public static boolean isLightLevelOverlayEnabled() {
+        synchronized (McrtxSettingsStore.LOCK) {
+            McrtxSettingsStore.ensureLoadedLocked();
+            return lightLevelOverlayEnabled;
+        }
+    }
+
+    public static void setLightLevelOverlayEnabled(boolean enabled) {
+        synchronized (McrtxSettingsStore.LOCK) {
+            McrtxSettingsStore.ensureLoadedLocked();
+            if (lightLevelOverlayEnabled == enabled) {
+                return;
+            }
+            lightLevelOverlayEnabled = enabled;
             McrtxSettingsStore.saveLocked();
         }
     }
@@ -202,6 +222,7 @@ public final class McrtxGameplaySettings {
         playerShadowsEnabled = McrtxRuntimeSettingParser.readBooleanSetting(fileValues, PLAYER_SHADOWS_ENABLED_KEY, true);
         firstPersonBodyEnabled = McrtxRuntimeSettingParser.readBooleanSetting(fileValues, FIRST_PERSON_BODY_ENABLED_KEY, false);
         heldTorchLightsEnabled = McrtxRuntimeSettingParser.readBooleanSetting(fileValues, HELD_TORCH_LIGHTS_ENABLED_KEY, true);
+        lightLevelOverlayEnabled = McrtxRuntimeSettingParser.readBooleanSetting(fileValues, LIGHT_LEVEL_OVERLAY_ENABLED_KEY, false);
         gameplayFovDegrees = McrtxRuntimeSettingParser.readRoundedIntSetting(
                 fileValues, GAMEPLAY_FOV_KEY, DEFAULT_GAMEPLAY_FOV_DEGREES,
                 MIN_GAMEPLAY_FOV_DEGREES, MAX_GAMEPLAY_FOV_DEGREES);
@@ -223,6 +244,7 @@ public final class McrtxGameplaySettings {
         fileValues.put(PLAYER_SHADOWS_ENABLED_KEY, McrtxRuntimeSettingFormatter.formatBoolean(playerShadowsEnabled));
         fileValues.put(FIRST_PERSON_BODY_ENABLED_KEY, McrtxRuntimeSettingFormatter.formatBoolean(firstPersonBodyEnabled));
         fileValues.put(HELD_TORCH_LIGHTS_ENABLED_KEY, McrtxRuntimeSettingFormatter.formatBoolean(heldTorchLightsEnabled));
+        fileValues.put(LIGHT_LEVEL_OVERLAY_ENABLED_KEY, McrtxRuntimeSettingFormatter.formatBoolean(lightLevelOverlayEnabled));
         fileValues.put(GAMEPLAY_FOV_KEY, Integer.toString(gameplayFovDegrees));
         fileValues.put(VIEW_MODEL_FOV_KEY, Integer.toString(viewModelFovDegrees));
         fileValues.put(BLOCK_OUTLINE_ENABLED_KEY, McrtxRuntimeSettingFormatter.formatBoolean(blockOutlineEnabled));

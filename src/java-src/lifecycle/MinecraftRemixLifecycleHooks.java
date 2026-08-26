@@ -14,6 +14,7 @@ public final class MinecraftRemixLifecycleHooks {
     private static final int WINDOWS_VK_MENU = 0x12;
     private static final int WINDOWS_VK_X = 0x58;
     private static final int WINDOWS_VK_B = 0x42;
+    private static final int WINDOWS_VK_F7 = 0x76;
     private static final long REMIX_UI_HOTKEY_RELEASE_DEBOUNCE_NANOS = 150_000_000L;
     private static final boolean STANDALONE_WINDOW_MODE = detectStandaloneWindowMode();
     private static final boolean SINGLE_NATIVE_WINDOW_MODE = detectSingleNativeWindowMode();
@@ -36,6 +37,10 @@ public final class MinecraftRemixLifecycleHooks {
     private static boolean quickSettingsLastAltHotkeyDown;
     private static boolean quickSettingsLastBHotkeyDown;
     private static long quickSettingsHotkeyReleaseStartedNanos;
+    private static boolean lightLevelHotkeyHeld;
+    private static boolean lightLevelHotkeyLocked;
+    private static boolean lightLevelLastF7HotkeyDown;
+    private static long lightLevelHotkeyReleaseStartedNanos;
     private static int preferredRemixUiState = DEFAULT_REMIX_UI_STATE;
     private static long activeUiRenderBeginNanos;
 
@@ -215,6 +220,8 @@ public final class MinecraftRemixLifecycleHooks {
             }
             syncRemixUiInput(minecraft, true);
             syncQuickSettingsInput(minecraft);
+            syncLightLevelOverlayInput(minecraft);
+            RemixLightLevelOverlay.update(minecraft);
         } finally {
             HookProfiler.endHook("hook.onRemixUiTick", __perf);
         }
@@ -260,6 +267,10 @@ public final class MinecraftRemixLifecycleHooks {
         quickSettingsLastAltHotkeyDown = false;
         quickSettingsLastBHotkeyDown = false;
         quickSettingsHotkeyReleaseStartedNanos = 0L;
+        lightLevelHotkeyHeld = false;
+        lightLevelHotkeyLocked = false;
+        lightLevelLastF7HotkeyDown = false;
+        lightLevelHotkeyReleaseStartedNanos = 0L;
         preferredRemixUiState = DEFAULT_REMIX_UI_STATE;
         RemixLifecycleBridge.setRemixUiInputActive(false);
     }
@@ -363,6 +374,46 @@ public final class MinecraftRemixLifecycleHooks {
             return RemixLifecycleBridge.isNativeVirtualKeyDown(WINDOWS_VK_B);
         }
         return platform.isKeyDown(MinecraftPlatformKey.B);
+    }
+
+    private static boolean isF7HotkeyDown(MinecraftPlatform platform) {
+        if (NATIVE_INPUT_BACKEND && RemixLifecycleBridge.isInitialized()) {
+            return RemixLifecycleBridge.isNativeVirtualKeyDown(WINDOWS_VK_F7);
+        }
+        return platform.isKeyDown(MinecraftPlatformKey.F7);
+    }
+
+    private static void syncLightLevelOverlayInput(Minecraft minecraft) {
+        if (minecraft == null) {
+            return;
+        }
+
+        MinecraftPlatform platform = MinecraftPlatformRuntime.current();
+        boolean f7Down = isF7HotkeyDown(platform);
+        boolean hotkeyFullyReleased = !f7Down;
+        boolean canToggle = minecraft.r == null;
+        long nowNanos = System.nanoTime();
+
+        if (!hotkeyFullyReleased) {
+            lightLevelHotkeyReleaseStartedNanos = 0L;
+        }
+
+        if (f7Down && !lightLevelHotkeyHeld && !lightLevelHotkeyLocked && canToggle) {
+            boolean nextEnabled = !mcrtx.bridge.McrtxGameplaySettings.isLightLevelOverlayEnabled();
+            mcrtx.bridge.McrtxGameplaySettings.setLightLevelOverlayEnabled(nextEnabled);
+            mcrtx.bridge.McrtxGameplaySettingsNative.setLightLevelOverlayEnabled(nextEnabled);
+            lightLevelHotkeyLocked = true;
+        } else if (hotkeyFullyReleased && lightLevelHotkeyLocked) {
+            if (lightLevelHotkeyReleaseStartedNanos == 0L) {
+                lightLevelHotkeyReleaseStartedNanos = nowNanos;
+            } else if (nowNanos - lightLevelHotkeyReleaseStartedNanos
+                    >= REMIX_UI_HOTKEY_RELEASE_DEBOUNCE_NANOS) {
+                lightLevelHotkeyLocked = false;
+            }
+        }
+
+        lightLevelLastF7HotkeyDown = f7Down;
+        lightLevelHotkeyHeld = f7Down;
     }
 
     private static void syncQuickSettingsInput(Minecraft minecraft) {

@@ -34,6 +34,8 @@ final class Lwjgl2MinecraftPlatform implements MinecraftPlatform {
                 return Keyboard.isKeyDown(Keyboard.KEY_X);
             case B:
                 return Keyboard.isKeyDown(Keyboard.KEY_B);
+            case F7:
+                return Keyboard.isKeyDown(Keyboard.KEY_F7);
             default:
                 return false;
         }
