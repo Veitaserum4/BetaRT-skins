@@ -7,6 +7,8 @@ final class McrtxGameplaySettingsUi implements McrtxSettingsCategoryUi {
     private static final int PLAYER_SHADOWS_BUTTON_ID = 1;
     private static final int HELD_TORCH_LIGHTS_BUTTON_ID = 2;
     private static final int FIRST_PERSON_BODY_BUTTON_ID = 3;
+    private static final int FIRST_PERSON_BODY_CAMERA_HEIGHT_SLIDER_ID = 4;
+    private static final int FIRST_PERSON_BODY_CAMERA_FORWARD_SLIDER_ID = 5;
     private static final int GAMEPLAY_FOV_SLIDER_ID = 7;
     private static final int VIEW_MODEL_FOV_SLIDER_ID = 8;
     private static final int BLOCK_OUTLINE_BUTTON_ID = 10;
@@ -24,6 +26,10 @@ final class McrtxGameplaySettingsUi implements McrtxSettingsCategoryUi {
         screen.addControl(button(screen, PLAYER_SHADOWS_BUTTON_ID, getPlayerShadowsLabel()));
         if (McrtxGameplaySettings.isPlayerShadowsEnabled()) {
             screen.addControl(button(screen, FIRST_PERSON_BODY_BUTTON_ID, getFirstPersonBodyLabel()));
+            if (McrtxGameplaySettings.isFirstPersonBodyEnabled()) {
+                screen.addControl(new Slider(FIRST_PERSON_BODY_CAMERA_HEIGHT_SLIDER_ID, screen.getControlX(), screen.takeNextRowY(), screen.getControlWidth(), McrtxQuickSettingsScreen.CONTROL_HEIGHT, Slider.MODE_FIRST_PERSON_BODY_CAMERA_HEIGHT));
+                screen.addControl(new Slider(FIRST_PERSON_BODY_CAMERA_FORWARD_SLIDER_ID, screen.getControlX(), screen.takeNextRowY(), screen.getControlWidth(), McrtxQuickSettingsScreen.CONTROL_HEIGHT, Slider.MODE_FIRST_PERSON_BODY_CAMERA_FORWARD));
+            }
         }
         screen.addControl(button(screen, HELD_TORCH_LIGHTS_BUTTON_ID, getHeldTorchLightsLabel()));
         screen.addControl(button(screen, LIGHT_LEVEL_OVERLAY_BUTTON_ID, getLightLevelOverlayLabel()));
@@ -47,7 +53,7 @@ final class McrtxGameplaySettingsUi implements McrtxSettingsCategoryUi {
         }
         if (buttonId == FIRST_PERSON_BODY_BUTTON_ID) {
             setFirstPersonBodyEnabled(!McrtxGameplaySettings.isFirstPersonBodyEnabled());
-            return UPDATE_REFRESH;
+            return UPDATE_REBUILD;
         }
         if (buttonId == HELD_TORCH_LIGHTS_BUTTON_ID) {
             setHeldTorchLightsEnabled(!McrtxGameplaySettings.isHeldTorchLightsEnabled());
@@ -196,6 +202,8 @@ final class McrtxGameplaySettingsUi implements McrtxSettingsCategoryUi {
         static final int MODE_GAMEPLAY_FOV = 0;
         static final int MODE_VIEW_MODEL_FOV = 1;
         static final int MODE_BLOCK_OUTLINE_INTENSITY = 2;
+        static final int MODE_FIRST_PERSON_BODY_CAMERA_HEIGHT = 3;
+        static final int MODE_FIRST_PERSON_BODY_CAMERA_FORWARD = 4;
 
         private final int mode;
         private final int minimum;
@@ -209,6 +217,12 @@ final class McrtxGameplaySettingsUi implements McrtxSettingsCategoryUi {
             if (mode == MODE_BLOCK_OUTLINE_INTENSITY) {
                 minimum = McrtxGameplaySettings.MIN_BLOCK_OUTLINE_EMISSIVE_INTENSITY_HUNDREDTHS;
                 maximum = McrtxGameplaySettings.MAX_BLOCK_OUTLINE_EMISSIVE_INTENSITY_HUNDREDTHS;
+            } else if (mode == MODE_FIRST_PERSON_BODY_CAMERA_HEIGHT) {
+                minimum = McrtxGameplaySettings.MIN_FIRST_PERSON_BODY_CAMERA_HEIGHT_HUNDREDTHS;
+                maximum = McrtxGameplaySettings.MAX_FIRST_PERSON_BODY_CAMERA_HEIGHT_HUNDREDTHS;
+            } else if (mode == MODE_FIRST_PERSON_BODY_CAMERA_FORWARD) {
+                minimum = McrtxGameplaySettings.MIN_FIRST_PERSON_BODY_CAMERA_FORWARD_HUNDREDTHS;
+                maximum = McrtxGameplaySettings.MAX_FIRST_PERSON_BODY_CAMERA_FORWARD_HUNDREDTHS;
             } else if (mode == MODE_VIEW_MODEL_FOV) {
                 minimum = McrtxGameplaySettings.MIN_VIEW_MODEL_FOV_DEGREES;
                 maximum = McrtxGameplaySettings.MAX_VIEW_MODEL_FOV_DEGREES;
@@ -234,6 +248,8 @@ final class McrtxGameplaySettingsUi implements McrtxSettingsCategoryUi {
         private void sync() {
             int value = mode == MODE_VIEW_MODEL_FOV ? McrtxGameplaySettings.getViewModelFovDegrees()
                     : mode == MODE_BLOCK_OUTLINE_INTENSITY ? McrtxGameplaySettings.getBlockOutlineEmissiveIntensityHundredths()
+                    : mode == MODE_FIRST_PERSON_BODY_CAMERA_HEIGHT ? McrtxGameplaySettings.getFirstPersonBodyCameraHeightHundredths()
+                    : mode == MODE_FIRST_PERSON_BODY_CAMERA_FORWARD ? McrtxGameplaySettings.getFirstPersonBodyCameraForwardHundredths()
                     : McrtxGameplaySettings.getGameplayFovDegrees();
             position = (float) (value - minimum) / (float) (maximum - minimum);
             label(value);
@@ -246,12 +262,16 @@ final class McrtxGameplaySettingsUi implements McrtxSettingsCategoryUi {
             position = (float) (value - minimum) / (float) (maximum - minimum);
             if (mode == MODE_VIEW_MODEL_FOV) setViewModelFovDegrees(value);
             else if (mode == MODE_BLOCK_OUTLINE_INTENSITY) setBlockOutlineIntensity(value);
+            else if (mode == MODE_FIRST_PERSON_BODY_CAMERA_HEIGHT) McrtxGameplaySettings.setFirstPersonBodyCameraHeightHundredths(value);
+            else if (mode == MODE_FIRST_PERSON_BODY_CAMERA_FORWARD) McrtxGameplaySettings.setFirstPersonBodyCameraForwardHundredths(value);
             else McrtxGameplaySettings.setGameplayFovDegrees(value);
             label(value);
         }
         private void label(int value) {
             if (mode == MODE_VIEW_MODEL_FOV) this.e = "Hand FOV: " + value;
             else if (mode == MODE_BLOCK_OUTLINE_INTENSITY) this.e = "Outline Intensity: " + formatHundredths(value);
+            else if (mode == MODE_FIRST_PERSON_BODY_CAMERA_HEIGHT) this.e = "Body Camera Height: " + (value > 0 ? "+" : "") + formatHundredths(value);
+            else if (mode == MODE_FIRST_PERSON_BODY_CAMERA_FORWARD) this.e = "Body Camera Forward: " + (value > 0 ? "+" : "") + formatHundredths(value);
             else this.e = "FOV: " + value;
         }
     }

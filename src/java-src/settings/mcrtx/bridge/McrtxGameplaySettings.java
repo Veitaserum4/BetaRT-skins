@@ -12,6 +12,8 @@ public final class McrtxGameplaySettings {
     public static final String BLOCK_OUTLINE_STYLE_KEY = "MCRTX_BLOCK_OUTLINE_STYLE";
     public static final String BLOCK_OUTLINE_EMISSIVE_INTENSITY_KEY = "MCRTX_BLOCK_OUTLINE_EMISSIVE_INTENSITY";
     public static final String LIGHT_LEVEL_OVERLAY_ENABLED_KEY = "MCRTX_LIGHT_LEVEL_OVERLAY_ENABLED";
+    public static final String FIRST_PERSON_BODY_CAMERA_HEIGHT_KEY = "MCRTX_FIRST_PERSON_BODY_CAMERA_HEIGHT";
+    public static final String FIRST_PERSON_BODY_CAMERA_FORWARD_KEY = "MCRTX_FIRST_PERSON_BODY_CAMERA_FORWARD";
 
     public static final int MIN_GAMEPLAY_FOV_DEGREES = 30;
     public static final int MAX_GAMEPLAY_FOV_DEGREES = 120;
@@ -22,6 +24,12 @@ public final class McrtxGameplaySettings {
     public static final int MIN_BLOCK_OUTLINE_EMISSIVE_INTENSITY_HUNDREDTHS = 0;
     public static final int MAX_BLOCK_OUTLINE_EMISSIVE_INTENSITY_HUNDREDTHS = 1000;
     public static final int DEFAULT_BLOCK_OUTLINE_EMISSIVE_INTENSITY_HUNDREDTHS = 450;
+    public static final int MIN_FIRST_PERSON_BODY_CAMERA_HEIGHT_HUNDREDTHS = -15;
+    public static final int MAX_FIRST_PERSON_BODY_CAMERA_HEIGHT_HUNDREDTHS = 15;
+    public static final int DEFAULT_FIRST_PERSON_BODY_CAMERA_HEIGHT_HUNDREDTHS = 0;
+    public static final int MIN_FIRST_PERSON_BODY_CAMERA_FORWARD_HUNDREDTHS = -15;
+    public static final int MAX_FIRST_PERSON_BODY_CAMERA_FORWARD_HUNDREDTHS = 15;
+    public static final int DEFAULT_FIRST_PERSON_BODY_CAMERA_FORWARD_HUNDREDTHS = 0;
 
     public static final int BLOCK_OUTLINE_STYLE_SUBTLE = 0;
     public static final int BLOCK_OUTLINE_STYLE_BOLD = 1;
@@ -39,6 +47,8 @@ public final class McrtxGameplaySettings {
     private static boolean blockOutlineEnabled = true;
     private static int blockOutlineStyle = BLOCK_OUTLINE_STYLE_BOLD;
     private static int blockOutlineEmissiveIntensityHundredths = DEFAULT_BLOCK_OUTLINE_EMISSIVE_INTENSITY_HUNDREDTHS;
+    private static int firstPersonBodyCameraHeightHundredths = DEFAULT_FIRST_PERSON_BODY_CAMERA_HEIGHT_HUNDREDTHS;
+    private static int firstPersonBodyCameraForwardHundredths = DEFAULT_FIRST_PERSON_BODY_CAMERA_FORWARD_HUNDREDTHS;
 
     private McrtxGameplaySettings() {
     }
@@ -218,6 +228,54 @@ public final class McrtxGameplaySettings {
         }
     }
 
+    public static int getFirstPersonBodyCameraHeightHundredths() {
+        synchronized (McrtxSettingsStore.LOCK) {
+            McrtxSettingsStore.ensureLoadedLocked();
+            return firstPersonBodyCameraHeightHundredths;
+        }
+    }
+
+    public static float getFirstPersonBodyCameraHeightOffset() {
+        return (float) getFirstPersonBodyCameraHeightHundredths() / 100.0f;
+    }
+
+    public static void setFirstPersonBodyCameraHeightHundredths(int value) {
+        synchronized (McrtxSettingsStore.LOCK) {
+            McrtxSettingsStore.ensureLoadedLocked();
+            int normalized = McrtxRuntimeSettingParser.clamp(
+                    value, MIN_FIRST_PERSON_BODY_CAMERA_HEIGHT_HUNDREDTHS, MAX_FIRST_PERSON_BODY_CAMERA_HEIGHT_HUNDREDTHS);
+            if (firstPersonBodyCameraHeightHundredths == normalized) {
+                return;
+            }
+            firstPersonBodyCameraHeightHundredths = normalized;
+            McrtxSettingsStore.saveLocked();
+        }
+    }
+
+    public static int getFirstPersonBodyCameraForwardHundredths() {
+        synchronized (McrtxSettingsStore.LOCK) {
+            McrtxSettingsStore.ensureLoadedLocked();
+            return firstPersonBodyCameraForwardHundredths;
+        }
+    }
+
+    public static float getFirstPersonBodyCameraForwardOffset() {
+        return (float) getFirstPersonBodyCameraForwardHundredths() / 100.0f;
+    }
+
+    public static void setFirstPersonBodyCameraForwardHundredths(int value) {
+        synchronized (McrtxSettingsStore.LOCK) {
+            McrtxSettingsStore.ensureLoadedLocked();
+            int normalized = McrtxRuntimeSettingParser.clamp(
+                    value, MIN_FIRST_PERSON_BODY_CAMERA_FORWARD_HUNDREDTHS, MAX_FIRST_PERSON_BODY_CAMERA_FORWARD_HUNDREDTHS);
+            if (firstPersonBodyCameraForwardHundredths == normalized) {
+                return;
+            }
+            firstPersonBodyCameraForwardHundredths = normalized;
+            McrtxSettingsStore.saveLocked();
+        }
+    }
+
     static void loadLocked(Map<String, String> fileValues) {
         playerShadowsEnabled = McrtxRuntimeSettingParser.readBooleanSetting(fileValues, PLAYER_SHADOWS_ENABLED_KEY, true);
         firstPersonBodyEnabled = McrtxRuntimeSettingParser.readBooleanSetting(fileValues, FIRST_PERSON_BODY_ENABLED_KEY, false);
@@ -238,6 +296,20 @@ public final class McrtxGameplaySettings {
                 MIN_BLOCK_OUTLINE_EMISSIVE_INTENSITY_HUNDREDTHS,
                 MAX_BLOCK_OUTLINE_EMISSIVE_INTENSITY_HUNDREDTHS,
                 100);
+        firstPersonBodyCameraHeightHundredths = McrtxRuntimeSettingParser.readScaledIntSetting(
+                fileValues,
+                FIRST_PERSON_BODY_CAMERA_HEIGHT_KEY,
+                DEFAULT_FIRST_PERSON_BODY_CAMERA_HEIGHT_HUNDREDTHS,
+                MIN_FIRST_PERSON_BODY_CAMERA_HEIGHT_HUNDREDTHS,
+                MAX_FIRST_PERSON_BODY_CAMERA_HEIGHT_HUNDREDTHS,
+                100);
+        firstPersonBodyCameraForwardHundredths = McrtxRuntimeSettingParser.readScaledIntSetting(
+                fileValues,
+                FIRST_PERSON_BODY_CAMERA_FORWARD_KEY,
+                DEFAULT_FIRST_PERSON_BODY_CAMERA_FORWARD_HUNDREDTHS,
+                MIN_FIRST_PERSON_BODY_CAMERA_FORWARD_HUNDREDTHS,
+                MAX_FIRST_PERSON_BODY_CAMERA_FORWARD_HUNDREDTHS,
+                100);
     }
 
     static void writeLocked(Map<String, String> fileValues) {
@@ -252,6 +324,12 @@ public final class McrtxGameplaySettings {
         fileValues.put(
                 BLOCK_OUTLINE_EMISSIVE_INTENSITY_KEY,
                 McrtxRuntimeSettingFormatter.formatHundredthsValue(blockOutlineEmissiveIntensityHundredths));
+        fileValues.put(
+                FIRST_PERSON_BODY_CAMERA_HEIGHT_KEY,
+                McrtxRuntimeSettingFormatter.formatHundredthsValue(firstPersonBodyCameraHeightHundredths));
+        fileValues.put(
+                FIRST_PERSON_BODY_CAMERA_FORWARD_KEY,
+                McrtxRuntimeSettingFormatter.formatHundredthsValue(firstPersonBodyCameraForwardHundredths));
     }
 
     private static int readBlockOutlineStyle(Map<String, String> fileValues) {
