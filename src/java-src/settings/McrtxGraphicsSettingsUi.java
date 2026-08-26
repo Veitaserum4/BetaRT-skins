@@ -20,29 +20,29 @@ final class McrtxGraphicsSettingsUi implements McrtxSettingsCategoryUi {
     public String getName() { return "Graphics"; }
 
     public void addControls(McrtxQuickSettingsScreen screen) {
-        screen.addControl(button(screen, UPSCALER_BUTTON_ID, getUpscalerLabel()));
-        screen.addControl(button(screen, UPSCALER_PRESET_BUTTON_ID, getUpscalerPresetLabel()));
+        screen.addOptionSelector(UPSCALER_BUTTON_ID, getUpscalerLabel());
+        screen.addOptionSelector(UPSCALER_PRESET_BUTTON_ID, getUpscalerPresetLabel());
         if (shouldShowDlssOptions()) {
             screen.addControl(button(screen, RAY_RECONSTRUCTION_BUTTON_ID, getRayReconstructionLabel()));
             screen.addControl(button(screen, SPARSE_RENDERING_BUTTON_ID, getSparseRenderingLabel()));
         }
-        screen.addControl(button(screen, RT_QUALITY_BUTTON_ID, getRtQualityLabel()));
+        screen.addOptionSelector(RT_QUALITY_BUTTON_ID, getRtQualityLabel());
         screen.addControl(button(screen, REMIX_ATMOSPHERE_CLOUDS_BUTTON_ID, McrtxGraphicsSettings.formatCloudButtonLabel(McrtxGraphicsSettings.isRemixAtmosphereCloudsEnabled())));
         screen.addControl(button(screen, GAME_RAIN_PARTICLES_BUTTON_ID, getGameRainLabel()));
         screen.addControl(button(screen, AERIAL_PERSPECTIVE_BUTTON_ID, getAerialPerspectiveLabel()));
         if (McrtxGraphicsSettings.isAerialPerspectiveEnabled()) {
-            screen.addControl(button(screen, AERIAL_PERSPECTIVE_STRENGTH_BUTTON_ID, getAerialPerspectiveStrengthLabel()));
+            screen.addOptionSelector(AERIAL_PERSPECTIVE_STRENGTH_BUTTON_ID, getAerialPerspectiveStrengthLabel());
             screen.addControl(button(screen, AERIAL_PERSPECTIVE_SHADOW_BUTTON_ID, getAerialPerspectiveShadowLabel()));
         }
         screen.addControl(new NoCullSlider(NO_CULL_DISTANCE_SLIDER_ID, screen.getControlX(), screen.takeNextRowY(), screen.getControlWidth(), McrtxQuickSettingsScreen.CONTROL_HEIGHT));
     }
 
-    public int handleButton(int buttonId) {
-        if (buttonId == UPSCALER_BUTTON_ID) { cycleUpscalerType(); return UPDATE_REBUILD; }
-        if (buttonId == UPSCALER_PRESET_BUTTON_ID) { cycleUpscalerPreset(); return UPDATE_REFRESH; }
+    public int handleButton(int buttonId, int direction) {
+        if (buttonId == UPSCALER_BUTTON_ID) { cycleUpscalerType(direction); return UPDATE_REBUILD; }
+        if (buttonId == UPSCALER_PRESET_BUTTON_ID) { cycleUpscalerPreset(direction); return UPDATE_REFRESH; }
         if (buttonId == RAY_RECONSTRUCTION_BUTTON_ID) { toggleRayReconstruction(); return UPDATE_REFRESH; }
         if (buttonId == SPARSE_RENDERING_BUTTON_ID) { toggleSparseRendering(); return UPDATE_REFRESH; }
-        if (buttonId == RT_QUALITY_BUTTON_ID) { cycleRtQuality(); return UPDATE_REFRESH; }
+        if (buttonId == RT_QUALITY_BUTTON_ID) { cycleRtQuality(direction); return UPDATE_REFRESH; }
         if (buttonId == REMIX_ATMOSPHERE_CLOUDS_BUTTON_ID) {
             setRemixAtmosphereCloudsEnabled(!McrtxGraphicsSettings.isRemixAtmosphereCloudsEnabled());
             return UPDATE_REFRESH;
@@ -59,7 +59,7 @@ final class McrtxGraphicsSettingsUi implements McrtxSettingsCategoryUi {
             return UPDATE_REBUILD;
         }
         if (buttonId == AERIAL_PERSPECTIVE_STRENGTH_BUTTON_ID) {
-            cycleAerialPerspectiveStrength();
+            cycleAerialPerspectiveStrength(direction);
             return UPDATE_REFRESH;
         }
         if (buttonId == AERIAL_PERSPECTIVE_SHADOW_BUTTON_ID) {
@@ -113,12 +113,19 @@ final class McrtxGraphicsSettingsUi implements McrtxSettingsCategoryUi {
         McrtxGraphicsSettingsNative.setAerialPerspectiveEnabled(McrtxGraphicsSettings.isAerialPerspectiveEnabled());
     }
 
-    private static void cycleAerialPerspectiveStrength() {
+    private static void cycleAerialPerspectiveStrength(int direction) {
         int value = McrtxGraphicsSettings.getAerialPerspectiveStrength();
-        if (value == McrtxGraphicsSettings.AERIAL_PERSPECTIVE_SUBTLE) value = McrtxGraphicsSettings.AERIAL_PERSPECTIVE_NORMAL;
-        else if (value == McrtxGraphicsSettings.AERIAL_PERSPECTIVE_NORMAL) value = McrtxGraphicsSettings.AERIAL_PERSPECTIVE_STRONG;
-        else if (value == McrtxGraphicsSettings.AERIAL_PERSPECTIVE_STRONG) value = McrtxGraphicsSettings.AERIAL_PERSPECTIVE_EXTREME;
-        else value = McrtxGraphicsSettings.AERIAL_PERSPECTIVE_SUBTLE;
+        if (direction >= 0) {
+            if (value == McrtxGraphicsSettings.AERIAL_PERSPECTIVE_SUBTLE) value = McrtxGraphicsSettings.AERIAL_PERSPECTIVE_NORMAL;
+            else if (value == McrtxGraphicsSettings.AERIAL_PERSPECTIVE_NORMAL) value = McrtxGraphicsSettings.AERIAL_PERSPECTIVE_STRONG;
+            else if (value == McrtxGraphicsSettings.AERIAL_PERSPECTIVE_STRONG) value = McrtxGraphicsSettings.AERIAL_PERSPECTIVE_EXTREME;
+            else value = McrtxGraphicsSettings.AERIAL_PERSPECTIVE_SUBTLE;
+        } else {
+            if (value == McrtxGraphicsSettings.AERIAL_PERSPECTIVE_SUBTLE) value = McrtxGraphicsSettings.AERIAL_PERSPECTIVE_EXTREME;
+            else if (value == McrtxGraphicsSettings.AERIAL_PERSPECTIVE_EXTREME) value = McrtxGraphicsSettings.AERIAL_PERSPECTIVE_STRONG;
+            else if (value == McrtxGraphicsSettings.AERIAL_PERSPECTIVE_STRONG) value = McrtxGraphicsSettings.AERIAL_PERSPECTIVE_NORMAL;
+            else value = McrtxGraphicsSettings.AERIAL_PERSPECTIVE_SUBTLE;
+        }
         McrtxGraphicsSettings.setAerialPerspectiveStrength(value);
         McrtxGraphicsSettingsNative.setAerialPerspectiveStrength(value);
     }
@@ -143,44 +150,68 @@ final class McrtxGraphicsSettingsUi implements McrtxSettingsCategoryUi {
         RemixCameraState.setNoCullDistanceBlocks(blocks);
     }
 
-    private static void cycleUpscalerType() {
+    private static void cycleUpscalerType(int direction) {
         int type = McrtxGraphicsSettings.getUpscalerType();
-        if (type == McrtxGraphicsSettings.UPSCALER_TYPE_NONE) type = McrtxGraphicsSettings.UPSCALER_TYPE_DLSS;
-        else if (type == McrtxGraphicsSettings.UPSCALER_TYPE_DLSS) type = McrtxGraphicsSettings.UPSCALER_TYPE_XESS;
-        else if (type == McrtxGraphicsSettings.UPSCALER_TYPE_XESS) type = McrtxGraphicsSettings.UPSCALER_TYPE_TAAU;
-        else type = McrtxGraphicsSettings.UPSCALER_TYPE_NONE;
+        if (direction >= 0) {
+            if (type == McrtxGraphicsSettings.UPSCALER_TYPE_NONE) type = McrtxGraphicsSettings.UPSCALER_TYPE_DLSS;
+            else if (type == McrtxGraphicsSettings.UPSCALER_TYPE_DLSS) type = McrtxGraphicsSettings.UPSCALER_TYPE_XESS;
+            else if (type == McrtxGraphicsSettings.UPSCALER_TYPE_XESS) type = McrtxGraphicsSettings.UPSCALER_TYPE_TAAU;
+            else type = McrtxGraphicsSettings.UPSCALER_TYPE_NONE;
+        } else {
+            if (type == McrtxGraphicsSettings.UPSCALER_TYPE_NONE) type = McrtxGraphicsSettings.UPSCALER_TYPE_TAAU;
+            else if (type == McrtxGraphicsSettings.UPSCALER_TYPE_TAAU) type = McrtxGraphicsSettings.UPSCALER_TYPE_XESS;
+            else if (type == McrtxGraphicsSettings.UPSCALER_TYPE_XESS) type = McrtxGraphicsSettings.UPSCALER_TYPE_DLSS;
+            else type = McrtxGraphicsSettings.UPSCALER_TYPE_NONE;
+        }
         McrtxGraphicsSettings.setUpscalerType(type);
         applyUpscaler();
     }
 
-    private static void cycleUpscalerPreset() {
+    private static void cycleUpscalerPreset(int direction) {
         int type = McrtxGraphicsSettings.getUpscalerType();
-        if (type == McrtxGraphicsSettings.UPSCALER_TYPE_DLSS) cycleDlss();
-        else if (type == McrtxGraphicsSettings.UPSCALER_TYPE_XESS) cycleXess();
-        else if (type == McrtxGraphicsSettings.UPSCALER_TYPE_TAAU) cycleTaau();
+        if (type == McrtxGraphicsSettings.UPSCALER_TYPE_DLSS) cycleDlss(direction);
+        else if (type == McrtxGraphicsSettings.UPSCALER_TYPE_XESS) cycleXess(direction);
+        else if (type == McrtxGraphicsSettings.UPSCALER_TYPE_TAAU) cycleTaau(direction);
         applyUpscaler();
     }
 
-    private static void cycleDlss() {
+    private static void cycleDlss(int direction) {
         int value = McrtxGraphicsSettings.getDlssPreset();
-        if (value == McrtxGraphicsSettings.DLSS_PRESET_AUTO) value = McrtxGraphicsSettings.DLSS_PRESET_QUALITY;
-        else if (value == McrtxGraphicsSettings.DLSS_PRESET_QUALITY) value = McrtxGraphicsSettings.DLSS_PRESET_BALANCED;
-        else if (value == McrtxGraphicsSettings.DLSS_PRESET_BALANCED) value = McrtxGraphicsSettings.DLSS_PRESET_PERFORMANCE;
-        else if (value == McrtxGraphicsSettings.DLSS_PRESET_PERFORMANCE) value = McrtxGraphicsSettings.DLSS_PRESET_ULTRA_PERFORMANCE;
-        else if (value == McrtxGraphicsSettings.DLSS_PRESET_ULTRA_PERFORMANCE) value = McrtxGraphicsSettings.DLSS_PRESET_DLAA;
-        else value = McrtxGraphicsSettings.DLSS_PRESET_AUTO;
+        if (direction >= 0) {
+            if (value == McrtxGraphicsSettings.DLSS_PRESET_AUTO) value = McrtxGraphicsSettings.DLSS_PRESET_QUALITY;
+            else if (value == McrtxGraphicsSettings.DLSS_PRESET_QUALITY) value = McrtxGraphicsSettings.DLSS_PRESET_BALANCED;
+            else if (value == McrtxGraphicsSettings.DLSS_PRESET_BALANCED) value = McrtxGraphicsSettings.DLSS_PRESET_PERFORMANCE;
+            else if (value == McrtxGraphicsSettings.DLSS_PRESET_PERFORMANCE) value = McrtxGraphicsSettings.DLSS_PRESET_ULTRA_PERFORMANCE;
+            else if (value == McrtxGraphicsSettings.DLSS_PRESET_ULTRA_PERFORMANCE) value = McrtxGraphicsSettings.DLSS_PRESET_DLAA;
+            else value = McrtxGraphicsSettings.DLSS_PRESET_AUTO;
+        } else {
+            if (value == McrtxGraphicsSettings.DLSS_PRESET_AUTO) value = McrtxGraphicsSettings.DLSS_PRESET_DLAA;
+            else if (value == McrtxGraphicsSettings.DLSS_PRESET_DLAA) value = McrtxGraphicsSettings.DLSS_PRESET_ULTRA_PERFORMANCE;
+            else if (value == McrtxGraphicsSettings.DLSS_PRESET_ULTRA_PERFORMANCE) value = McrtxGraphicsSettings.DLSS_PRESET_PERFORMANCE;
+            else if (value == McrtxGraphicsSettings.DLSS_PRESET_PERFORMANCE) value = McrtxGraphicsSettings.DLSS_PRESET_BALANCED;
+            else if (value == McrtxGraphicsSettings.DLSS_PRESET_BALANCED) value = McrtxGraphicsSettings.DLSS_PRESET_QUALITY;
+            else value = McrtxGraphicsSettings.DLSS_PRESET_AUTO;
+        }
         McrtxGraphicsSettings.setDlssPreset(value);
     }
 
-    private static void cycleXess() {
+    private static void cycleXess(int direction) {
         int value = McrtxGraphicsSettings.getXessPreset();
-        value = value >= McrtxGraphicsSettings.XESS_PRESET_NATIVE_AA ? McrtxGraphicsSettings.XESS_PRESET_ULTRA_PERFORMANCE : value + 1;
+        if (direction >= 0) {
+            value = value >= McrtxGraphicsSettings.XESS_PRESET_NATIVE_AA ? McrtxGraphicsSettings.XESS_PRESET_ULTRA_PERFORMANCE : value + 1;
+        } else {
+            value = value <= McrtxGraphicsSettings.XESS_PRESET_ULTRA_PERFORMANCE ? McrtxGraphicsSettings.XESS_PRESET_NATIVE_AA : value - 1;
+        }
         McrtxGraphicsSettings.setXessPreset(value);
     }
 
-    private static void cycleTaau() {
+    private static void cycleTaau(int direction) {
         int value = McrtxGraphicsSettings.getTaauPreset();
-        value = value >= McrtxGraphicsSettings.TAAU_PRESET_FULLSCREEN ? McrtxGraphicsSettings.TAAU_PRESET_ULTRA_PERFORMANCE : value + 1;
+        if (direction >= 0) {
+            value = value >= McrtxGraphicsSettings.TAAU_PRESET_FULLSCREEN ? McrtxGraphicsSettings.TAAU_PRESET_ULTRA_PERFORMANCE : value + 1;
+        } else {
+            value = value <= McrtxGraphicsSettings.TAAU_PRESET_ULTRA_PERFORMANCE ? McrtxGraphicsSettings.TAAU_PRESET_FULLSCREEN : value - 1;
+        }
         McrtxGraphicsSettings.setTaauPreset(value);
     }
 
@@ -195,13 +226,21 @@ final class McrtxGraphicsSettingsUi implements McrtxSettingsCategoryUi {
         applyUpscaler();
     }
 
-    private static void cycleRtQuality() {
+    private static void cycleRtQuality(int direction) {
         int value = McrtxGraphicsSettings.getRtQuality();
-        if (value == McrtxGraphicsSettings.RT_QUALITY_LOW) value = McrtxGraphicsSettings.RT_QUALITY_MEDIUM;
-        else if (value == McrtxGraphicsSettings.RT_QUALITY_MEDIUM) value = McrtxGraphicsSettings.RT_QUALITY_HIGH;
-        else if (value == McrtxGraphicsSettings.RT_QUALITY_HIGH) value = McrtxGraphicsSettings.RT_QUALITY_ULTRA;
-        else if (value == McrtxGraphicsSettings.RT_QUALITY_ULTRA) value = McrtxGraphicsSettings.RT_QUALITY_POTATO;
-        else value = McrtxGraphicsSettings.RT_QUALITY_LOW;
+        if (direction >= 0) {
+            if (value == McrtxGraphicsSettings.RT_QUALITY_LOW) value = McrtxGraphicsSettings.RT_QUALITY_MEDIUM;
+            else if (value == McrtxGraphicsSettings.RT_QUALITY_MEDIUM) value = McrtxGraphicsSettings.RT_QUALITY_HIGH;
+            else if (value == McrtxGraphicsSettings.RT_QUALITY_HIGH) value = McrtxGraphicsSettings.RT_QUALITY_ULTRA;
+            else if (value == McrtxGraphicsSettings.RT_QUALITY_ULTRA) value = McrtxGraphicsSettings.RT_QUALITY_POTATO;
+            else value = McrtxGraphicsSettings.RT_QUALITY_LOW;
+        } else {
+            if (value == McrtxGraphicsSettings.RT_QUALITY_LOW) value = McrtxGraphicsSettings.RT_QUALITY_POTATO;
+            else if (value == McrtxGraphicsSettings.RT_QUALITY_POTATO) value = McrtxGraphicsSettings.RT_QUALITY_ULTRA;
+            else if (value == McrtxGraphicsSettings.RT_QUALITY_ULTRA) value = McrtxGraphicsSettings.RT_QUALITY_HIGH;
+            else if (value == McrtxGraphicsSettings.RT_QUALITY_HIGH) value = McrtxGraphicsSettings.RT_QUALITY_MEDIUM;
+            else value = McrtxGraphicsSettings.RT_QUALITY_LOW;
+        }
         McrtxGraphicsSettings.setRtQuality(value);
         applyRtQuality();
     }

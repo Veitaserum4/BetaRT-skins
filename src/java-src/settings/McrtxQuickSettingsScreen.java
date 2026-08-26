@@ -26,7 +26,22 @@ public final class McrtxQuickSettingsScreen extends da {
     private static int activeCategory = McrtxSettingsStore.DEFAULT_CATEGORY;
     private static final int[] categoryScrollOffsets = new int[4];
 
+    private static final class OptionSelectorRow {
+        final ke prevButton;
+        final ke labelButton;
+        final ke nextButton;
+        final int targetButtonId;
+
+        OptionSelectorRow(ke prevButton, ke labelButton, ke nextButton, int targetButtonId) {
+            this.prevButton = prevButton;
+            this.labelButton = labelButton;
+            this.nextButton = nextButton;
+            this.targetButtonId = targetButtonId;
+        }
+    }
+
     private final List scrollControls = new ArrayList();
+    private final List selectorRows = new ArrayList();
     private int nextControlY;
     private int panelBottomY = PANEL_TOP + 80;
     private int scrollViewportTop;
@@ -41,6 +56,7 @@ public final class McrtxQuickSettingsScreen extends da {
     public void b() {
         this.e.clear();
         scrollControls.clear();
+        selectorRows.clear();
         activeCategory = McrtxSettingsStore.getQuickSettingsCategory();
         nextControlY = PANEL_TOP + HEADER_HEIGHT + CONTROL_GAP;
 
@@ -59,9 +75,19 @@ public final class McrtxQuickSettingsScreen extends da {
         maxScrollOffset = Math.max(0, scrollContentBottom - scrollViewportBottom);
 
         if (maxScrollOffset > 0) {
+            int scrollbarDelta = SCROLLBAR_WIDTH + CONTROL_GAP;
             for (int index = 0; index < scrollControls.size(); index += 1) {
                 ke control = (ke) scrollControls.get(index);
-                control.a -= SCROLLBAR_WIDTH + CONTROL_GAP;
+                OptionSelectorRow row = findSelectorRowForControl(control);
+                if (row != null) {
+                    if (control == row.labelButton) {
+                        control.a -= scrollbarDelta;
+                    } else if (control == row.nextButton) {
+                        control.c -= scrollbarDelta;
+                    }
+                } else {
+                    control.a -= scrollbarDelta;
+                }
             }
         }
 
@@ -79,15 +105,19 @@ public final class McrtxQuickSettingsScreen extends da {
     }
 
     protected void a(ke button) {
+        handleButtonAction(button, 1);
+    }
+
+    private void handleButtonAction(ke button, int direction) {
         if (button == null || !button.g) return;
 
         if (button.f == CATEGORY_PREVIOUS_BUTTON_ID) {
-            cycleCategory(-1);
+            cycleCategory(-direction);
             b();
             return;
         }
         if (button.f == CATEGORY_NEXT_BUTTON_ID || button.f == CATEGORY_LABEL_BUTTON_ID) {
-            cycleCategory(1);
+            cycleCategory(direction);
             b();
             return;
         }
@@ -96,7 +126,19 @@ public final class McrtxQuickSettingsScreen extends da {
             return;
         }
 
-        int update = activeUi().handleButton(button.f);
+        OptionSelectorRow selectorRow = findSelectorRowForControl(button);
+        int targetId = button.f;
+        int effectiveDirection = direction;
+        if (selectorRow != null) {
+            targetId = selectorRow.targetButtonId;
+            if (button == selectorRow.prevButton) {
+                effectiveDirection = -1 * direction;
+            } else if (button == selectorRow.nextButton) {
+                effectiveDirection = 1 * direction;
+            }
+        }
+
+        int update = activeUi().handleButton(targetId, effectiveDirection);
         if (update == McrtxSettingsCategoryUi.UPDATE_REBUILD) b();
         else if (update == McrtxSettingsCategoryUi.UPDATE_REFRESH) refreshButtons();
     }
@@ -155,6 +197,21 @@ public final class McrtxQuickSettingsScreen extends da {
             return;
         }
 
+        if (mouseButton == 1) {
+            for (int index = 0; index < this.e.size(); ++index) {
+                ke button = (ke) this.e.get(index);
+                if (scrollControls.contains(button) && !isInsideScrollViewport(mouseX, mouseY)) {
+                    continue;
+                }
+                if (button.c(this.b, mouseX, mouseY)) {
+                    this.b.B.a("random.click", 1.0F, 1.0F);
+                    handleButtonAction(button, -1);
+                    return;
+                }
+            }
+            return;
+        }
+
         if (!isInsideScrollViewport(mouseX, mouseY)) {
             List controlsToRestore = new ArrayList(scrollControls);
             boolean[] visibility = new boolean[controlsToRestore.size()];
@@ -191,6 +248,34 @@ public final class McrtxQuickSettingsScreen extends da {
     void addControl(ke control) {
         this.e.add(control);
         if (addingScrollControls) scrollControls.add(control);
+    }
+
+    void addOptionSelector(int buttonId, String label) {
+        int rowY = takeNextRowY();
+        int controlX = getControlX();
+        int availableWidth = getControlWidth();
+        int labelWidth = availableWidth - SELECTOR_ARROW_WIDTH * 2 - CONTROL_GAP * 2;
+        int labelX = controlX + SELECTOR_ARROW_WIDTH + CONTROL_GAP;
+        int nextX = labelX + labelWidth + CONTROL_GAP;
+
+        ke prev = new ke(-1000 - buttonId, controlX, rowY, SELECTOR_ARROW_WIDTH, CONTROL_HEIGHT, "<");
+        ke main = new ke(buttonId, labelX, rowY, labelWidth, CONTROL_HEIGHT, label);
+        ke next = new ke(1000 + buttonId, nextX, rowY, SELECTOR_ARROW_WIDTH, CONTROL_HEIGHT, ">");
+
+        addControl(prev);
+        addControl(main);
+        addControl(next);
+        selectorRows.add(new OptionSelectorRow(prev, main, next, buttonId));
+    }
+
+    private OptionSelectorRow findSelectorRowForControl(ke control) {
+        for (int i = 0; i < selectorRows.size(); i++) {
+            OptionSelectorRow row = (OptionSelectorRow) selectorRows.get(i);
+            if (row.prevButton == control || row.labelButton == control || row.nextButton == control) {
+                return row;
+            }
+        }
+        return null;
     }
 
     int takeNextRowY() {

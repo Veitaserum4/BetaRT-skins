@@ -42,7 +42,7 @@ final class McrtxMaterialSettingsUi implements McrtxSettingsCategoryUi {
         screen.addControl(button(screen, RESET_DEFAULTS_BUTTON_ID, "Reset Material Defaults"));
     }
 
-    public int handleButton(int id) {
+    public int handleButton(int id, int direction) {
         if (id == SUBSURFACE_DIFFUSION_PROFILE_BUTTON_ID) {
             setSubsurfaceDiffusionEnabled(!McrtxMaterialSettings.isSubsurfaceDiffusionProfileEnabled());
             return UPDATE_REFRESH;
