@@ -283,6 +283,10 @@ public:
   bool requestPresentedScreenshot(const std::string& absolutePath);
   bool present();
 
+  void setLightLevelOverlayEnabled(bool enabled);
+  void submitLightLevelMarkers(const int* markerData, int count);
+  void clearLightLevelMarkers();
+
   bool isInitialized() const;
   std::string lastError() const;
 
@@ -388,7 +392,11 @@ private:
   void destroyFireMesh();
   void destroyDestroyOverlayMesh();
   void destroyBlockOutlineMesh();
+  void destroyLightLevelOverlayMesh();
   void destroyParticleMesh();
+  bool rebuildLightLevelOverlayMesh(const WorldRenderOrigin& renderOrigin);
+  void createLightLevelOverlayMaterials();
+  void destroyLightLevelOverlayMaterials();
   void destroyMeshHandle(remixapi_MeshHandle& meshHandle);
   void destroyLightHandle(remixapi_LightHandle lightHandle);
   void flushDeferredDestroyQueuesLocked();
@@ -571,6 +579,18 @@ private:
   bool heldTorchLightsEnabled_ {true};
   bool dynamicEntityRenderingEnabled_ {true};
   bool blockOutlineEnabled_ {true};
+  struct LightLevelMarkerInstance {
+    int blockX;
+    int blockY;
+    int blockZ;
+    int type;
+  };
+  std::vector<LightLevelMarkerInstance> lightLevelMarkers_ {};
+  bool lightLevelOverlayEnabled_ {false};
+  remixapi_MeshHandle lightLevelOverlayMeshHandle_ {nullptr};
+  remixapi_MaterialHandle lightLevelOverlayMaterialHandle_ {nullptr};
+  std::uint64_t nextLightLevelOverlayMeshHash_ {0};
+  std::size_t lightLevelMarkerCount_ {0};
   static constexpr int kBlockOutlineStyleSubtle = 0;
   static constexpr int kBlockOutlineStyleBold = 1;
   static constexpr int kBlockOutlineStyleSolid = 2;

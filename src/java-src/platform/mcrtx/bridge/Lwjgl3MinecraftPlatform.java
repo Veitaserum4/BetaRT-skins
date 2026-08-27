@@ -10,6 +10,7 @@ final class Lwjgl3MinecraftPlatform implements MinecraftPlatform {
     private static final int DEFAULT_GLFW_KEY_RIGHT_ALT = 346;
     private static final int DEFAULT_GLFW_KEY_X = 88;
     private static final int DEFAULT_GLFW_KEY_B = 66;
+    private static final int DEFAULT_GLFW_KEY_F7 = 296;
 
     private final Method glfwGetCurrentContext;
     private final Method glfwGetWindowAttrib;
@@ -22,6 +23,7 @@ final class Lwjgl3MinecraftPlatform implements MinecraftPlatform {
     private final int glfwKeyRightAlt;
     private final int glfwKeyX;
     private final int glfwKeyB;
+    private final int glfwKeyF7;
 
     Lwjgl3MinecraftPlatform() {
         try {
@@ -40,6 +42,7 @@ final class Lwjgl3MinecraftPlatform implements MinecraftPlatform {
             glfwKeyRightAlt = readStaticInt(glfwClass, "GLFW_KEY_RIGHT_ALT", DEFAULT_GLFW_KEY_RIGHT_ALT);
             glfwKeyX = readStaticInt(glfwClass, "GLFW_KEY_X", DEFAULT_GLFW_KEY_X);
             glfwKeyB = readStaticInt(glfwClass, "GLFW_KEY_B", DEFAULT_GLFW_KEY_B);
+            glfwKeyF7 = readStaticInt(glfwClass, "GLFW_KEY_F7", DEFAULT_GLFW_KEY_F7);
         } catch (ReflectiveOperationException exception) {
             throw new IllegalStateException("Failed to initialize the LWJGL 3 platform backend", exception);
         }
@@ -94,6 +97,9 @@ final class Lwjgl3MinecraftPlatform implements MinecraftPlatform {
                 break;
             case B:
                 glfwKey = glfwKeyB;
+                break;
+            case F7:
+                glfwKey = glfwKeyF7;
                 break;
             default:
                 return false;

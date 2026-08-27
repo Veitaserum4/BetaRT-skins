@@ -513,6 +513,46 @@ bool RemixRenderer::drawCapturedGeometry(FrameRenderSnapshot& snapshot) {
     }
   }
 
+  if (snapshot.lightLevelOverlayMeshHandle != nullptr) {
+    MCRTX_TRACY_SCOPE("drawCapturedGeometry.lightLevelOverlay");
+    remixapi_InstanceInfoBlendEXT blendInfo {};
+    blendInfo.sType = REMIXAPI_STRUCT_TYPE_INSTANCE_INFO_BLEND_EXT;
+    blendInfo.alphaTestEnabled = TRUE;
+    blendInfo.alphaTestReferenceValue = 1;
+    blendInfo.alphaTestCompareOp = 4;
+    blendInfo.alphaBlendEnabled = TRUE;
+    blendInfo.srcColorBlendFactor = 6;
+    blendInfo.dstColorBlendFactor = 7;
+    blendInfo.colorBlendOp = 0;
+    blendInfo.srcAlphaBlendFactor = 1;
+    blendInfo.dstAlphaBlendFactor = 0;
+    blendInfo.alphaBlendOp = 0;
+    blendInfo.textureColorArg1Source = kRtTextureArgTexture;
+    blendInfo.textureColorArg2Source = kRtTextureArgVertexColor0;
+    blendInfo.textureColorOperation = kRtTextureOpModulate;
+    blendInfo.textureAlphaArg1Source = kRtTextureArgTexture;
+    blendInfo.textureAlphaArg2Source = kRtTextureArgNone;
+    blendInfo.textureAlphaOperation = kRtTextureOpSelectArg1;
+    blendInfo.isVertexColorBakedLighting = FALSE;
+
+    remixapi_InstanceInfo instanceInfo {};
+    instanceInfo.sType = REMIXAPI_STRUCT_TYPE_INSTANCE_INFO;
+    instanceInfo.pNext = &blendInfo;
+    instanceInfo.categoryFlags = REMIXAPI_INSTANCE_CATEGORY_BIT_TERRAIN;
+    instanceInfo.mesh = snapshot.lightLevelOverlayMeshHandle;
+    instanceInfo.transform = makeTranslationTransform(0.0f, 0.0f, 0.0f);
+    instanceInfo.doubleSided = TRUE;
+
+    const remixapi_ErrorCode result = [&]() {
+      MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Remix, "DrawInstance.lightLevelOverlay");
+      return remix_.DrawInstance(&instanceInfo);
+    }();
+    if (result != REMIXAPI_ERROR_CODE_SUCCESS) {
+      setError("DrawInstance failed: " + errorCodeToString(result));
+      return false;
+    }
+  }
+
   if (snapshot.particleMeshHandle != nullptr) {
     MCRTX_TRACY_SCOPE("drawCapturedGeometry.particles");
     remixapi_InstanceInfoBlendEXT blendInfo {};

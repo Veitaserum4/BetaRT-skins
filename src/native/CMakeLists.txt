@@ -94,6 +94,7 @@ add_library(mcrtx_jni SHARED
   src/scene/remix_subsystem_lights.cpp
   src/particles/remix_overlay_destroy.cpp
   src/particles/remix_overlay_outline.cpp
+  src/particles/remix_overlay_light_level.cpp
   src/particles/remix_overlay_fire.cpp
   src/particles/remix_overlay_particles.cpp
   src/scene/remix_subsystem_world.cpp

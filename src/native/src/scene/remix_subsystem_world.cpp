@@ -455,11 +455,13 @@ void RemixRenderer::clearWorldScene() {
   destroyFireMesh();
   destroyDestroyOverlayMesh();
   destroyBlockOutlineMesh();
+  destroyLightLevelOverlayMesh();
   destroyParticleMesh();
   destroyDynamicEntityMeshes();
   clearDynamicEntityFrameInstances();
   destroyOverlayInstances_.clear();
   blockOutlineInstances_.clear();
+  lightLevelMarkers_.clear();
   particleQuads_.clear();
   while (!entityHeldTorchLights_.empty()) {
     destroyEntityHeldTorchLight(entityHeldTorchLights_.begin()->first);

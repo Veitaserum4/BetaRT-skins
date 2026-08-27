@@ -31,6 +31,7 @@ public final class MinecraftRemixSceneHooks {
         long __perf = HookProfiler.begin();
         try {
             RemixCameraState.captureFrameView();
+            RemixLightLevelOverlay.update(mcrtx.bridge.RemixLifecycleBridge.getRememberedMinecraft());
         } finally {
             HookProfiler.endHook("hook.onFrameViewCaptured", __perf);
         }

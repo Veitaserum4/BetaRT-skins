@@ -112,6 +112,7 @@ struct FrameRenderSnapshot {
   remixapi_MeshHandle fireMeshHandle {nullptr};
   remixapi_MeshHandle destroyOverlayMeshHandle {nullptr};
   remixapi_MeshHandle blockOutlineMeshHandle {nullptr};
+  remixapi_MeshHandle lightLevelOverlayMeshHandle {nullptr};
   remixapi_MeshHandle particleMeshHandle {nullptr};
   float cloudTransformX {0.0f};
   float cloudTransformY {0.0f};
@@ -140,6 +141,7 @@ struct FrameRenderSnapshot {
         || fireMeshHandle != nullptr
         || destroyOverlayMeshHandle != nullptr
           || blockOutlineMeshHandle != nullptr
+        || lightLevelOverlayMeshHandle != nullptr
         || particleMeshHandle != nullptr
         || !torchLights.empty();
   }

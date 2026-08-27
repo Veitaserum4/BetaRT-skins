@@ -39,6 +39,11 @@ public final class McrtxGameplaySettingsNative {
             try { nSetViewModelFovDegrees((float) fovDegrees); } catch (Throwable ignored) {}
         }
     }
+    public static void setLightLevelOverlayEnabled(boolean enabled) {
+        if (ready()) {
+            try { nSetLightLevelOverlayEnabled(enabled); } catch (Throwable ignored) {}
+        }
+    }
 
     private static boolean ready() {
         return RemixBridgeNative.isAvailable() && RemixLifecycleBridge.isInitialized();
@@ -51,4 +56,5 @@ public final class McrtxGameplaySettingsNative {
     private static native void nSetBlockOutlineStyle(int style);
     private static native void nSetBlockOutlineEmissiveIntensity(float intensity);
     private static native void nSetViewModelFovDegrees(float fovYDegrees);
+    private static native void nSetLightLevelOverlayEnabled(boolean enabled);
 }

@@ -50,4 +50,36 @@ JNIEXPORT void JNICALL Java_mcrtx_bridge_McrtxGameplaySettingsNative_nSetViewMod
   RemixRenderer::instance().setViewModelFovDegrees(fovYDegrees);
 }
 
+JNIEXPORT void JNICALL Java_mcrtx_bridge_McrtxGameplaySettingsNative_nSetLightLevelOverlayEnabled(
+    JNIEnv*, jclass, jboolean enabled) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Jni, "nSetLightLevelOverlayEnabled");
+  RemixRenderer::instance().setLightLevelOverlayEnabled(enabled == JNI_TRUE);
+}
+
+JNIEXPORT void JNICALL Java_mcrtx_bridge_RemixLightOverlayBridge_nSetLightLevelOverlayEnabled(
+    JNIEnv*, jclass, jboolean enabled) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Jni, "nSetLightLevelOverlayEnabled");
+  RemixRenderer::instance().setLightLevelOverlayEnabled(enabled == JNI_TRUE);
+}
+
+JNIEXPORT void JNICALL Java_mcrtx_bridge_RemixLightOverlayBridge_nSubmitLightLevelMarkers(
+    JNIEnv* env, jclass, jintArray markerDataArray, jint count) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Jni, "nSubmitLightLevelMarkers");
+  if (markerDataArray == nullptr || count <= 0) {
+    RemixRenderer::instance().clearLightLevelMarkers();
+    return;
+  }
+  jint* elements = env->GetIntArrayElements(markerDataArray, nullptr);
+  if (elements != nullptr) {
+    RemixRenderer::instance().submitLightLevelMarkers(reinterpret_cast<const int*>(elements), static_cast<int>(count));
+    env->ReleaseIntArrayElements(markerDataArray, elements, JNI_ABORT);
+  }
+}
+
+JNIEXPORT void JNICALL Java_mcrtx_bridge_RemixLightOverlayBridge_nClearLightLevelMarkers(
+    JNIEnv*, jclass) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Jni, "nClearLightLevelMarkers");
+  RemixRenderer::instance().clearLightLevelMarkers();
+}
+
 }  // extern "C"
