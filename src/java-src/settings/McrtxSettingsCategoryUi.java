@@ -5,7 +5,7 @@ interface McrtxSettingsCategoryUi {
 
     String getName();
     void addControls(McrtxQuickSettingsScreen screen);
-    int handleButton(int buttonId);
+    int handleButton(int buttonId, int direction);
     void refreshButtons(McrtxQuickSettingsScreen screen);
     void applySavedSettings();
 }

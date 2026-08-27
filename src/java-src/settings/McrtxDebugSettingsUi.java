@@ -26,7 +26,7 @@ final class McrtxDebugSettingsUi implements McrtxSettingsCategoryUi {
         screen.addControl(button(screen, SIGN_VANILLA_SUPPRESSION_BUTTON_ID, "Replace Signs: " + toggle(McrtxDebugSettings.isSignVanillaSuppressionEnabled())));
     }
 
-    public int handleButton(int id) {
+    public int handleButton(int id, int direction) {
         if (id == DYNAMIC_ENTITY_RENDERING_BUTTON_ID) setDynamicEntityRenderingEnabled(!McrtxDebugSettings.isDynamicEntityRenderingEnabled());
         else if (id == LIVING_ENTITY_RENDERING_BUTTON_ID) setLivingEntityRenderingEnabled(!McrtxDebugSettings.isLivingEntityRenderingEnabled());
         else if (id == ITEM_ENTITY_RENDERING_BUTTON_ID) setItemEntityRenderingEnabled(!McrtxDebugSettings.isItemEntityRenderingEnabled());

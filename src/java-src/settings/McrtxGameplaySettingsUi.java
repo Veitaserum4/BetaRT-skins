@@ -27,14 +27,14 @@ final class McrtxGameplaySettingsUi implements McrtxSettingsCategoryUi {
         screen.addControl(button(screen, HELD_TORCH_LIGHTS_BUTTON_ID, getHeldTorchLightsLabel()));
         screen.addControl(button(screen, BLOCK_OUTLINE_BUTTON_ID, getBlockOutlineLabel()));
         if (McrtxGameplaySettings.isBlockOutlineEnabled()) {
-            screen.addControl(button(screen, BLOCK_OUTLINE_STYLE_BUTTON_ID, getBlockOutlineStyleLabel()));
+            screen.addOptionSelector(BLOCK_OUTLINE_STYLE_BUTTON_ID, getBlockOutlineStyleLabel());
         }
         if (shouldShowBlockOutlineIntensitySlider()) {
             screen.addControl(new Slider(BLOCK_OUTLINE_INTENSITY_SLIDER_ID, screen.getControlX(), screen.takeNextRowY(), screen.getControlWidth(), McrtxQuickSettingsScreen.CONTROL_HEIGHT, Slider.MODE_BLOCK_OUTLINE_INTENSITY));
         }
     }
 
-    public int handleButton(int buttonId) {
+    public int handleButton(int buttonId, int direction) {
         if (buttonId == PLAYER_SHADOWS_BUTTON_ID) {
             boolean enabled = !McrtxGameplaySettings.isPlayerShadowsEnabled();
             setPlayerShadowsEnabled(enabled);
@@ -56,7 +56,7 @@ final class McrtxGameplaySettingsUi implements McrtxSettingsCategoryUi {
             return UPDATE_REBUILD;
         }
         if (buttonId == BLOCK_OUTLINE_STYLE_BUTTON_ID) {
-            cycleBlockOutlineStyle();
+            cycleBlockOutlineStyle(direction);
             return UPDATE_REBUILD;
         }
         return UPDATE_NONE;
@@ -141,14 +141,23 @@ final class McrtxGameplaySettingsUi implements McrtxSettingsCategoryUi {
         McrtxGameplaySettingsNative.setBlockOutlineEmissiveIntensity(McrtxGameplaySettings.getBlockOutlineEmissiveIntensity());
     }
 
-    private static void cycleBlockOutlineStyle() {
+    private static void cycleBlockOutlineStyle(int direction) {
         int style = McrtxGameplaySettings.getBlockOutlineStyle();
-        if (style == McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_SUBTLE) style = McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_THIN;
-        else if (style == McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_THIN) style = McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_GLOW;
-        else if (style == McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_GLOW) style = McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_RGB;
-        else if (style == McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_RGB) style = McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_BOLD;
-        else if (style == McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_BOLD) style = McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_SOLID;
-        else style = McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_SUBTLE;
+        if (direction >= 0) {
+            if (style == McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_SUBTLE) style = McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_THIN;
+            else if (style == McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_THIN) style = McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_GLOW;
+            else if (style == McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_GLOW) style = McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_RGB;
+            else if (style == McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_RGB) style = McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_BOLD;
+            else if (style == McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_BOLD) style = McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_SOLID;
+            else style = McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_SUBTLE;
+        } else {
+            if (style == McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_SUBTLE) style = McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_SOLID;
+            else if (style == McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_SOLID) style = McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_BOLD;
+            else if (style == McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_BOLD) style = McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_RGB;
+            else if (style == McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_RGB) style = McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_GLOW;
+            else if (style == McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_GLOW) style = McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_THIN;
+            else style = McrtxGameplaySettings.BLOCK_OUTLINE_STYLE_SUBTLE;
+        }
         McrtxGameplaySettings.setBlockOutlineStyle(style);
         McrtxGameplaySettingsNative.setBlockOutlineStyle(style);
     }
