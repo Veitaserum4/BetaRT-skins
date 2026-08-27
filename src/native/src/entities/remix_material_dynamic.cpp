@@ -111,6 +111,9 @@ remixapi_MaterialHandle RemixRenderer::acquireDynamicEntityMaterial(
     }
   } else {
     optionalEmissivePath = resolveOptionalPbrSibling(resolvedTexturePath, L"_emissive");
+    if (optionalEmissivePath.empty()) {
+      optionalEmissivePath = resolveOptionalPbrSibling(resolvedTexturePath, L"_emission");
+    }
     if (!optionalEmissivePath.empty()) {
       emissiveTexturePath = &optionalEmissivePath;
     }
@@ -166,6 +169,18 @@ remixapi_MaterialHandle RemixRenderer::acquireDynamicEntityMaterial(
       ^ (materialClass == DynamicEntityMaterialClass::Translucent ? kDynamicEntityTranslucentMaterialHashMask : 0ull)
       ^ (static_cast<std::uint64_t>(clampedHurtStage) * kDynamicEntityHurtMaterialHashMask)
       ^ (static_cast<std::uint64_t>(clampedCreeperFuseStage) * kDynamicEntityCreeperFuseMaterialHashMask);
+  if (emissiveTexturePath != nullptr) {
+    materialInfo.hash ^= static_cast<std::uint64_t>(std::hash<std::wstring> {}(emissiveTexturePath->wstring()));
+  }
+  if (!pbrTextures.normal.empty()) {
+    materialInfo.hash ^= static_cast<std::uint64_t>(std::hash<std::wstring> {}(pbrTextures.normal.wstring())) * 31ull;
+  }
+  if (!pbrTextures.roughness.empty()) {
+    materialInfo.hash ^= static_cast<std::uint64_t>(std::hash<std::wstring> {}(pbrTextures.roughness.wstring())) * 37ull;
+  }
+  if (!pbrTextures.metallic.empty()) {
+    materialInfo.hash ^= static_cast<std::uint64_t>(std::hash<std::wstring> {}(pbrTextures.metallic.wstring())) * 41ull;
+  }
   materialInfo.albedoTexture = materialTexturePath->c_str();
   materialInfo.emissiveTexture = emissiveTexture;
   materialInfo.emissiveIntensity = emissiveIntensity;

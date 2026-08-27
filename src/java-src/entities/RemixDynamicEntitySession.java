@@ -209,10 +209,10 @@ final class RemixDynamicEntitySession {
                             skinsDir.mkdirs();
                         }
                         
-                        // Look for newest skin_Jacob*.dds
+                        // Look for newest base skin (excluding PBR siblings like _emissive)
                         java.io.File[] existingFiles = skinsDir.listFiles(new java.io.FilenameFilter() {
                             public boolean accept(java.io.File dir, String name) {
-                                return name.startsWith(baseName) && name.endsWith(".dds");
+                                return name.startsWith(baseName) && name.endsWith(".dds") && !isPbrSibling(name);
                             }
                         });
                         if (existingFiles != null && existingFiles.length > 0) {
@@ -228,7 +228,7 @@ final class RemixDynamicEntitySession {
                         }
                     }
 
-                    boolean shouldDownload = !downloadedThisSession.contains(normalizedPrimary);
+                    boolean shouldDownload = !fileExists && !downloadedThisSession.contains(normalizedPrimary);
 
 
                     if (shouldDownload && downloadingSkins.add(normalizedPrimary)) {
@@ -253,19 +253,26 @@ final class RemixDynamicEntitySession {
                                             java.io.File skinsDir = new java.io.File("../libraries/mcrtx_assets/skins");
                                             if (!skinsDir.exists()) skinsDir.mkdirs();
                                             
-                                            // Delete old skins
+                                            // Find previous newest file to migrate any PBR siblings
+                                            String previousOldStem = null;
                                             java.io.File[] oldFiles = skinsDir.listFiles(new java.io.FilenameFilter() {
                                                 public boolean accept(java.io.File dir, String name) {
-                                                    return name.startsWith(baseName) && name.endsWith(".dds");
+                                                    return name.startsWith(baseName) && name.endsWith(".dds") && !isPbrSibling(name);
                                                 }
                                             });
-                                            if (oldFiles != null) {
+                                            if (oldFiles != null && oldFiles.length > 0) {
+                                                java.io.File oldest = oldFiles[0];
                                                 for (java.io.File f : oldFiles) {
-                                                    try { f.delete(); } catch(Exception e) {}
+                                                    if (f.lastModified() > oldest.lastModified()) oldest = f;
+                                                }
+                                                String oldName = oldest.getName();
+                                                if (oldName.endsWith(".dds")) {
+                                                    previousOldStem = oldName.substring(0, oldName.length() - 4);
                                                 }
                                             }
                                             
-                                            String newFileName = baseName + "_" + System.currentTimeMillis() + ".dds";
+                                            String newStem = baseName + "_" + System.currentTimeMillis();
+                                            String newFileName = newStem + ".dds";
                                             java.io.File ddsFile = new java.io.File(skinsDir, newFileName);
                                             java.io.File tempFile = new java.io.File(ddsFile.getAbsolutePath() + ".tmp");
                                             
@@ -277,6 +284,34 @@ final class RemixDynamicEntitySession {
                                             } catch (Exception e) {
                                                 System.out.println("[BetaRT] Failed to move temp skin file: " + e.getMessage());
                                                 tempFile.renameTo(ddsFile); // fallback
+                                            }
+
+                                            // Migrate any existing PBR maps from previous stem to new stem
+                                            if (previousOldStem != null && !previousOldStem.equals(newStem)) {
+                                                final String matchOldStem = previousOldStem;
+                                                java.io.File[] pbrFiles = skinsDir.listFiles(new java.io.FilenameFilter() {
+                                                    public boolean accept(java.io.File dir, String name) {
+                                                        return name.startsWith(matchOldStem) && isPbrSibling(name);
+                                                    }
+                                                });
+                                                if (pbrFiles != null) {
+                                                    for (java.io.File pbr : pbrFiles) {
+                                                        String suffix = pbr.getName().substring(matchOldStem.length());
+                                                        java.io.File newPbr = new java.io.File(skinsDir, newStem + suffix);
+                                                        try {
+                                                            java.nio.file.Files.copy(pbr.toPath(), newPbr.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                                                        } catch (Exception ignored) {}
+                                                    }
+                                                }
+                                            }
+
+                                            // Delete old base skin files (never delete any PBR files)
+                                            if (oldFiles != null) {
+                                                for (java.io.File f : oldFiles) {
+                                                    if (!f.getName().equals(newFileName)) {
+                                                        try { f.delete(); } catch(Exception ignored) {}
+                                                    }
+                                                }
                                             }
                                             
                                             activeSkinPaths.put(normalizedPrimary, "/skins/" + newFileName);
@@ -323,6 +358,27 @@ final class RemixDynamicEntitySession {
             }
         }
         return normalized;
+    }
+
+    private static boolean isPbrSibling(String filename) {
+        if (filename == null) {
+            return false;
+        }
+        String lower = filename.toLowerCase();
+        return lower.contains("_emissive.")
+                || lower.contains("_normal.")
+                || lower.contains("_rough.")
+                || lower.contains("_roughness.")
+                || lower.contains("_metallic.")
+                || lower.contains("_metalness.")
+                || lower.contains("_height.")
+                || lower.contains("_displacement.")
+                || lower.contains("_depth.")
+                || lower.contains("_ao.")
+                || lower.contains("_subsurface.")
+                || lower.contains("_transmittance.")
+                || lower.contains("_thickness.")
+                || lower.contains("_radius.");
     }
 
     static int stableTileEntityId(int x, int y, int z, int salt) {

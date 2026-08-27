@@ -425,8 +425,11 @@ private:
   void resetPerFramePerfCounters() noexcept;
   void shutdownLocked();
   void setError(std::string message);
+
+public:
   static void log(const std::string& message);
 
+private:
   mutable MCRTX_TRACY_LOCKABLE_N(std::mutex, mutex_, "RemixRenderer::mutex_");
   TracyConditionVariable standaloneWorkerEvent_ {};
   std::thread standaloneWorker_ {};

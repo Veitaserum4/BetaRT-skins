@@ -2,7 +2,9 @@
 
 #include "mcrtx/materials/remix_material_common.hpp"
 #include "mcrtx/core/runtime_config.hpp"
+#include "mcrtx/core/remix_renderer.hpp"
 
+#include <cwctype>
 #include <cctype>
 #include <fstream>
 #include <string>
@@ -35,7 +37,26 @@ std::filesystem::path resolveOptionalPbrSibling(const std::filesystem::path& tex
   }
 
   const std::filesystem::path parentPath = texturePath.parent_path();
-  const std::wstring stemWithSuffix = texturePath.stem().wstring() + suffix;
+  const std::wstring stem = texturePath.stem().wstring();
+
+  std::vector<std::wstring> stemCandidates;
+  stemCandidates.push_back(stem + suffix);
+
+  // If the stem ends with _<timestamp> (digits only), also try matching without the timestamp suffix (e.g. skin_Ver_1_emissive.dds)
+  const std::size_t lastUnderscore = stem.rfind(L'_');
+  if (lastUnderscore != std::wstring::npos && lastUnderscore + 1 < stem.size()) {
+    bool isTimestamp = true;
+    for (std::size_t i = lastUnderscore + 1; i < stem.size(); ++i) {
+      if (!::iswdigit(stem[i])) {
+        isTimestamp = false;
+        break;
+      }
+    }
+    if (isTimestamp) {
+      const std::wstring baseStem = stem.substr(0, lastUnderscore);
+      stemCandidates.push_back(baseStem + suffix);
+    }
+  }
 
   std::filesystem::path relativeToAssets;
   bool foundAssets = false;
@@ -47,36 +68,27 @@ std::filesystem::path resolveOptionalPbrSibling(const std::filesystem::path& tex
     }
   }
 
-  std::filesystem::path currentCacheDir = getCurrentTexturePackCacheDir();
+  const std::filesystem::path moduleDirectory = getCurrentModuleDirectory();
 
-  for (const wchar_t* extension : {L".dds", L".png"}) {
-    std::filesystem::path filename = std::filesystem::path(stemWithSuffix).replace_extension(extension);
+  for (const std::wstring& candidateStem : stemCandidates) {
+    std::filesystem::path filename = std::filesystem::path(candidateStem).replace_extension(L".dds");
     
-    if (foundAssets && !currentCacheDir.empty()) {
-      std::filesystem::path cacheCandidate = currentCacheDir / relativeToAssets / filename;
-      if (std::filesystem::exists(cacheCandidate)) {
-        return cacheCandidate;
-      }
-    }
-
-    // Fallback: check cache using the parent path relative to current dir
-    if (!currentCacheDir.empty()) {
-      std::filesystem::path cacheRootCandidate = currentCacheDir / parentPath / filename;
-      if (std::filesystem::exists(cacheRootCandidate)) {
-        return cacheRootCandidate;
-      }
-
-      // Also check the root of the cache just in case
-      std::filesystem::path cacheFlatCandidate = currentCacheDir / filename;
-      if (std::filesystem::exists(cacheFlatCandidate)) {
-        return cacheFlatCandidate;
-      }
-    }
-
-    // Original path check
-    std::filesystem::path candidatePath = parentPath / filename;
+    // Check directly in parentPath first
+    std::filesystem::path candidatePath = (parentPath / filename).lexically_normal();
     if (std::filesystem::exists(candidatePath)) {
       return candidatePath;
+    }
+
+    std::vector<std::filesystem::path> attemptedPaths;
+    if (foundAssets) {
+      pushAssetCandidates(attemptedPaths, moduleDirectory, relativeToAssets / filename);
+    }
+    pushAssetCandidates(attemptedPaths, moduleDirectory, filename);
+
+    for (const auto& path : attemptedPaths) {
+      if (std::filesystem::exists(path)) {
+        return path;
+      }
     }
   }
 
