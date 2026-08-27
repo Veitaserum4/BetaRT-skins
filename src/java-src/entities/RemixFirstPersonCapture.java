@@ -107,6 +107,7 @@ final class RemixFirstPersonCapture {
         }
         long lookupRendererEndNanos = System.nanoTime();
 
+        resetVoxelCapture();
         RemixDynamicEntitySession.ensureFrame();
         String normalizedSkinUrl = RemixDynamicEntitySession.normalizeTexturePath(lastExtractedSkinUrl, PLAYER_TEXTURE_PATH);
         RemixDynamicEntitySession.beginEntity(
@@ -226,6 +227,10 @@ final class RemixFirstPersonCapture {
         if (!enabled && !playerShadowsEnabled) {
             shadowCaptureActive = false;
         }
+    }
+
+    static boolean isFirstPersonBodyEnabled() {
+        return firstPersonBodyEnabled;
     }
 
     static boolean isShadowCaptureActive() {

@@ -26,6 +26,11 @@ final class RemixHeldItemCapture {
             return;
         }
 
+        if (RemixFirstPersonCapture.isFirstPersonBodyEnabled()) {
+            RemixDynamicEntityBridge.setFirstPersonHeldItem(NO_HELD_ITEM);
+            return;
+        }
+
         if (!RemixFirstPersonCapture.isActive()) {
             RemixDynamicEntityBridge.setFirstPersonHeldItem(
                     heldTorchLightsEnabled && isTorchLikeHeldItem(itemStack.c)
@@ -75,7 +80,7 @@ final class RemixHeldItemCapture {
     }
 
     private static void syncEntityHeldTorch(gs player, iz heldItem, float partialTicks) {
-        if (RemixFirstPersonCapture.isShadowCaptureActive()) {
+        if (RemixFirstPersonCapture.isShadowCaptureActive() && !RemixFirstPersonCapture.isFirstPersonBodyEnabled()) {
             return;
         }
 
@@ -99,14 +104,21 @@ final class RemixHeldItemCapture {
             return;
         }
         RemixCameraState.PreciseTransform modelToWorld =
-                RemixCameraState.buildModelToWorldTransform(modelView);
+                RemixFirstPersonCapture.isShadowCaptureActive()
+                        ? RemixFirstPersonCapture.modelToWorldTransform(modelView)
+                        : RemixCameraState.buildModelToWorldTransform(modelView);
         double handX = modelToWorld.x;
         double handY = modelToWorld.y;
         double handZ = modelToWorld.z;
         float interpolatedYaw = player.aU + (player.aS - player.aU) * partialTicks;
         double yawRadians = Math.toRadians(interpolatedYaw);
-        handX += (-Math.cos(yawRadians)) * (double) ENTITY_HELD_TORCH_RIGHT_NUDGE;
-        handZ += (-Math.sin(yawRadians)) * (double) ENTITY_HELD_TORCH_RIGHT_NUDGE;
+        double forwardX = -Math.sin(yawRadians);
+        double forwardZ = Math.cos(yawRadians);
+        double rightX = -Math.cos(yawRadians);
+        double rightZ = -Math.sin(yawRadians);
+        handX += forwardX * 0.35 + rightX * 0.08;
+        handY += 0.25;
+        handZ += forwardZ * 0.35 + rightZ * 0.08;
         RemixDynamicEntityBridge.setEntityLight(player.aD, handX, handY, handZ, itemId);
     }
 }
