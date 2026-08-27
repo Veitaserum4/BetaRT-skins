@@ -39,6 +39,7 @@ public final class RemixCameraState {
 
     private static boolean frameViewCaptured;
     private static boolean frustumReady;
+    private static boolean thirdPersonActiveState;
     private static final float[] frameInverseViewMatrix = new float[16];
     private static double frameCameraPoseX;
     private static double frameCameraPoseY;
@@ -69,6 +70,7 @@ public final class RemixCameraState {
         if (entity == null) {
             return;
         }
+        thirdPersonActiveState = thirdPersonActive;
         bt position = entity.e(partialTicks);
         bt forward = entity.f(partialTicks);
         cameraPositionX = position.a;
@@ -156,9 +158,19 @@ public final class RemixCameraState {
 
         float[] inverse = MatrixMath.invertAffineColumnMajor(view);
         long invertViewEndNanos = System.nanoTime();
-        frameCameraPoseX = cameraPositionX + (double) inverse[12];
-        frameCameraPoseY = cameraPositionY + (double) inverse[13];
-        frameCameraPoseZ = cameraPositionZ + (double) inverse[14];
+        double heightOffset = (!thirdPersonActiveState && McrtxGameplaySettings.isFirstPersonBodyEnabled())
+                ? (double) McrtxGameplaySettings.getFirstPersonBodyCameraHeightOffset()
+                : 0.0;
+        double forwardOffset = (!thirdPersonActiveState && McrtxGameplaySettings.isFirstPersonBodyEnabled())
+                ? (double) McrtxGameplaySettings.getFirstPersonBodyCameraForwardOffset()
+                : 0.0;
+        float horizLen = (float) Math.sqrt(cameraForwardX * cameraForwardX + cameraForwardZ * cameraForwardZ);
+        double dirX = horizLen > 1.0e-4f ? (double) (cameraForwardX / horizLen) : 0.0;
+        double dirZ = horizLen > 1.0e-4f ? (double) (cameraForwardZ / horizLen) : 0.0;
+
+        frameCameraPoseX = cameraPositionX + (double) inverse[12] + dirX * forwardOffset;
+        frameCameraPoseY = cameraPositionY + (double) inverse[13] + heightOffset;
+        frameCameraPoseZ = cameraPositionZ + (double) inverse[14] + dirZ * forwardOffset;
         inverse[12] = (float) frameCameraPoseX;
         inverse[13] = (float) frameCameraPoseY;
         inverse[14] = (float) frameCameraPoseZ;
