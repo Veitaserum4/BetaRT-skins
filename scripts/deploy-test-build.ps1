@@ -100,6 +100,9 @@ $instanceLibraryPdbPath = Join-Path $instanceLibrariesDir "mcrtx_jni.pdb"
 $instanceAssetsDir = Join-Path $instanceLibrariesDir "mcrtx_assets"
 $instanceMinecraftDllPath = Join-Path $instanceMinecraftDir "mcrtx_jni.dll"
 $instanceMinecraftPdbPath = Join-Path $instanceMinecraftDir "mcrtx_jni.pdb"
+$instanceMinecraftBinDir = Join-Path $instanceMinecraftDir "bin"
+$instanceMinecraftBinDllPath = Join-Path $instanceMinecraftBinDir "mcrtx_jni.dll"
+$instanceMinecraftBinPdbPath = Join-Path $instanceMinecraftBinDir "mcrtx_jni.pdb"
 $runtimeConfigPath = Join-Path $instanceMinecraftDir "mcrtx-runtime.env"
 $instanceConfigPath = Join-Path $InstanceRoot "instance.cfg"
 $instanceMmcPackPath = Join-Path $InstanceRoot "mmc-pack.json"
@@ -817,21 +820,29 @@ if (Test-Path $patchedPdb) {
     }
 }
 
-foreach ($dllTarget in @($instanceLibraryDllPath, $instanceMinecraftDllPath)) {
+foreach ($dllTarget in @($instanceLibraryDllPath, $instanceMinecraftDllPath, $instanceMinecraftBinDllPath)) {
     if ($PSCmdlet.ShouldProcess($dllTarget, "Deploy instance-local mcrtx JNI DLL")) {
+        $targetParent = Split-Path $dllTarget -Parent
+        if ($targetParent -and -not (Test-Path $targetParent)) {
+            New-Item -ItemType Directory -Force -Path $targetParent | Out-Null
+        }
         Copy-Item $patchedDll $dllTarget -Force
         $didCopyDll = $true
     }
 }
 
 if (Test-Path $patchedPdb) {
-    foreach ($pdbTarget in @($instanceLibraryPdbPath, $instanceMinecraftPdbPath)) {
+    foreach ($pdbTarget in @($instanceLibraryPdbPath, $instanceMinecraftPdbPath, $instanceMinecraftBinPdbPath)) {
         if ($PSCmdlet.ShouldProcess($pdbTarget, "Deploy instance-local mcrtx JNI PDB")) {
+            $targetParent = Split-Path $pdbTarget -Parent
+            if ($targetParent -and -not (Test-Path $targetParent)) {
+                New-Item -ItemType Directory -Force -Path $targetParent | Out-Null
+            }
             Copy-Item $patchedPdb $pdbTarget -Force
         }
     }
 } else {
-    foreach ($pdbTarget in @($instanceLibraryPdbPath, $instanceMinecraftPdbPath)) {
+    foreach ($pdbTarget in @($instanceLibraryPdbPath, $instanceMinecraftPdbPath, $instanceMinecraftBinPdbPath)) {
         if (Test-Path $pdbTarget) {
             if ($PSCmdlet.ShouldProcess($pdbTarget, "Remove stale instance-local mcrtx JNI PDB")) {
                 Remove-Item $pdbTarget -Force

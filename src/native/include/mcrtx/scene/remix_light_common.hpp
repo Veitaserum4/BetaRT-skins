@@ -28,8 +28,12 @@ inline constexpr remixapi_Float3D kLavaBucketLightRadiance = {35.0f, 7.0f, 1.5f}
 constexpr std::uint64_t kPortalLightHashSeed = 0x4D43525458505254ull;
 inline constexpr remixapi_Float3D kPortalLightRadiance = {300.0f, 100.0f, 800.0f}; // Much brighter
 
+constexpr std::uint64_t kGlowstoneLightHashSeed = 0x4D43525458474C57ull;
+inline constexpr remixapi_Float3D kGlowstoneLightRadiance = {30.0f, 15.0f, 4.0f};
+
 std::uint64_t makeTorchLightHash(const WorldBlockPosition& position);
 std::uint64_t makePortalLightHash(const WorldBlockPosition& position);
+std::uint64_t makeGlowstoneLightHash(const WorldBlockPosition& position);
 
 bool containsWorldBlockPosition(
     const std::vector<WorldBlockPosition>& positions,
@@ -39,6 +43,9 @@ const TorchLightPlacement* findTorchLightPlacement(
     const WorldBlockPosition& position);
 const PortalLightPlacement* findPortalLightPlacement(
     const std::vector<PortalLightPlacement>& placements,
+    const WorldBlockPosition& position);
+const GlowstoneLightPlacement* findGlowstoneLightPlacement(
+    const std::vector<GlowstoneLightPlacement>& placements,
     const WorldBlockPosition& position);
 TorchLightPlacement makeTorchLightPlacement(
     const ChunkBlockCell& cell,
@@ -50,5 +57,11 @@ PortalLightPlacement makePortalLightPlacement(
     int worldX,
     int worldY,
     int worldZ);
+GlowstoneLightPlacement makeGlowstoneLightPlacement(
+    const ChunkBlockCell& cell,
+    int worldX,
+    int worldY,
+    int worldZ,
+    std::uint8_t visibleFacesMask);
 
 }  // namespace mcrtx::light

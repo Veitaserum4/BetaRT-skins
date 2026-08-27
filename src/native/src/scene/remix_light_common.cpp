@@ -121,4 +121,41 @@ PortalLightPlacement makePortalLightPlacement(
   placement.isZAxis = (xThickness <= zThickness);
   return placement;
 }
+
+std::uint64_t makeGlowstoneLightHash(const WorldBlockPosition& position) {
+  std::uint64_t hash = kGlowstoneLightHashSeed;
+  hash = mixHashComponent(hash, std::bit_cast<std::uint32_t>(position.x));
+  hash = mixHashComponent(hash, std::bit_cast<std::uint32_t>(position.y));
+  hash = mixHashComponent(hash, std::bit_cast<std::uint32_t>(position.z));
+  return hash;
+}
+
+const GlowstoneLightPlacement* findGlowstoneLightPlacement(
+    const std::vector<GlowstoneLightPlacement>& placements,
+    const WorldBlockPosition& position) {
+  const auto it = std::find_if(
+      placements.begin(),
+      placements.end(),
+      [&position](const GlowstoneLightPlacement& placement) {
+        return placement.blockPosition == position;
+      });
+  return it == placements.end() ? nullptr : &(*it);
+}
+
+GlowstoneLightPlacement makeGlowstoneLightPlacement(
+    const ChunkBlockCell& /*cell*/,
+    int worldX,
+    int worldY,
+    int worldZ,
+    std::uint8_t visibleFacesMask) {
+  GlowstoneLightPlacement placement;
+  placement.blockPosition = WorldBlockPosition {
+      .x = worldX,
+      .y = worldY,
+      .z = worldZ,
+  };
+  placement.visibleFacesMask = visibleFacesMask;
+  return placement;
+}
+
 }  // namespace mcrtx::light

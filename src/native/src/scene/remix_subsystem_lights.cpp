@@ -925,6 +925,276 @@ void RemixRenderer::reconcileParticleLights(const WorldRenderOrigin& renderOrigi
   }
 }
 
+bool RemixRenderer::createGlowstoneLight(
+    const GlowstoneLightPlacement& placement,
+    const WorldRenderOrigin& renderOrigin) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Native, "RemixRenderer::createGlowstoneLight");
+  if (remix_.CreateLight == nullptr) {
+    return true;
+  }
+
+  const WorldRenderPosition centerPosition = rebaseWorldPosition(
+      placement.blockPosition.x + 0.5f,
+      placement.blockPosition.y + 0.5f,
+      placement.blockPosition.z + 0.5f,
+      renderOrigin);
+
+  const float nudge = 0.51f; // Slightly outside the block
+  const float rectSize = 1.0f;
+  
+  // BetaRT face mapping: 0: Z-, 1: Z+, 2: X-, 3: X+, 4: Y-, 5: Y+
+  const remixapi_Float3D directions[6] = {
+    {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}, 
+    {1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}
+  };
+  const remixapi_Float3D xAxes[6] = {
+    {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, 
+    {0.0f, 0.0f, -1.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}
+  };
+  const remixapi_Float3D yAxes[6] = {
+    {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 
+    {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}
+  };
+
+  std::uint64_t baseHash = light::makeGlowstoneLightHash(placement.blockPosition);
+  
+  GlowstoneLightState state {};
+  state.renderOrigin = renderOrigin;
+  state.submittedPosition = centerPosition;
+  
+  bool anyCreated = false;
+  
+  for (int i = 0; i < 6; ++i) {
+    if ((placement.visibleFacesMask & (1 << i)) == 0) {
+      continue;
+    }
+    
+    remixapi_LightInfoRectEXT rectInfo {};
+    rectInfo.sType = REMIXAPI_STRUCT_TYPE_LIGHT_INFO_RECT_EXT;
+    rectInfo.position = {
+      centerPosition.x + directions[i].x * nudge,
+      centerPosition.y + directions[i].y * nudge,
+      centerPosition.z + directions[i].z * nudge
+    };
+    rectInfo.xAxis = xAxes[i];
+    rectInfo.xSize = rectSize;
+    rectInfo.yAxis = yAxes[i];
+    rectInfo.ySize = rectSize;
+    rectInfo.direction = directions[i];
+    
+    rectInfo.shaping_hasvalue = FALSE;
+    rectInfo.shaping_value.direction = directions[i];
+    rectInfo.shaping_value.coneAngleDegrees = 180.0f; // Half-sphere
+    rectInfo.shaping_value.coneSoftness = 0.1f;
+    rectInfo.shaping_value.focusExponent = 0.0f;
+    rectInfo.volumetricRadianceScale = 1.0f;
+    
+    remixapi_LightInfoLocalOriginEXT originInfo = makeLightLocalOriginInfo(renderOrigin, &rectInfo);
+    remixapi_LightInfo lightInfo {};
+    lightInfo.sType = REMIXAPI_STRUCT_TYPE_LIGHT_INFO;
+    lightInfo.pNext = &originInfo;
+    lightInfo.hash = persistentLightHashForRenderOrigin(baseHash ^ (std::uint64_t(i) << 56), renderOrigin);
+    lightInfo.radiance = light::kGlowstoneLightRadiance;
+    lightInfo.isDynamic = FALSE;
+    lightInfo.ignoreViewModel = FALSE;
+    lightInfo.ignoreFirstPersonPlayerShadow = FALSE;
+    
+    remixapi_LightHandle handle = nullptr;
+    const remixapi_ErrorCode result = [&]() {
+      MCRTX_TRACY_SCOPE("createGlowstoneLight.createLight");
+      MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Remix, "CreateLight.glowstone");
+      return remix_.CreateLight(&lightInfo, &handle);
+    }();
+
+    if (result == REMIXAPI_ERROR_CODE_SUCCESS && handle != nullptr) {
+      state.handles[i] = handle;
+      state.apiHashes[i] = lightInfo.hash;
+      anyCreated = true;
+    }
+  }
+
+  glowstoneLights_[placement.blockPosition] = state;
+  glowstoneLightPlacements_[placement.blockPosition] = placement;
+  return anyCreated;
+}
+
+bool RemixRenderer::updateGlowstoneLight(
+    const GlowstoneLightPlacement& placement,
+    const WorldRenderOrigin& renderOrigin) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Native, "RemixRenderer::updateGlowstoneLight");
+  if (remix_.UpdateLightDefinition == nullptr) {
+    destroyGlowstoneLight(placement.blockPosition);
+    return createGlowstoneLight(placement, renderOrigin);
+  }
+
+  auto lightIt = glowstoneLights_.find(placement.blockPosition);
+  if (lightIt == glowstoneLights_.end()) {
+    return createGlowstoneLight(placement, renderOrigin);
+  }
+
+  GlowstoneLightState& state = lightIt->second;
+  const WorldRenderPosition centerPosition = rebaseWorldPosition(
+      placement.blockPosition.x + 0.5f,
+      placement.blockPosition.y + 0.5f,
+      placement.blockPosition.z + 0.5f,
+      renderOrigin);
+
+  const float nudge = 0.51f;
+  const float rectSize = 1.0f;
+  
+  // BetaRT face mapping: 0: Z-, 1: Z+, 2: X-, 3: X+, 4: Y-, 5: Y+
+  const remixapi_Float3D directions[6] = {
+    {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, 1.0f}, {-1.0f, 0.0f, 0.0f}, 
+    {1.0f, 0.0f, 0.0f}, {0.0f, -1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}
+  };
+  const remixapi_Float3D xAxes[6] = {
+    {-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, 
+    {0.0f, 0.0f, -1.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}
+  };
+  const remixapi_Float3D yAxes[6] = {
+    {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 0.0f}, 
+    {0.0f, 1.0f, 0.0f}, {0.0f, 0.0f, 1.0f}, {0.0f, 0.0f, -1.0f}
+  };
+
+  std::uint64_t baseHash = light::makeGlowstoneLightHash(placement.blockPosition);
+  
+  bool anyFailed = false;
+  
+  for (int i = 0; i < 6; ++i) {
+    if ((placement.visibleFacesMask & (1 << i)) == 0) {
+      if (state.handles[i] != nullptr) {
+        destroyLightHandle(state.handles[i]);
+        state.handles[i] = nullptr;
+      }
+      continue;
+    }
+    
+    remixapi_LightInfoRectEXT rectInfo {};
+    rectInfo.sType = REMIXAPI_STRUCT_TYPE_LIGHT_INFO_RECT_EXT;
+    rectInfo.position = {
+      centerPosition.x + directions[i].x * nudge,
+      centerPosition.y + directions[i].y * nudge,
+      centerPosition.z + directions[i].z * nudge
+    };
+    rectInfo.xAxis = xAxes[i];
+    rectInfo.xSize = rectSize;
+    rectInfo.yAxis = yAxes[i];
+    rectInfo.ySize = rectSize;
+    rectInfo.direction = directions[i];
+    
+    rectInfo.shaping_hasvalue = FALSE;
+    rectInfo.shaping_value.direction = directions[i];
+    rectInfo.shaping_value.coneAngleDegrees = 180.0f;
+    rectInfo.shaping_value.coneSoftness = 0.1f;
+    rectInfo.shaping_value.focusExponent = 0.0f;
+    rectInfo.volumetricRadianceScale = 1.0f;
+    
+    remixapi_LightInfoLocalOriginEXT originInfo = makeLightLocalOriginInfo(renderOrigin, &rectInfo);
+    remixapi_LightInfo lightInfo {};
+    lightInfo.sType = REMIXAPI_STRUCT_TYPE_LIGHT_INFO;
+    lightInfo.pNext = &originInfo;
+    lightInfo.hash = persistentLightHashForRenderOrigin(baseHash ^ (std::uint64_t(i) << 56), renderOrigin);
+    lightInfo.radiance = light::kGlowstoneLightRadiance;
+    lightInfo.isDynamic = FALSE;
+    lightInfo.ignoreViewModel = FALSE;
+    lightInfo.ignoreFirstPersonPlayerShadow = FALSE;
+    
+    if (state.handles[i] == nullptr) {
+      remixapi_LightHandle handle = nullptr;
+      if (remix_.CreateLight(&lightInfo, &handle) == REMIXAPI_ERROR_CODE_SUCCESS) {
+        state.handles[i] = handle;
+        state.apiHashes[i] = lightInfo.hash;
+      } else {
+        anyFailed = true;
+      }
+    } else {
+      if (remix_.UpdateLightDefinition(state.handles[i], &lightInfo) == REMIXAPI_ERROR_CODE_SUCCESS) {
+        state.apiHashes[i] = lightInfo.hash;
+      } else {
+        anyFailed = true;
+      }
+    }
+  }
+
+  glowstoneLightPlacements_[placement.blockPosition] = placement;
+  state.renderOrigin = renderOrigin;
+  state.submittedPosition = centerPosition;
+  return !anyFailed;
+}
+
+bool RemixRenderer::reconcileChunkGlowstoneLights(
+    ChunkMeshData& meshData,
+    const std::vector<GlowstoneLightPlacement>& desiredGlowstoneLights) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Native, "RemixRenderer::reconcileChunkGlowstoneLights");
+  if (remix_.CreateLight == nullptr) {
+    destroyChunkGlowstoneLights(meshData);
+    return true;
+  }
+
+  std::vector<WorldBlockPosition> createdLights;
+  createdLights.reserve(desiredGlowstoneLights.size());
+  const WorldRenderOrigin renderOrigin = currentRenderOriginLocked();
+  for (const GlowstoneLightPlacement& placement : desiredGlowstoneLights) {
+    const bool existed = glowstoneLights_.find(placement.blockPosition) != glowstoneLights_.end();
+
+    if (!updateGlowstoneLight(placement, renderOrigin)) {
+      for (const WorldBlockPosition& createdPosition : createdLights) {
+        destroyGlowstoneLight(createdPosition);
+      }
+      return false;
+    }
+    if (!existed) {
+      createdLights.push_back(placement.blockPosition);
+    }
+  }
+
+  for (const GlowstoneLightPlacement& placement : meshData.glowstoneLights) {
+    if (light::findGlowstoneLightPlacement(desiredGlowstoneLights, placement.blockPosition) == nullptr) {
+      destroyGlowstoneLight(placement.blockPosition);
+    }
+  }
+
+  meshData.glowstoneLights = desiredGlowstoneLights;
+  return true;
+}
+
+void RemixRenderer::destroyGlowstoneLight(const WorldBlockPosition& position) {
+  const auto it = glowstoneLights_.find(position);
+  if (it != glowstoneLights_.end()) {
+    for (int i = 0; i < 6; ++i) {
+      if (it->second.handles[i] != nullptr) {
+        destroyLightHandle(it->second.handles[i]);
+      }
+    }
+    glowstoneLights_.erase(it);
+  }
+  glowstoneLightPlacements_.erase(position);
+}
+
+void RemixRenderer::destroyChunkGlowstoneLights(ChunkMeshData& meshData) {
+  for (const GlowstoneLightPlacement& placement : meshData.glowstoneLights) {
+    destroyGlowstoneLight(placement.blockPosition);
+  }
+  meshData.glowstoneLights.clear();
+}
+
+bool RemixRenderer::refreshGlowstoneLightDefinitions(const WorldRenderOrigin& renderOrigin) {
+  std::vector<GlowstoneLightPlacement> placements;
+  placements.reserve(glowstoneLightPlacements_.size());
+  for (const auto& [position, placement] : glowstoneLightPlacements_) {
+    (void)position;
+    placements.push_back(placement);
+  }
+
+  for (const GlowstoneLightPlacement& placement : placements) {
+    if (!updateGlowstoneLight(placement, renderOrigin)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 }  // namespace mcrtx
 
 
