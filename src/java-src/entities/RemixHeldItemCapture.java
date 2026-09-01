@@ -68,6 +68,11 @@ final class RemixHeldItemCapture {
         RemixDynamicEntitySession.bindEntityTexture(texturePathForItem(itemStack), null);
     }
 
+    private static final int LAPIS_BLOCK_ID = 22;
+    private static final int DYE_ITEM_ID = 351;
+    private static final int LAPIS_DYE_DAMAGE = 4;
+    static final String LAPIS_TEXTURE_ALIAS_PREFIX = "mcrtx_alias/lapis/";
+
     private static boolean isTorchLikeHeldItem(int itemId) {
         return itemId == TORCH_BLOCK_ID
                 || itemId == REDSTONE_TORCH_ON_BLOCK_ID
@@ -75,8 +80,36 @@ final class RemixHeldItemCapture {
                 || itemId == LAVA_BUCKET_ITEM_ID;
     }
 
+    static boolean isLapisItem(iz itemStack) {
+        if (itemStack == null) {
+            return false;
+        }
+        if (itemStack.c == LAPIS_BLOCK_ID) {
+            return true;
+        }
+        if (itemStack.c == DYE_ITEM_ID && itemStack.i() == LAPIS_DYE_DAMAGE) {
+            return true;
+        }
+        return false;
+    }
+
+    static String lapisTextureAlias(String texturePath) {
+        if (texturePath == null || texturePath.isEmpty()) {
+            return "";
+        }
+        if (texturePath.startsWith(LAPIS_TEXTURE_ALIAS_PREFIX)) {
+            return texturePath;
+        }
+        String normalized = texturePath.startsWith("/") ? texturePath.substring(1) : texturePath;
+        return LAPIS_TEXTURE_ALIAS_PREFIX + normalized;
+    }
+
     private static String texturePathForItem(iz itemStack) {
-        return itemStack.c < 256 ? TERRAIN_TEXTURE_PATH : GUI_ITEMS_TEXTURE_PATH;
+        String basePath = itemStack.c < 256 ? TERRAIN_TEXTURE_PATH : GUI_ITEMS_TEXTURE_PATH;
+        if (isLapisItem(itemStack)) {
+            return lapisTextureAlias(basePath);
+        }
+        return basePath;
     }
 
     private static void syncEntityHeldTorch(gs player, iz heldItem, float partialTicks) {

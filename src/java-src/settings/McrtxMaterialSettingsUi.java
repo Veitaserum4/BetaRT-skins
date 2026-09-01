@@ -102,8 +102,9 @@ final class McrtxMaterialSettingsUi implements McrtxSettingsCategoryUi {
         else if (mode == Slider.WATER_DISTANCE) McrtxMaterialSettings.setWaterTransmittanceDistanceHundredths(value);
         else if (mode == Slider.WATER_IOR) McrtxMaterialSettings.setWaterRefractiveIndexThousandths(value);
         else if (mode == Slider.WATER_DIFFUSE_SCALE) McrtxMaterialSettings.setWaterDiffuseLayerScaleHundredths(value);
-        else McrtxMaterialSettings.setWaterMaterialThicknessThousandths(value);
-        if (mode >= Slider.WATER_RED) applyWater();
+        else if (mode == Slider.WATER_THICKNESS) McrtxMaterialSettings.setWaterMaterialThicknessThousandths(value);
+
+        if (mode >= Slider.WATER_RED && mode <= Slider.WATER_DIFFUSE_SCALE) applyWater();
     }
 
     private static void setSubsurfaceDiffusionEnabled(boolean enabled) {

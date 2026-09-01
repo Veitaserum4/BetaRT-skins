@@ -274,6 +274,7 @@ std::filesystem::path RemixRenderer::resolveDynamicEntityTexturePath(const std::
   stripDynamicEntityTextureAliasPrefix(normalized, kFirstPersonShadowTextureAliasPrefix);
   stripDynamicEntityTextureAliasPrefix(normalized, kEntityFireOverlayTextureAliasPrefix);
   stripDynamicEntityTextureAliasPrefix(normalized, kSignTextTextureAliasPrefix);
+  stripDynamicEntityTextureAliasPrefix(normalized, kLapisTextureAliasPrefix);
 
   std::filesystem::path relativePath(normalized);
   relativePath.make_preferred();

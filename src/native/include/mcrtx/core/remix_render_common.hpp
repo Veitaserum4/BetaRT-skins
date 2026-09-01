@@ -17,7 +17,7 @@ namespace detail {
 
 // ---- Shared constants -----------------------------------------------------
 
-constexpr std::size_t kTerrainMaterialClassCount = 8;
+constexpr std::size_t kTerrainMaterialClassCount = 9;
 constexpr std::uint8_t kOpaqueTerrainMaterialClass = 0;
 constexpr std::uint8_t kCutoutTerrainMaterialClass = 1;
 constexpr std::uint8_t kWaterTerrainMaterialClass = 2;
@@ -26,6 +26,7 @@ constexpr std::uint8_t kPoweredRedstoneTerrainMaterialClass = 4;
 constexpr std::uint8_t kPortalTerrainMaterialClass = 5;
 constexpr std::uint8_t kIceTerrainMaterialClass = 6;
 constexpr std::uint8_t kUnlitRedstoneOreTerrainMaterialClass = 7;
+constexpr std::uint8_t kLapisTerrainMaterialClass = 8;
 constexpr std::uint8_t kCubeBlockRenderType = 0;
 constexpr std::uint8_t kCrossedQuadBlockRenderType = 1;
 constexpr std::uint8_t kTorchBlockRenderType = 2;
@@ -150,6 +151,9 @@ constexpr std::uint64_t kLavaTerrainMaterialHash = 0x4D435254584C4156ull;
 constexpr std::uint64_t kPoweredRedstoneTerrainMaterialHash = 0x4D43525458524453ull;
 constexpr std::uint64_t kPortalTerrainMaterialHash = 0x4D43525458505254ull;
 constexpr std::uint64_t kIceTerrainMaterialHash = 0x4D43525458494345ull;
+constexpr std::uint8_t kLapisBlockId = 22;
+constexpr float kLapisThinFilmThickness = 581.0f;
+constexpr std::uint64_t kLapisTerrainMaterialHash = 0x4D435254584C4150ull;
 constexpr std::uint64_t kUnlitRedstoneOreTerrainMaterialHash = 0x4D4352545855524Full;
 constexpr std::uint64_t kDestroyOverlayMaterialHash = 0x4D43525458444F4Dull;
 constexpr std::uint64_t kBlockOutlineGlowMaterialHash = 0x4D4352545842474Cull;

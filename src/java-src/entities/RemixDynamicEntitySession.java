@@ -160,8 +160,14 @@ final class RemixDynamicEntitySession {
         if (RemixEntityFireCapture.isActive()) {
             resolvedTexture = RemixEntityFireCapture.textureAlias(
                     resolvedTexture.isEmpty() ? RemixHeldItemCapture.TERRAIN_TEXTURE_PATH : resolvedTexture);
-        } else if (RemixFirstPersonCapture.isShadowCaptureActive()) {
-            resolvedTexture = RemixFirstPersonCapture.shadowTextureAlias(resolvedTexture);
+        } else {
+            if (activeEntityTexture.startsWith(RemixHeldItemCapture.LAPIS_TEXTURE_ALIAS_PREFIX)
+                    || resolvedTexture.startsWith(RemixHeldItemCapture.LAPIS_TEXTURE_ALIAS_PREFIX)) {
+                resolvedTexture = RemixHeldItemCapture.lapisTextureAlias(resolvedTexture);
+            }
+            if (RemixFirstPersonCapture.isShadowCaptureActive()) {
+                resolvedTexture = RemixFirstPersonCapture.shadowTextureAlias(resolvedTexture);
+            }
         }
         setEntityTexture(resolvedTexture);
     }
@@ -186,6 +192,9 @@ final class RemixDynamicEntitySession {
 
         String normalizedPrimary = stripTexturePrefix(primaryTexture);
         if (!normalizedPrimary.isEmpty() && normalizedPrimary.charAt(0) == '/') {
+            return normalizedPrimary;
+        }
+        if (!normalizedPrimary.isEmpty() && normalizedPrimary.startsWith("mcrtx_alias/")) {
             return normalizedPrimary;
         }
 
