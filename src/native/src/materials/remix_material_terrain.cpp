@@ -92,6 +92,10 @@ bool RemixRenderer::initializeTerrainMaterials() {
       opaqueInfo.useDrawCallAlphaState = useDrawCallAlphaState ? TRUE : FALSE;
       opaqueInfo.alphaTestType = cutout ? 4 : 7;
       opaqueInfo.alphaReferenceValue = cutout ? 1 : 0;
+      if (materialClass == kLapisTerrainMaterialClass) {
+        opaqueInfo.thinFilmThickness_hasvalue = TRUE;
+        opaqueInfo.thinFilmThickness_value = kLapisThinFilmThickness;
+      }
       pNext = &opaqueInfo;
     }
 
@@ -198,6 +202,24 @@ bool RemixRenderer::initializeTerrainMaterials() {
       1.0f,
       terrainAtlasPath_,
       kUnlitRedstoneOreTerrainMaterialHash,
+      nullptr,
+      0.0f,
+      {0.0f, 0.0f, 0.0f},
+      0,
+      0,
+      0,
+      terrainPbrTextures,
+      terrainSssTextures);
+  const bool lapisCreated = createTerrainMaterial(
+      kLapisTerrainMaterialClass,
+      false,
+      false,
+      false,
+      {1.0f, 1.0f, 1.0f},
+      1.0f,
+      1.0f,
+      terrainAtlasPath_,
+      kLapisTerrainMaterialHash,
       nullptr,
       0.0f,
       {0.0f, 0.0f, 0.0f},
@@ -380,6 +402,9 @@ bool RemixRenderer::initializeTerrainMaterials() {
   }
   if (!unlitRedstoneOreCreated) {
     log("Unlit redstone ore material unavailable; unlit redstone ore will use fallback material");
+  }
+  if (!lapisCreated) {
+    log("Lapis terrain material unavailable; lapis blocks will use fallback material");
   }
   if (!redstoneEmissiveTexturePath_.empty()) {
     log("Redstone emissive map loaded from " + redstoneEmissiveTexturePath_.string());

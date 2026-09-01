@@ -160,8 +160,14 @@ final class RemixDynamicEntitySession {
         if (RemixEntityFireCapture.isActive()) {
             resolvedTexture = RemixEntityFireCapture.textureAlias(
                     resolvedTexture.isEmpty() ? RemixHeldItemCapture.TERRAIN_TEXTURE_PATH : resolvedTexture);
-        } else if (RemixFirstPersonCapture.isShadowCaptureActive()) {
-            resolvedTexture = RemixFirstPersonCapture.shadowTextureAlias(resolvedTexture);
+        } else {
+            if (activeEntityTexture.startsWith(RemixHeldItemCapture.LAPIS_TEXTURE_ALIAS_PREFIX)
+                    || resolvedTexture.startsWith(RemixHeldItemCapture.LAPIS_TEXTURE_ALIAS_PREFIX)) {
+                resolvedTexture = RemixHeldItemCapture.lapisTextureAlias(resolvedTexture);
+            }
+            if (RemixFirstPersonCapture.isShadowCaptureActive()) {
+                resolvedTexture = RemixFirstPersonCapture.shadowTextureAlias(resolvedTexture);
+            }
         }
         setEntityTexture(resolvedTexture);
     }

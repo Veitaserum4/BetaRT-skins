@@ -275,6 +275,9 @@ std::uint8_t materialClassForBlock(int blockId, int blockMetadata, int renderTyp
   if (blockId == kRedstoneOreBlockId) {
     return kUnlitRedstoneOreTerrainMaterialClass;
   }
+  if (blockId == kLapisBlockId) {
+    return kLapisTerrainMaterialClass;
+  }
   return usesCutoutMaterialForBlock(blockId, renderType) ? kCutoutTerrainMaterialClass : kOpaqueTerrainMaterialClass;
 }
 

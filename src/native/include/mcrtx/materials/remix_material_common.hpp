@@ -11,6 +11,7 @@ namespace mcrtx::material {
 inline constexpr std::string_view kFirstPersonShadowTextureAliasPrefix = "mcrtx_alias/firstperson_shadow/";
 inline constexpr std::string_view kEntityFireOverlayTextureAliasPrefix = "mcrtx_alias/entity_fire_overlay/";
 inline constexpr std::string_view kSignTextTextureAliasPrefix = "mcrtx_alias/sign_text/";
+inline constexpr std::string_view kLapisTextureAliasPrefix = "mcrtx_alias/lapis/";
 
 struct OptionalPbrTextures {
   std::filesystem::path normal {};

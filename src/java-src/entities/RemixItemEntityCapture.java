@@ -13,26 +13,9 @@ final class RemixItemEntityCapture {
         pickupRenderActive = false;
     }
 
-    private static java.lang.reflect.Field itemStackField;
-    private static boolean itemStackFieldSearched;
-
     private static iz getItemStackFromEntity(sn entity) {
-        if (!itemStackFieldSearched) {
-            itemStackFieldSearched = true;
-            for (java.lang.reflect.Field f : entity.getClass().getDeclaredFields()) {
-                if (f.getType() == iz.class) {
-                    f.setAccessible(true);
-                    itemStackField = f;
-                    break;
-                }
-            }
-        }
-        if (itemStackField != null) {
-            try {
-                return (iz) itemStackField.get(entity);
-            } catch (Exception e) {
-                // Ignore
-            }
+        if (entity instanceof hl) {
+            return ((hl) entity).a;
         }
         return null;
     }
@@ -46,6 +29,9 @@ final class RemixItemEntityCapture {
         iz itemStack = getItemStackFromEntity(entity);
         int itemId = itemStack != null ? itemStack.c : -1;
         String texture = (itemId > -1 && itemId < 256) ? "/terrain.png" : "/gui/items.png";
+        if (RemixHeldItemCapture.isLapisItem(itemStack)) {
+            texture = RemixHeldItemCapture.lapisTextureAlias(texture);
+        }
         RemixDynamicEntitySession.beginEntity(entity.aD, 0, 0, 0.0f, texture);
         
         double worldX = entity.aM;
