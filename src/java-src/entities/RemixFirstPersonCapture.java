@@ -80,7 +80,10 @@ final class RemixFirstPersonCapture {
         }
 
         active = true;
-        activeTexture = RemixDynamicEntitySession.normalizeTexturePath(lastExtractedSkinUrl, PLAYER_TEXTURE_PATH);
+        Minecraft mc = RemixLifecycleBridge.getRememberedMinecraft();
+        boolean holdingMap = mc != null && mc.h != null && mc.h.c != null
+                && mc.h.c.b() != null && mc.h.c.b().c == 358;
+        activeTexture = holdingMap ? "" : RemixDynamicEntitySession.normalizeTexturePath(lastExtractedSkinUrl, PLAYER_TEXTURE_PATH);
         RemixDynamicEntitySession.prepareAuxiliaryEntity(0, 0, 0.0f);
         RemixDynamicEntityBridge.beginDynamicEntity(FIRST_PERSON_ENTITY_ID, 0, 0);
         RemixDynamicEntityBridge.setDynamicEntityTexture(activeTexture);
