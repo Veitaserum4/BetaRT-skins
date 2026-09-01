@@ -194,6 +194,9 @@ final class RemixDynamicEntitySession {
         if (!normalizedPrimary.isEmpty() && normalizedPrimary.charAt(0) == '/') {
             return normalizedPrimary;
         }
+        if (!normalizedPrimary.isEmpty() && normalizedPrimary.startsWith("mcrtx_alias/")) {
+            return normalizedPrimary;
+        }
 
         if (!normalizedPrimary.isEmpty() && (normalizedPrimary.startsWith("http://") || normalizedPrimary.startsWith("https://"))) {
             try {
