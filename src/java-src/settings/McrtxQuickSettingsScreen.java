@@ -6,6 +6,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class McrtxQuickSettingsScreen extends da {
+    private final da parentScreen;
+
+    public McrtxQuickSettingsScreen(da parentScreen) {
+        this.parentScreen = parentScreen;
+    }
+
+    public da getParentScreen() {
+        return parentScreen;
+    }
+
     private static final int PANEL_LEFT = 8;
     private static final int PANEL_TOP = 8;
     private static final int PANEL_WIDTH = 220;
@@ -122,7 +132,7 @@ public final class McrtxQuickSettingsScreen extends da {
             return;
         }
         if (button.f == CLOSE_BUTTON_ID) {
-            this.b.a((da) null);
+            this.b.a(parentScreen);
             return;
         }
 
@@ -145,13 +155,19 @@ public final class McrtxQuickSettingsScreen extends da {
 
     protected void a(char character, int keyCode) {
         if (keyCode == 1) {
-            this.b.a((da) null);
+            this.b.a(parentScreen);
             return;
         }
         super.a(character, keyCode);
     }
 
     public void a(int mouseX, int mouseY, float partialTicks) {
+        if (parentScreen != null) {
+            parentScreen.a(-1, -1, partialTicks);
+        }
+
+        org.lwjgl.opengl.GL11.glDisable(org.lwjgl.opengl.GL11.GL_DEPTH_TEST);
+
         if (draggingScrollbar) {
             setScrollOffsetFromThumb(mouseY - scrollbarDragOffset);
         }
@@ -169,6 +185,8 @@ public final class McrtxQuickSettingsScreen extends da {
         drawFixedControls(mouseX, mouseY);
         this.a(this.g, "BetaRT Settings", PANEL_LEFT + PANEL_WIDTH / 2, PANEL_TOP + 8, 0xFFFFFF);
         drawScrollbar(mouseX, mouseY);
+
+        org.lwjgl.opengl.GL11.glEnable(org.lwjgl.opengl.GL11.GL_DEPTH_TEST);
     }
 
     public void f() {
