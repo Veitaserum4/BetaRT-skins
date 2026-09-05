@@ -17,7 +17,7 @@ namespace detail {
 
 // ---- Shared constants -----------------------------------------------------
 
-constexpr std::size_t kTerrainMaterialClassCount = 9;
+constexpr std::size_t kTerrainMaterialClassCount = 10;
 constexpr std::uint8_t kOpaqueTerrainMaterialClass = 0;
 constexpr std::uint8_t kCutoutTerrainMaterialClass = 1;
 constexpr std::uint8_t kWaterTerrainMaterialClass = 2;
@@ -27,6 +27,7 @@ constexpr std::uint8_t kPortalTerrainMaterialClass = 5;
 constexpr std::uint8_t kIceTerrainMaterialClass = 6;
 constexpr std::uint8_t kUnlitRedstoneOreTerrainMaterialClass = 7;
 constexpr std::uint8_t kLapisTerrainMaterialClass = 8;
+constexpr std::uint8_t kGlowstoneTerrainMaterialClass = 9;
 constexpr std::uint8_t kCubeBlockRenderType = 0;
 constexpr std::uint8_t kCrossedQuadBlockRenderType = 1;
 constexpr std::uint8_t kTorchBlockRenderType = 2;
@@ -116,6 +117,7 @@ constexpr float kPortalEmissiveIntensity = 0.85f;
 inline constexpr remixapi_Float3D kPortalEmissiveColor = {1.0f, 1.0f, 1.0f};
 constexpr float kTerrainEmissiveIntensity = 5.0f;
 inline constexpr remixapi_Float3D kTerrainEmissiveColor = {1.0f, 1.0f, 1.0f};
+constexpr float kGlowstoneEmissiveIntensity = 2.5f;
 
 // Translucent material physics parameters
 inline constexpr remixapi_Float3D kWaterTransmittanceColor = {0.74f, 0.9f, 1.0f};
@@ -155,6 +157,7 @@ constexpr std::uint8_t kLapisBlockId = 22;
 constexpr float kLapisThinFilmThickness = 581.0f;
 constexpr std::uint64_t kLapisTerrainMaterialHash = 0x4D435254584C4150ull;
 constexpr std::uint64_t kUnlitRedstoneOreTerrainMaterialHash = 0x4D4352545855524Full;
+constexpr std::uint64_t kGlowstoneTerrainMaterialHash = 0x4D43525458474C53ull;
 constexpr std::uint64_t kDestroyOverlayMaterialHash = 0x4D43525458444F4Dull;
 constexpr std::uint64_t kBlockOutlineGlowMaterialHash = 0x4D4352545842474Cull;
 constexpr std::uint64_t kBlockOutlineRgbMaterialHashSeed = 0x4D43525458425200ull;
