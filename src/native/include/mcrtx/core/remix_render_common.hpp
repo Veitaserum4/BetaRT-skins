@@ -154,6 +154,7 @@ constexpr std::uint64_t kUnlitRedstoneOreTerrainMaterialHash = 0x4D4352545855524
 constexpr std::uint64_t kDestroyOverlayMaterialHash = 0x4D43525458444F4Dull;
 constexpr std::uint64_t kBlockOutlineGlowMaterialHash = 0x4D4352545842474Cull;
 constexpr std::uint64_t kBlockOutlineRgbMaterialHashSeed = 0x4D43525458425200ull;
+constexpr std::uint64_t kLightLevelOverlayMaterialHash = 0x4D435254584C4C4Dull;
 constexpr std::uint64_t kCloudMaterialHash = 0x4D43525458434C44ull;
 constexpr std::uint64_t kFireMaterialHash = 0x4D43525458464952ull;
 constexpr std::uint64_t kParticleMaterialHashSeed = 0x4D43525458505443ull;

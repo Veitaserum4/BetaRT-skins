@@ -4,6 +4,7 @@
 #include "mcrtx/chunks/remix_chunk_policy.hpp"
 #include "mcrtx/core/remix_geometry_common.hpp"
 #include "mcrtx/core/remix_render_common.hpp"
+#include "mcrtx/materials/remix_material_common.hpp"
 #include "mcrtx/lifecycle/perf_log.hpp"
 
 #include <cstddef>
@@ -15,6 +16,7 @@ namespace mcrtx {
 using namespace mcrtx::detail;
 using namespace mcrtx::chunk;
 using namespace mcrtx::geometry;
+using namespace mcrtx::material;
 
 namespace {
 
@@ -178,9 +180,70 @@ void RemixRenderer::destroyLightLevelOverlayMesh() {
 }
 
 void RemixRenderer::createLightLevelOverlayMaterials() {
+  destroyLightLevelOverlayMaterials();
+
+  if (terrainAtlasPath_.empty() || remix_.CreateMaterial == nullptr) {
+    return;
+  }
+
+  const material::OptionalPbrTextures terrainPbrTextures = material::resolveOptionalPbrTextures(terrainAtlasPath_);
+  const material::OptionalSssTextures terrainSssTextures = material::resolveOptionalSssTextures(terrainAtlasPath_);
+  const material::OpaqueSubsurfaceSettings terrainSubsurfaceSettings {
+      subsurfaceMeasurementDistance_,
+      subsurfaceRadiusScale_,
+      subsurfaceMaxSampleRadius_,
+      subsurfaceVolumetricAnisotropy_,
+      subsurfaceDiffusionProfileEnabled_};
+
+  remixapi_MaterialInfoOpaqueEXT lightLevelOpaqueInfo {};
+  remixapi_MaterialInfoOpaqueSubsurfaceEXT lightLevelSubsurfaceInfo {};
+  lightLevelOpaqueInfo.sType = REMIXAPI_STRUCT_TYPE_MATERIAL_INFO_OPAQUE_EXT;
+  lightLevelOpaqueInfo.albedoConstant = {1.0f, 1.0f, 1.0f};
+  lightLevelOpaqueInfo.opacityConstant = 1.0f;
+  lightLevelOpaqueInfo.roughnessConstant = 1.0f;
+  lightLevelOpaqueInfo.metallicConstant = 0.0f;
+  lightLevelOpaqueInfo.useDrawCallAlphaState = TRUE;
+  lightLevelOpaqueInfo.alphaTestType = 4;
+  lightLevelOpaqueInfo.alphaReferenceValue = 1;
+
+  remixapi_MaterialInfo lightLevelMaterialInfo {};
+  lightLevelMaterialInfo.sType = REMIXAPI_STRUCT_TYPE_MATERIAL_INFO;
+  lightLevelMaterialInfo.pNext = &lightLevelOpaqueInfo;
+  lightLevelMaterialInfo.hash = kLightLevelOverlayMaterialHash;
+  lightLevelMaterialInfo.albedoTexture = terrainAtlasPath_.c_str();
+  lightLevelMaterialInfo.emissiveIntensity = 3.0f;
+  lightLevelMaterialInfo.emissiveColorConstant = {1.0f, 1.0f, 1.0f};
+  lightLevelMaterialInfo.filterMode = 0;
+  lightLevelMaterialInfo.wrapModeU = 1;
+  lightLevelMaterialInfo.wrapModeV = 1;
+  material::applyOptionalOpaqueMaterialTextures(
+      lightLevelMaterialInfo,
+      lightLevelOpaqueInfo,
+      lightLevelSubsurfaceInfo,
+      terrainPbrTextures,
+      terrainSssTextures,
+      displacementFactor_,
+      terrainSubsurfaceSettings);
+
+  const remixapi_ErrorCode result = [&]() {
+    MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Remix, "CreateMaterial.lightLevelOverlay");
+    return remix_.CreateMaterial(&lightLevelMaterialInfo, &lightLevelOverlayMaterialHandle_);
+  }();
+  if (result != REMIXAPI_ERROR_CODE_SUCCESS) {
+    setError("CreateMaterial failed: " + errorCodeToString(result));
+    log("Light level overlay material unavailable; falling back to destroy overlay material");
+    lightLevelOverlayMaterialHandle_ = nullptr;
+  } else {
+    log("Initialized light level overlay material from " + terrainAtlasPath_.string() + " with emissiveIntensity=3.0");
+  }
 }
 
 void RemixRenderer::destroyLightLevelOverlayMaterials() {
+  if (remix_.DestroyMaterial != nullptr && lightLevelOverlayMaterialHandle_ != nullptr) {
+    MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Remix, "DestroyMaterial.lightLevelOverlay");
+    remix_.DestroyMaterial(lightLevelOverlayMaterialHandle_);
+    lightLevelOverlayMaterialHandle_ = nullptr;
+  }
 }
 
 bool RemixRenderer::rebuildLightLevelOverlayMesh(const WorldRenderOrigin& renderOrigin) {
@@ -191,9 +254,9 @@ bool RemixRenderer::rebuildLightLevelOverlayMesh(const WorldRenderOrigin& render
     return true;
   }
 
-  remixapi_MaterialHandle materialHandle = blockOutlineGlowMaterialHandle_ != nullptr
-      ? blockOutlineGlowMaterialHandle_
-      : destroyOverlayMaterialHandle_;
+  remixapi_MaterialHandle materialHandle = lightLevelOverlayMaterialHandle_ != nullptr
+      ? lightLevelOverlayMaterialHandle_
+      : (blockOutlineGlowMaterialHandle_ != nullptr ? blockOutlineGlowMaterialHandle_ : destroyOverlayMaterialHandle_);
   if (materialHandle == nullptr) {
     destroyLightLevelOverlayMesh();
     return true;
