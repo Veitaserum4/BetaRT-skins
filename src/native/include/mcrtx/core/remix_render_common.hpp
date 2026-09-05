@@ -116,7 +116,7 @@ constexpr float kPortalEmissiveIntensity = 0.85f;
 inline constexpr remixapi_Float3D kPortalEmissiveColor = {1.0f, 1.0f, 1.0f};
 constexpr float kTerrainEmissiveIntensity = 5.0f;
 inline constexpr remixapi_Float3D kTerrainEmissiveColor = {1.0f, 1.0f, 1.0f};
-constexpr float kGlowstoneEmissiveIntensity = 2.5f;
+constexpr float kGlowstoneEmissiveIntensity = 0.0f;
 
 // Translucent material physics parameters
 inline constexpr remixapi_Float3D kWaterTransmittanceColor = {0.74f, 0.9f, 1.0f};
