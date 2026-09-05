@@ -123,7 +123,6 @@ void RemixRenderer::createBlockOutlineMaterials() {
       rgbMaterialHandle = nullptr;
     }
   }
-  log("Initialized RGB block outline material palette from " + terrainAtlasPath_.string() + " using draw-call alpha state");
 }
 
 void RemixRenderer::destroyBlockOutlineMaterials() {
