@@ -8,7 +8,6 @@ public final class RemixLightLevelOverlay {
     private static final int MAX_MARKERS = 8192;
     private static final int[] MARKER_BUFFER = new int[MAX_MARKERS * 4];
     private static int lastMarkerCount = 0;
-    private static long lastLogNanos = 0L;
 
     private RemixLightLevelOverlay() {
     }
@@ -114,11 +113,6 @@ public final class RemixLightLevelOverlay {
             }
 
             lastMarkerCount = markerCount;
-            long now = System.nanoTime();
-            if (now - lastLogNanos >= 2_000_000_000L) {
-                lastLogNanos = now;
-                System.out.println("[mcrtx] Light Level Overlay active: player=(" + playerX + "," + playerY + "," + playerZ + ") markers=" + markerCount);
-            }
             RemixLightOverlayBridge.submitLightLevelMarkers(MARKER_BUFFER, markerCount);
         } catch (Throwable t) {
             t.printStackTrace();
