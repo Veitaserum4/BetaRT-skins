@@ -206,7 +206,7 @@ bool RemixRenderer::initializeTerrainMaterials() {
       0,
       terrainPbrTextures,
       terrainSssTextures);
-  createTerrainMaterial(
+  const bool glowstoneCreated = createTerrainMaterial(
       kGlowstoneTerrainMaterialClass,
       false,
       false,
@@ -216,9 +216,9 @@ bool RemixRenderer::initializeTerrainMaterials() {
       1.0f,
       terrainAtlasPath_,
       kGlowstoneTerrainMaterialHash,
-      kGlowstoneEmissiveIntensity > 0.0f ? terrainEmissiveTexture : nullptr,
+      terrainEmissiveTexture,
       kGlowstoneEmissiveIntensity,
-      kGlowstoneEmissiveIntensity > 0.0f ? terrainEmissiveColor : remixapi_Float3D{0.0f, 0.0f, 0.0f},
+      terrainEmissiveColor,
       0,
       0,
       0,
