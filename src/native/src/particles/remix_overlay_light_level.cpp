@@ -234,7 +234,6 @@ void RemixRenderer::createLightLevelOverlayMaterials() {
     log("Light level overlay material unavailable; falling back to destroy overlay material");
     lightLevelOverlayMaterialHandle_ = nullptr;
   } else {
-    log("Initialized light level overlay material from " + terrainAtlasPath_.string() + " with emissiveIntensity=3.0");
   }
 }
 
