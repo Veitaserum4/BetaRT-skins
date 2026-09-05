@@ -206,6 +206,24 @@ bool RemixRenderer::initializeTerrainMaterials() {
       0,
       terrainPbrTextures,
       terrainSssTextures);
+  const bool glowstoneCreated = createTerrainMaterial(
+      kGlowstoneTerrainMaterialClass,
+      false,
+      false,
+      false,
+      {1.0f, 1.0f, 1.0f},
+      1.0f,
+      1.0f,
+      terrainAtlasPath_,
+      kGlowstoneTerrainMaterialHash,
+      terrainEmissiveTexture,
+      kGlowstoneEmissiveIntensity,
+      terrainEmissiveColor,
+      0,
+      0,
+      0,
+      terrainPbrTextures,
+      terrainSssTextures);
   remixapi_MaterialInfoOpaqueEXT destroyOverlayOpaqueInfo {};
       remixapi_MaterialInfoOpaqueSubsurfaceEXT destroyOverlaySubsurfaceInfo {};
   destroyOverlayOpaqueInfo.sType = REMIXAPI_STRUCT_TYPE_MATERIAL_INFO_OPAQUE_EXT;

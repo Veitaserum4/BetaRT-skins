@@ -99,7 +99,7 @@ void RemixRenderer::computeFaceCoverage(ChunkMeshData& meshData) {
       if (meshData.occupancy[index] == 0) return false;
       const ChunkBlockCell& cell = meshData.cells[index];
       if (cell.renderType != kCubeBlockRenderType) return false;
-      if (cell.materialClass != kOpaqueTerrainMaterialClass && cell.materialClass != kUnlitRedstoneOreTerrainMaterialClass) return false;
+      if (cell.materialClass != kOpaqueTerrainMaterialClass && cell.materialClass != kUnlitRedstoneOreTerrainMaterialClass && cell.materialClass != kGlowstoneTerrainMaterialClass) return false;
       if (usesPartialCubeBounds(cell)) return false;
       return true;
     };
