@@ -427,18 +427,28 @@ public final class MinecraftRemixLifecycleHooks {
         boolean hotkeyHeld = altDown && bDown;
         boolean hotkeyFullyReleased = !altDown && !bDown;
         boolean quickPanelOpen = minecraft.r instanceof McrtxQuickSettingsScreen;
-        boolean canToggle = minecraft.r == null || quickPanelOpen;
+        boolean isAllowedScreen = minecraft.r == null || minecraft.r.getClass().getName().equals("fu") || minecraft.r.getClass().getName().equals("gc") || minecraft.r.getClass().getName().equals("oz");
+        boolean canToggle = quickPanelOpen || isAllowedScreen;
         long nowNanos = System.nanoTime();
 
         if (!hotkeyFullyReleased) {
             quickSettingsHotkeyReleaseStartedNanos = 0L;
         }
+        if (hotkeyFullyReleased) {
+            if (quickSettingsHotkeyReleaseStartedNanos == 0L) {
+                quickSettingsHotkeyReleaseStartedNanos = nowNanos;
+            }
+            if (nowNanos - quickSettingsHotkeyReleaseStartedNanos > 100_000_000L) {
+                quickSettingsHotkeyLocked = false;
+            }
+        }
 
         if (hotkeyHeld && !quickSettingsHotkeyHeld && !quickSettingsHotkeyLocked && canToggle) {
             if (quickPanelOpen) {
-                minecraft.a((da) null);
+                McrtxQuickSettingsScreen screen = (McrtxQuickSettingsScreen) minecraft.r;
+                minecraft.a(screen.getParentScreen());
             } else {
-                minecraft.a(new McrtxQuickSettingsScreen());
+                minecraft.a(new McrtxQuickSettingsScreen(minecraft.r));
             }
             quickSettingsHotkeyLocked = true;
         } else if (hotkeyFullyReleased && quickSettingsHotkeyLocked) {

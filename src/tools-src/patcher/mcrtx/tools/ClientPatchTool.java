@@ -779,17 +779,12 @@ public final class ClientPatchTool {
             }
         }
 
-        AbstractInsnNode lastReturn = null;
         for (AbstractInsnNode node = method.instructions.getFirst(); node != null; node = node.getNext()) {
             if (node.getOpcode() == Opcodes.RETURN) {
-                lastReturn = node;
+                method.instructions.insertBefore(node, remixUiTickCall());
+                method.instructions.insertBefore(node, staticHelperCall("onUiRenderEnd", "()V"));
+                method.instructions.insertBefore(node, staticHelperCall("onPresent", "()V"));
             }
-        }
-
-        if (lastReturn != null) {
-            method.instructions.insertBefore(lastReturn, remixUiTickCall());
-            method.instructions.insertBefore(lastReturn, staticHelperCall("onUiRenderEnd", "()V"));
-            method.instructions.insertBefore(lastReturn, staticHelperCall("onPresent", "()V"));
         }
     }
 
