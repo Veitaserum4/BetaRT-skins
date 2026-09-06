@@ -19,6 +19,7 @@ namespace {
 constexpr std::uint64_t kDynamicEntityTranslucentMaterialHashMask = 0x54524E5300000000ull;
 constexpr std::uint64_t kDynamicEntityHurtMaterialHashMask = 0x4852540000000000ull;
 constexpr std::uint64_t kDynamicEntityCreeperFuseMaterialHashMask = 0x4655534500000000ull;
+constexpr std::uint64_t kDynamicEntityLapisMaterialHashMask = 0x4C41504900000000ull;
 
 
 constexpr float kDynamicEntityHurtMaxEmissiveIntensity = 0.1f;
@@ -93,6 +94,9 @@ remixapi_MaterialHandle RemixRenderer::acquireDynamicEntityMaterial(
   const bool isSignText = stripDynamicEntityTextureAliasPrefix(
       normalizedTexturePath,
       kSignTextTextureAliasPrefix);
+  const bool isLapis = stripDynamicEntityTextureAliasPrefix(
+      normalizedTexturePath,
+      kLapisTextureAliasPrefix);
   const bool isSpiderBody = normalizedTexturePath == "mob/spider.png";
 
   std::filesystem::path spiderEyesTexturePath;
@@ -167,6 +171,7 @@ remixapi_MaterialHandle RemixRenderer::acquireDynamicEntityMaterial(
   materialInfo.hash = kDynamicEntityMaterialHashSeed
       ^ static_cast<std::uint64_t>(std::hash<std::string> {}(texturePath))
       ^ (materialClass == DynamicEntityMaterialClass::Translucent ? kDynamicEntityTranslucentMaterialHashMask : 0ull)
+      ^ (isLapis ? kDynamicEntityLapisMaterialHashMask : 0ull)
       ^ (static_cast<std::uint64_t>(clampedHurtStage) * kDynamicEntityHurtMaterialHashMask)
       ^ (static_cast<std::uint64_t>(clampedCreeperFuseStage) * kDynamicEntityCreeperFuseMaterialHashMask);
   if (emissiveTexturePath != nullptr) {
@@ -207,6 +212,10 @@ remixapi_MaterialHandle RemixRenderer::acquireDynamicEntityMaterial(
     opaqueInfo.useDrawCallAlphaState = FALSE;
     opaqueInfo.alphaTestType = 4;
     opaqueInfo.alphaReferenceValue = isSignText ? 64 : 1;
+    if (isLapis) {
+      opaqueInfo.thinFilmThickness_hasvalue = TRUE;
+      opaqueInfo.thinFilmThickness_value = kLapisThinFilmThickness;
+    }
     materialInfo.pNext = &opaqueInfo;
     applyOptionalOpaqueMaterialTextures(
       materialInfo,
