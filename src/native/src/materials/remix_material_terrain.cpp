@@ -424,6 +424,9 @@ bool RemixRenderer::initializeTerrainMaterials() {
   if (!lapisCreated) {
     log("Lapis terrain material unavailable; lapis blocks will use fallback material");
   }
+  if (!glowstoneCreated) {
+    log("Glowstone terrain material unavailable; glowstone will fall back to opaque terrain");
+  }
   if (!redstoneEmissiveTexturePath_.empty()) {
     log("Redstone emissive map loaded from " + redstoneEmissiveTexturePath_.string());
   }

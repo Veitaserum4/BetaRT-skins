@@ -96,12 +96,17 @@ std::filesystem::path RemixRenderer::resolveRemixDllPath() {
 
   const std::filesystem::path moduleDirectory = getCurrentModuleDirectory();
   if (!moduleDirectory.empty()) {
-    attemptedPaths.push_back(moduleDirectory / "d3d9.dll");
-    attemptedPaths.push_back(moduleDirectory / "bin" / "d3d9.dll");
+    attemptedPaths.push_back((moduleDirectory / "d3d9.dll").lexically_normal());
+    attemptedPaths.push_back((moduleDirectory / "bin" / "d3d9.dll").lexically_normal());
+    attemptedPaths.push_back((moduleDirectory / ".." / "libraries" / "d3d9.dll").lexically_normal());
+    attemptedPaths.push_back((moduleDirectory / "libraries" / "d3d9.dll").lexically_normal());
   }
 
-  attemptedPaths.push_back(std::filesystem::path(L"d3d9.dll"));
-  attemptedPaths.push_back(std::filesystem::path(L"bin") / "d3d9.dll");
+  const std::filesystem::path currentPath = std::filesystem::current_path();
+  attemptedPaths.push_back((currentPath / "d3d9.dll").lexically_normal());
+  attemptedPaths.push_back((currentPath / "bin" / "d3d9.dll").lexically_normal());
+  attemptedPaths.push_back((currentPath / "libraries" / "d3d9.dll").lexically_normal());
+  attemptedPaths.push_back((currentPath / ".." / "libraries" / "d3d9.dll").lexically_normal());
 
   for (const auto& path : attemptedPaths) {
     if (std::filesystem::exists(path)) {
