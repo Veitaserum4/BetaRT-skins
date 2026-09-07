@@ -121,7 +121,7 @@ FireLightPlacement makeFireLightPlacement(
       .z = worldZ,
   };
   placement.lightX = static_cast<float>(worldX) + 0.5f;
-  placement.lightY = static_cast<float>(worldY) + 0.05f;
+  placement.lightY = static_cast<float>(worldY) + 0.10f;
   placement.lightZ = static_cast<float>(worldZ) + 0.5f;
   placement.radiance = kFireLightRadiance;
   return placement;

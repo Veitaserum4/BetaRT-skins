@@ -884,10 +884,10 @@ bool RemixRenderer::createFireLight(const FireLightPlacement& placement, const W
   rectInfo.position = {lightPosition.x, lightPosition.y, lightPosition.z};
   rectInfo.xAxis = {1.0f, 0.0f, 0.0f};
   rectInfo.xSize = 0.8f;
-  rectInfo.yAxis = {0.0f, 0.0f, 1.0f};
+  rectInfo.yAxis = {0.0f, 0.0f, -1.0f};
   rectInfo.ySize = 0.8f;
   rectInfo.direction = {0.0f, 1.0f, 0.0f};
-  rectInfo.shaping_hasvalue = TRUE;
+  rectInfo.shaping_hasvalue = FALSE;
   rectInfo.shaping_value.direction = rectInfo.direction;
   rectInfo.shaping_value.coneAngleDegrees = 180.0f;
   rectInfo.shaping_value.coneSoftness = 0.0f;
@@ -936,10 +936,10 @@ bool RemixRenderer::updateFireLight(const FireLightPlacement& placement, const W
   rectInfo.position = {lightPosition.x, lightPosition.y, lightPosition.z};
   rectInfo.xAxis = {1.0f, 0.0f, 0.0f};
   rectInfo.xSize = 0.8f;
-  rectInfo.yAxis = {0.0f, 0.0f, 1.0f};
+  rectInfo.yAxis = {0.0f, 0.0f, -1.0f};
   rectInfo.ySize = 0.8f;
   rectInfo.direction = {0.0f, 1.0f, 0.0f};
-  rectInfo.shaping_hasvalue = TRUE;
+  rectInfo.shaping_hasvalue = FALSE;
   rectInfo.shaping_value.direction = rectInfo.direction;
   rectInfo.shaping_value.coneAngleDegrees = 180.0f;
   rectInfo.shaping_value.coneSoftness = 0.0f;

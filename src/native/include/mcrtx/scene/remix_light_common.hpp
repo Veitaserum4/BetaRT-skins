@@ -35,7 +35,7 @@ constexpr std::uint64_t kGlowstoneLightHashSeed = 0x4D43525458474C57ull;
 inline constexpr remixapi_Float3D kGlowstoneLightRadiance = {30.0f, 15.0f, 4.0f};
 
 constexpr std::uint64_t kFireLightHashSeed = 0x4D43525458464952ull;
-inline constexpr remixapi_Float3D kFireLightRadiance = {450.0f, 200.0f, 40.0f};
+inline constexpr remixapi_Float3D kFireLightRadiance = {650.0f, 300.0f, 60.0f};
 
 std::uint64_t makeTorchLightHash(const WorldBlockPosition& position);
 std::uint64_t makePortalLightHash(const WorldBlockPosition& position);
