@@ -24,6 +24,12 @@ struct BlockOutlineInstance {
   int blockX {0};
   int blockY {0};
   int blockZ {0};
+  float minX {0.0f};
+  float minY {0.0f};
+  float minZ {0.0f};
+  float maxX {0.0f};
+  float maxY {0.0f};
+  float maxZ {0.0f};
 };
 
 struct ParticleQuad {

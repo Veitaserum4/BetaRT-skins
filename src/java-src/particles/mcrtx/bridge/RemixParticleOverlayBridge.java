@@ -37,9 +37,27 @@ public final class RemixParticleOverlayBridge {
                 destroyStage);
     }
 
-    public static synchronized void captureBlockOutline(int blockX, int blockY, int blockZ) {
+    public static synchronized void captureBlockOutline(
+            int blockX,
+            int blockY,
+            int blockZ,
+            float minX,
+            float minY,
+            float minZ,
+            float maxX,
+            float maxY,
+            float maxZ) {
         if (RemixLifecycleBridge.isInitialized()) {
-            nCaptureBlockOutline(blockX, blockY, blockZ);
+            nCaptureBlockOutline(
+                    blockX,
+                    blockY,
+                    blockZ,
+                    minX,
+                    minY,
+                    minZ,
+                    maxX,
+                    maxY,
+                    maxZ);
         }
     }
 
@@ -78,7 +96,16 @@ public final class RemixParticleOverlayBridge {
             int blockMetadata,
             int renderType,
             int destroyStage);
-    private static native void nCaptureBlockOutline(int blockX, int blockY, int blockZ);
+    private static native void nCaptureBlockOutline(
+            int blockX,
+            int blockY,
+            int blockZ,
+            float minX,
+            float minY,
+            float minZ,
+            float maxX,
+            float maxY,
+            float maxZ);
     private static native void nBeginParticleFrame();
     private static native void nCaptureParticleQuad(
             float x0, float y0, float z0, float u0, float v0,

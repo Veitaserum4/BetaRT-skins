@@ -173,7 +173,16 @@ void RemixRenderer::beginBlockOutlineFrame() {
   blockOutlineInstances_.clear();
 }
 
-void RemixRenderer::captureBlockOutline(int blockX, int blockY, int blockZ) {
+void RemixRenderer::captureBlockOutline(
+    int blockX,
+    int blockY,
+    int blockZ,
+    float minX,
+    float minY,
+    float minZ,
+    float maxX,
+    float maxY,
+    float maxZ) {
   MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Native, "RemixRenderer::captureBlockOutline");
   std::scoped_lock lock(mutex_);
 
@@ -185,6 +194,12 @@ void RemixRenderer::captureBlockOutline(int blockX, int blockY, int blockZ) {
   outline.blockX = blockX;
   outline.blockY = blockY;
   outline.blockZ = blockZ;
+  outline.minX = minX;
+  outline.minY = minY;
+  outline.minZ = minZ;
+  outline.maxX = maxX;
+  outline.maxY = maxY;
+  outline.maxZ = maxZ;
   blockOutlineInstances_.push_back(outline);
 }
 
@@ -230,33 +245,6 @@ bool RemixRenderer::rebuildBlockOutlineMesh(const WorldRenderOrigin& renderOrigi
     return true;
   }
 
-  const auto chunkOriginForWorld = [](int coordinate) {
-    return coordinate >= 0
-        ? (coordinate / kChunkDimension) * kChunkDimension
-        : (((coordinate + 1) / kChunkDimension) - 1) * kChunkDimension;
-  };
-
-  const auto findWorldCell = [this, &chunkOriginForWorld](int worldX, int worldY, int worldZ) -> const ChunkBlockCell* {
-    const int originX = chunkOriginForWorld(worldX);
-    const int originY = chunkOriginForWorld(worldY);
-    const int originZ = chunkOriginForWorld(worldZ);
-    const int localX = worldX - originX;
-    const int localY = worldY - originY;
-    const int localZ = worldZ - originZ;
-    const int cellIndex = blockIndex(localX, localY, localZ);
-
-    for (int renderPass = 0; renderPass <= 1; ++renderPass) {
-      const ChunkKey chunkKey {originX, originY, originZ, renderPass};
-      const auto it = chunkMeshes_.find(chunkKey);
-      if (it == chunkMeshes_.end() || !it->second.hasOccupancy || it->second.occupancy[cellIndex] == 0) {
-        continue;
-      }
-      return &it->second.cells[cellIndex];
-    }
-
-    return nullptr;
-  };
-
   std::vector<remixapi_HardcodedVertex> vertices;
   std::vector<std::uint32_t> indices;
   vertices.reserve(blockOutlineInstances_.size() * 288);
@@ -280,14 +268,14 @@ bool RemixRenderer::rebuildBlockOutlineMesh(const WorldRenderOrigin& renderOrigi
     }
 
     WorldRenderPosition minPosition = rebaseWorldPosition(
-        static_cast<float>(outline.blockX),
-        static_cast<float>(outline.blockY),
-        static_cast<float>(outline.blockZ),
+        outline.minX,
+        outline.minY,
+        outline.minZ,
         renderOrigin);
     WorldRenderPosition maxPosition = rebaseWorldPosition(
-        static_cast<float>(outline.blockX) + 1.0f,
-        static_cast<float>(outline.blockY) + 1.0f,
-        static_cast<float>(outline.blockZ) + 1.0f,
+        outline.maxX,
+        outline.maxY,
+        outline.maxZ,
         renderOrigin);
     float minX = minPosition.x - styleParameters.inflate;
     float minY = minPosition.y - styleParameters.inflate;
@@ -295,25 +283,6 @@ bool RemixRenderer::rebuildBlockOutlineMesh(const WorldRenderOrigin& renderOrigi
     float maxX = maxPosition.x + styleParameters.inflate;
     float maxY = maxPosition.y + styleParameters.inflate;
     float maxZ = maxPosition.z + styleParameters.inflate;
-
-    if (const ChunkBlockCell* worldCell = findWorldCell(outline.blockX, outline.blockY, outline.blockZ); worldCell != nullptr) {
-      minPosition = rebaseWorldPosition(
-          static_cast<float>(outline.blockX) + worldCell->bounds[0],
-          static_cast<float>(outline.blockY) + worldCell->bounds[1],
-          static_cast<float>(outline.blockZ) + worldCell->bounds[2],
-          renderOrigin);
-      maxPosition = rebaseWorldPosition(
-          static_cast<float>(outline.blockX) + worldCell->bounds[3],
-          static_cast<float>(outline.blockY) + worldCell->bounds[4],
-          static_cast<float>(outline.blockZ) + worldCell->bounds[5],
-          renderOrigin);
-      minX = minPosition.x - styleParameters.inflate;
-      minY = minPosition.y - styleParameters.inflate;
-      minZ = minPosition.z - styleParameters.inflate;
-      maxX = maxPosition.x + styleParameters.inflate;
-      maxY = maxPosition.y + styleParameters.inflate;
-      maxZ = maxPosition.z + styleParameters.inflate;
-    }
 
     if (styleParameters.filled) {
       appendBlockOutlineFillGeometry(minX, minY, minZ, maxX, maxY, maxZ, outlineColor, vertices, indices);

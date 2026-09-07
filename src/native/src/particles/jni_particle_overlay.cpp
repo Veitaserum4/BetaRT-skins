@@ -48,9 +48,17 @@ JNIEXPORT void JNICALL Java_mcrtx_bridge_RemixParticleOverlayBridge_nCaptureBloc
     JNIEnv*, jclass,
     jint blockX,
     jint blockY,
-    jint blockZ) {
+    jint blockZ,
+    jfloat minX,
+    jfloat minY,
+    jfloat minZ,
+    jfloat maxX,
+    jfloat maxY,
+    jfloat maxZ) {
   MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Jni, "nCaptureBlockOutline");
-  RemixRenderer::instance().captureBlockOutline(blockX, blockY, blockZ);
+  RemixRenderer::instance().captureBlockOutline(
+      blockX, blockY, blockZ,
+      minX, minY, minZ, maxX, maxY, maxZ);
 }
 
 JNIEXPORT void JNICALL Java_mcrtx_bridge_RemixParticleOverlayBridge_nBeginParticleFrame(JNIEnv*, jclass) {
