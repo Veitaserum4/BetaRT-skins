@@ -228,6 +228,24 @@ bool RemixRenderer::initializeTerrainMaterials() {
       0,
       terrainPbrTextures,
       terrainSssTextures);
+  const bool glowstoneCreated = createTerrainMaterial(
+      kGlowstoneTerrainMaterialClass,
+      false,
+      false,
+      false,
+      {1.0f, 1.0f, 1.0f},
+      1.0f,
+      1.0f,
+      terrainAtlasPath_,
+      kGlowstoneTerrainMaterialHash,
+      terrainEmissiveTexture,
+      kGlowstoneEmissiveIntensity,
+      terrainEmissiveColor,
+      0,
+      0,
+      0,
+      terrainPbrTextures,
+      terrainSssTextures);
   remixapi_MaterialInfoOpaqueEXT destroyOverlayOpaqueInfo {};
       remixapi_MaterialInfoOpaqueSubsurfaceEXT destroyOverlaySubsurfaceInfo {};
   destroyOverlayOpaqueInfo.sType = REMIXAPI_STRUCT_TYPE_MATERIAL_INFO_OPAQUE_EXT;
@@ -405,6 +423,9 @@ bool RemixRenderer::initializeTerrainMaterials() {
   }
   if (!lapisCreated) {
     log("Lapis terrain material unavailable; lapis blocks will use fallback material");
+  }
+  if (!glowstoneCreated) {
+    log("Glowstone terrain material unavailable; glowstone will fall back to opaque terrain");
   }
   if (!redstoneEmissiveTexturePath_.empty()) {
     log("Redstone emissive map loaded from " + redstoneEmissiveTexturePath_.string());

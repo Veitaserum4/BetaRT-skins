@@ -16,14 +16,18 @@ void appendCandidates(
 
   std::filesystem::path cacheDir = material::getCurrentTexturePackCacheDir();
   if (!cacheDir.empty()) {
-    candidates.push_back(cacheDir / (std::wstring(baseName) + L".dds"));
-    candidates.push_back(cacheDir / (std::wstring(baseName) + L".png"));
+    candidates.push_back((cacheDir / (std::wstring(baseName) + L".dds")).lexically_normal());
+    candidates.push_back((cacheDir / (std::wstring(baseName) + L".png")).lexically_normal());
   }
 
-  candidates.push_back(root / L"mcrtx_assets" / (std::wstring(baseName) + L".dds"));
-  candidates.push_back(root / L"mcrtx_assets" / (std::wstring(baseName) + L".png"));
-  candidates.push_back(root / (std::wstring(baseName) + L".dds"));
-  candidates.push_back(root / (std::wstring(baseName) + L".png"));
+  candidates.push_back((root / L"mcrtx_assets" / (std::wstring(baseName) + L".dds")).lexically_normal());
+  candidates.push_back((root / L"mcrtx_assets" / (std::wstring(baseName) + L".png")).lexically_normal());
+  candidates.push_back((root / L".." / L"libraries" / L"mcrtx_assets" / (std::wstring(baseName) + L".dds")).lexically_normal());
+  candidates.push_back((root / L".." / L"libraries" / L"mcrtx_assets" / (std::wstring(baseName) + L".png")).lexically_normal());
+  candidates.push_back((root / L"libraries" / L"mcrtx_assets" / (std::wstring(baseName) + L".dds")).lexically_normal());
+  candidates.push_back((root / L"libraries" / L"mcrtx_assets" / (std::wstring(baseName) + L".png")).lexically_normal());
+  candidates.push_back((root / (std::wstring(baseName) + L".dds")).lexically_normal());
+  candidates.push_back((root / (std::wstring(baseName) + L".png")).lexically_normal());
 }
 
 std::string pathToGameValue(const std::filesystem::path& path) {

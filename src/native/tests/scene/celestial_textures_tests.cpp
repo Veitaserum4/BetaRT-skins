@@ -43,15 +43,26 @@ int main() {
   const auto moduleDir = root / L"module";
   const auto currentDir = root / L"cwd";
 
+  touchFile(currentDir / L".." / L"libraries" / L"mcrtx_assets" / L"sun.png");
+  touchFile(currentDir / L".." / L"libraries" / L"mcrtx_assets" / L"moon.png");
+  require(
+      mcrtx::resolveCelestialTexturePath(mcrtx::CelestialTextureKind::Sun, moduleDir, currentDir)
+          == (currentDir / L".." / L"libraries" / L"mcrtx_assets" / L"sun.png").lexically_normal(),
+      "sun png fallback in libraries mcrtx_assets");
+  require(
+      mcrtx::resolveCelestialTexturePath(mcrtx::CelestialTextureKind::Moon0, moduleDir, currentDir)
+          == (currentDir / L".." / L"libraries" / L"mcrtx_assets" / L"moon.png").lexically_normal(),
+      "moon png fallback in libraries mcrtx_assets");
+
   touchFile(currentDir / L"mcrtx_assets" / L"sun.png");
   touchFile(currentDir / L"mcrtx_assets" / L"moon.png");
   require(
       mcrtx::resolveCelestialTexturePath(mcrtx::CelestialTextureKind::Sun, moduleDir, currentDir)
-          == currentDir / L"mcrtx_assets" / L"sun.png",
+          == (currentDir / L"mcrtx_assets" / L"sun.png").lexically_normal(),
       "sun png fallback in current mcrtx_assets");
   require(
       mcrtx::resolveCelestialTexturePath(mcrtx::CelestialTextureKind::Moon0, moduleDir, currentDir)
-          == currentDir / L"mcrtx_assets" / L"moon.png",
+          == (currentDir / L"mcrtx_assets" / L"moon.png").lexically_normal(),
       "moon png fallback in current mcrtx_assets");
 
   touchFile(currentDir / L"mcrtx_assets" / L"sun.dds");

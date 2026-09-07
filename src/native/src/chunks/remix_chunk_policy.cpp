@@ -278,6 +278,9 @@ std::uint8_t materialClassForBlock(int blockId, int blockMetadata, int renderTyp
   if (blockId == kLapisBlockId) {
     return kLapisTerrainMaterialClass;
   }
+  if (blockId == kGlowstoneBlockId) {
+    return kGlowstoneTerrainMaterialClass;
+  }
   return usesCutoutMaterialForBlock(blockId, renderType) ? kCutoutTerrainMaterialClass : kOpaqueTerrainMaterialClass;
 }
 
