@@ -152,7 +152,16 @@ public:
       int blockMetadata,
       int renderType,
       int destroyStage);
-  void captureBlockOutline(int blockX, int blockY, int blockZ);
+  void captureBlockOutline(
+      int blockX,
+      int blockY,
+      int blockZ,
+      float minX,
+      float minY,
+      float minZ,
+      float maxX,
+      float maxY,
+      float maxZ);
   void beginParticleFrame();
   void captureParticleQuad(
       float x0,
