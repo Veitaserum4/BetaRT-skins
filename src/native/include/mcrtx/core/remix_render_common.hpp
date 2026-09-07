@@ -165,6 +165,7 @@ constexpr std::uint64_t kLightLevelOverlayMaterialHash = 0x4D435254584C4C4Dull;
 constexpr std::uint64_t kCloudMaterialHash = 0x4D43525458434C44ull;
 constexpr std::uint64_t kFireMaterialHash = 0x4D43525458464952ull;
 constexpr std::uint64_t kParticleMaterialHashSeed = 0x4D43525458505443ull;
+constexpr std::uint32_t kParticleEmissiveFlag = 0x8000;
 constexpr std::uint32_t kDefaultVertexColor = 0xFFFFFFFFu;
 
 inline constexpr float kFaceVertexOffsets[6][4][3] = {

@@ -129,7 +129,8 @@ public final class RemixParticleCapture {
         float originZ = (float) (particle.aL + (particle.aO - particle.aL) * (double) partialTicks);
         int colorRgba = ColorMath.packColor(particle.i, particle.j, particle.k, 1.0f);
 
-        int packedTextureKind = textureKind | (particle.b << 16);
+        int emissiveFlag = (particle instanceof op || particle instanceof im) ? 0x8000 : 0;
+        int packedTextureKind = textureKind | emissiveFlag | (particle.b << 16);
 
         RemixParticleOverlayBridge.captureParticleQuad(
                 originX - f3 * particleScale - f6 * particleScale,
