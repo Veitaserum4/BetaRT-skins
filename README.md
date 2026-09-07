@@ -35,5 +35,5 @@ Download the latest release, import the .zip file into PrismLauncher (`Add Insta
 https://github.com/Veitaserum4/Jacobs-BetaRT-PBR
 
 ## Credits
-- [sparkles](https://github.com/Kim2091) for their remix branch [Remix Plus](https://github.com/RemixProjGroup/dxvk-remix)
-- jacob on the RTX Remix Showcase Discord for guidance, project logo, and the PBR pack. 
+- [sparkles](https://github.com/Kim2091) for their remix branch [Remix Plus](https://github.com/RemixProjGroup/dxvk-remix) and PRs.
+- jacob on the RTX Remix Showcase Discord for guidance, project logo, the PBR pack, and finally, all of bug fixes and feature PRs. 
