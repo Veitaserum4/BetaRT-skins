@@ -122,6 +122,21 @@ struct PortalLightState {
   WorldRenderPosition submittedPosition {};
 };
 
+struct FireLightPlacement {
+  WorldBlockPosition blockPosition {};
+  float lightX {0.0f};
+  float lightY {0.0f};
+  float lightZ {0.0f};
+  remixapi_Float3D radiance {0.0f, 0.0f, 0.0f};
+};
+
+struct FireLightState {
+  remixapi_LightHandle handle {nullptr};
+  WorldRenderOrigin renderOrigin {};
+  std::uint64_t apiHash {0};
+  WorldRenderPosition submittedPosition {};
+};
+
 struct GlowstoneLightPlacement {
   WorldBlockPosition blockPosition {};
   std::uint8_t visibleFacesMask {0};
@@ -145,6 +160,7 @@ struct ChunkMeshData {
   std::vector<std::uint16_t> fireCellIndices {};
   std::vector<TorchLightPlacement> torchLights {};
   std::vector<PortalLightPlacement> portalLights {};
+  std::vector<FireLightPlacement> fireLights {};
   std::vector<GlowstoneLightPlacement> glowstoneLights {};
   bool hasOccupancy {false};
   bool hidden {false};

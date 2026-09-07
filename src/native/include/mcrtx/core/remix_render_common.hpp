@@ -53,6 +53,7 @@ constexpr std::uint8_t kSingleSlabBlockId = 44;
 constexpr std::uint8_t kBedBlockId = 26;
 constexpr std::uint8_t kTallGrassBlockId = 31;
 constexpr std::uint8_t kTorchBlockId = 50;
+constexpr std::uint8_t kFireBlockId = 51;
 constexpr std::uint8_t kCropsBlockId = 59;
 constexpr std::uint8_t kWoodStairsBlockId = 53;
 constexpr std::uint8_t kRedstoneDustBlockId = 55;

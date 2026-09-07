@@ -350,6 +350,11 @@ private:
   bool updatePortalLight(const PortalLightPlacement& placement, const WorldRenderOrigin& renderOrigin);
   bool reconcileChunkPortalLights(ChunkMeshData& meshData, const std::vector<PortalLightPlacement>& desiredPortalLights);
   void destroyPortalLight(const WorldBlockPosition& blockPosition);
+  bool createFireLight(const FireLightPlacement& placement, const WorldRenderOrigin& renderOrigin);
+  bool updateFireLight(const FireLightPlacement& placement, const WorldRenderOrigin& renderOrigin);
+  bool reconcileChunkFireLights(ChunkMeshData& meshData, const std::vector<FireLightPlacement>& desiredFireLights);
+  void destroyFireLight(const WorldBlockPosition& blockPosition);
+  void destroyChunkFireLights(ChunkMeshData& meshData);
   bool createGlowstoneLight(const GlowstoneLightPlacement& placement, const WorldRenderOrigin& renderOrigin);
   bool updateGlowstoneLight(const GlowstoneLightPlacement& placement, const WorldRenderOrigin& renderOrigin);
   bool reconcileChunkGlowstoneLights(ChunkMeshData& meshData, const std::vector<GlowstoneLightPlacement>& desiredGlowstoneLights);
@@ -358,6 +363,8 @@ private:
   bool reconcileHeldItemTorchLight(const WorldRenderOrigin& renderOrigin);
   void reconcileParticleLights(const WorldRenderOrigin& renderOrigin);
   bool refreshTorchLightDefinitions(const WorldRenderOrigin& renderOrigin);
+  bool refreshPortalLightDefinitions(const WorldRenderOrigin& renderOrigin);
+  bool refreshFireLightDefinitions(const WorldRenderOrigin& renderOrigin);
   bool refreshGlowstoneLightDefinitions(const WorldRenderOrigin& renderOrigin);
   bool updateEntityLight(int entityId, EntityHeldTorchLightState& state, const WorldRenderOrigin& renderOrigin);
   void updateEntityLightsLocked(const WorldRenderOrigin& renderOrigin);
@@ -574,6 +581,8 @@ private:
   std::unordered_map<WorldBlockPosition, TorchLightPlacement, WorldBlockPositionHash> torchLightPlacements_ {};
   std::unordered_map<WorldBlockPosition, PortalLightState, WorldBlockPositionHash> portalLights_ {};
   std::unordered_map<WorldBlockPosition, PortalLightPlacement, WorldBlockPositionHash> portalLightPlacements_ {};
+  std::unordered_map<WorldBlockPosition, FireLightState, WorldBlockPositionHash> fireLights_ {};
+  std::unordered_map<WorldBlockPosition, FireLightPlacement, WorldBlockPositionHash> fireLightPlacements_ {};
   std::unordered_map<WorldBlockPosition, GlowstoneLightState, WorldBlockPositionHash> glowstoneLights_ {};
   std::unordered_map<WorldBlockPosition, GlowstoneLightPlacement, WorldBlockPositionHash> glowstoneLightPlacements_ {};
   remixapi_LightHandle heldItemTorchLightHandle_ {nullptr};

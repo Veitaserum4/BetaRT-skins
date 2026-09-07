@@ -196,6 +196,12 @@ bool RemixRenderer::prepareFrameSnapshotLocked(FrameRenderSnapshot& snapshot, bo
     if (!refreshTorchLightDefinitions(snapshot.renderOrigin)) {
       return false;
     }
+    if (!refreshPortalLightDefinitions(snapshot.renderOrigin)) {
+      return false;
+    }
+    if (!refreshFireLightDefinitions(snapshot.renderOrigin)) {
+      return false;
+    }
     if (!refreshGlowstoneLightDefinitions(snapshot.renderOrigin)) {
       return false;
     }

@@ -400,6 +400,19 @@ bool RemixRenderer::refreshTorchLightDefinitions(const WorldRenderOrigin& render
     }
   }
 
+  std::vector<FireLightPlacement> firePlacements;
+  firePlacements.reserve(fireLightPlacements_.size());
+  for (const auto& [position, placement] : fireLightPlacements_) {
+    (void)position;
+    firePlacements.push_back(placement);
+  }
+
+  for (const FireLightPlacement& placement : firePlacements) {
+    if (!updateFireLight(placement, renderOrigin)) {
+      return false;
+    }
+  }
+
   for (auto& [entityId, state] : entityHeldTorchLights_) {
     if (!updateEntityLight(entityId, state, renderOrigin)) {
       return false;
@@ -856,6 +869,190 @@ void RemixRenderer::destroyChunkPortalLights(ChunkMeshData& meshData) {
     destroyPortalLight(placement.blockPosition);
   }
   meshData.portalLights.clear();
+}
+
+bool RemixRenderer::createFireLight(const FireLightPlacement& placement, const WorldRenderOrigin& renderOrigin) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Native, "RemixRenderer::createFireLight");
+  const WorldRenderPosition lightPosition = rebaseWorldPosition(
+      placement.lightX,
+      placement.lightY,
+      placement.lightZ,
+      renderOrigin);
+
+  remixapi_LightInfoRectEXT rectInfo {};
+  rectInfo.sType = REMIXAPI_STRUCT_TYPE_LIGHT_INFO_RECT_EXT;
+  rectInfo.position = {lightPosition.x, lightPosition.y, lightPosition.z};
+  rectInfo.xAxis = {1.0f, 0.0f, 0.0f};
+  rectInfo.xSize = 0.8f;
+  rectInfo.yAxis = {0.0f, 0.0f, 1.0f};
+  rectInfo.ySize = 0.8f;
+  rectInfo.direction = {0.0f, 1.0f, 0.0f};
+  rectInfo.shaping_hasvalue = TRUE;
+  rectInfo.shaping_value.direction = rectInfo.direction;
+  rectInfo.shaping_value.coneAngleDegrees = 180.0f;
+  rectInfo.shaping_value.coneSoftness = 0.0f;
+  rectInfo.shaping_value.focusExponent = 0.0f;
+  rectInfo.volumetricRadianceScale = 1.0f;
+
+  remixapi_LightInfoLocalOriginEXT originInfo = makeLightLocalOriginInfo(renderOrigin, &rectInfo);
+  remixapi_LightInfo lightInfo {};
+  lightInfo.sType = REMIXAPI_STRUCT_TYPE_LIGHT_INFO;
+  lightInfo.pNext = &originInfo;
+  lightInfo.hash = persistentLightHashForRenderOrigin(makeFireLightHash(placement.blockPosition), renderOrigin);
+  lightInfo.radiance = placement.radiance;
+  lightInfo.isDynamic = FALSE;
+  lightInfo.ignoreViewModel = FALSE;
+  lightInfo.ignoreFirstPersonPlayerShadow = FALSE;
+
+  remixapi_LightHandle lightHandle = nullptr;
+  if (remix_.CreateLight(&lightInfo, &lightHandle) != REMIXAPI_ERROR_CODE_SUCCESS) {
+    return false;
+  }
+
+  fireLights_[placement.blockPosition] = {lightHandle, renderOrigin, lightInfo.hash, lightPosition};
+  fireLightPlacements_[placement.blockPosition] = placement;
+  return true;
+}
+
+bool RemixRenderer::updateFireLight(const FireLightPlacement& placement, const WorldRenderOrigin& renderOrigin) {
+  const auto lightIt = fireLights_.find(placement.blockPosition);
+  if (lightIt == fireLights_.end() || lightIt->second.handle == nullptr) {
+    return createFireLight(placement, renderOrigin);
+  }
+
+  if (remix_.UpdateLightDefinition == nullptr) {
+    destroyFireLight(placement.blockPosition);
+    return createFireLight(placement, renderOrigin);
+  }
+
+  const WorldRenderPosition lightPosition = rebaseWorldPosition(
+      placement.lightX,
+      placement.lightY,
+      placement.lightZ,
+      renderOrigin);
+
+  remixapi_LightInfoRectEXT rectInfo {};
+  rectInfo.sType = REMIXAPI_STRUCT_TYPE_LIGHT_INFO_RECT_EXT;
+  rectInfo.position = {lightPosition.x, lightPosition.y, lightPosition.z};
+  rectInfo.xAxis = {1.0f, 0.0f, 0.0f};
+  rectInfo.xSize = 0.8f;
+  rectInfo.yAxis = {0.0f, 0.0f, 1.0f};
+  rectInfo.ySize = 0.8f;
+  rectInfo.direction = {0.0f, 1.0f, 0.0f};
+  rectInfo.shaping_hasvalue = TRUE;
+  rectInfo.shaping_value.direction = rectInfo.direction;
+  rectInfo.shaping_value.coneAngleDegrees = 180.0f;
+  rectInfo.shaping_value.coneSoftness = 0.0f;
+  rectInfo.shaping_value.focusExponent = 0.0f;
+  rectInfo.volumetricRadianceScale = 1.0f;
+
+  remixapi_LightInfoLocalOriginEXT originInfo = makeLightLocalOriginInfo(renderOrigin, &rectInfo);
+  remixapi_LightInfo lightInfo {};
+  lightInfo.sType = REMIXAPI_STRUCT_TYPE_LIGHT_INFO;
+  lightInfo.pNext = &originInfo;
+  lightInfo.hash = persistentLightHashForRenderOrigin(makeFireLightHash(placement.blockPosition), renderOrigin);
+  lightInfo.radiance = placement.radiance;
+  lightInfo.isDynamic = FALSE;
+  lightInfo.ignoreViewModel = FALSE;
+  lightInfo.ignoreFirstPersonPlayerShadow = FALSE;
+
+  const remixapi_ErrorCode result = remix_.UpdateLightDefinition(lightIt->second.handle, &lightInfo);
+  if (result != REMIXAPI_ERROR_CODE_SUCCESS) {
+    return true; // Transient failure
+  }
+
+  lightIt->second.renderOrigin = renderOrigin;
+  lightIt->second.apiHash = lightInfo.hash;
+  lightIt->second.submittedPosition = lightPosition;
+  return true;
+}
+
+bool RemixRenderer::reconcileChunkFireLights(
+    ChunkMeshData& meshData,
+    const std::vector<FireLightPlacement>& desiredFireLights) {
+  MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Native, "RemixRenderer::reconcileChunkFireLights");
+  if (remix_.CreateLight == nullptr) {
+    destroyChunkFireLights(meshData);
+    return true;
+  }
+
+  std::vector<WorldBlockPosition> createdLights;
+  createdLights.reserve(desiredFireLights.size());
+  const WorldRenderOrigin renderOrigin = currentRenderOriginLocked();
+  for (const FireLightPlacement& placement : desiredFireLights) {
+    const bool existed = fireLights_.find(placement.blockPosition) != fireLights_.end();
+
+    if (!updateFireLight(placement, renderOrigin)) {
+      for (const WorldBlockPosition& createdPosition : createdLights) {
+        destroyFireLight(createdPosition);
+      }
+      return false;
+    }
+    if (!existed) {
+      createdLights.push_back(placement.blockPosition);
+    }
+  }
+
+  for (const FireLightPlacement& placement : meshData.fireLights) {
+    if (findFireLightPlacement(desiredFireLights, placement.blockPosition) == nullptr) {
+      destroyFireLight(placement.blockPosition);
+    }
+  }
+
+  meshData.fireLights = desiredFireLights;
+  return true;
+}
+
+void RemixRenderer::destroyFireLight(const WorldBlockPosition& position) {
+  const auto it = fireLights_.find(position);
+  if (it != fireLights_.end()) {
+    if (it->second.handle != nullptr) {
+      destroyLightHandle(it->second.handle);
+    }
+    fireLights_.erase(it);
+  }
+  fireLightPlacements_.erase(position);
+}
+
+void RemixRenderer::destroyChunkFireLights(ChunkMeshData& meshData) {
+  for (const FireLightPlacement& placement : meshData.fireLights) {
+    destroyFireLight(placement.blockPosition);
+  }
+  meshData.fireLights.clear();
+}
+
+bool RemixRenderer::refreshFireLightDefinitions(const WorldRenderOrigin& renderOrigin) {
+  std::vector<FireLightPlacement> placements;
+  placements.reserve(fireLightPlacements_.size());
+  for (const auto& [position, placement] : fireLightPlacements_) {
+    (void)position;
+    placements.push_back(placement);
+  }
+
+  for (const FireLightPlacement& placement : placements) {
+    if (!updateFireLight(placement, renderOrigin)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool RemixRenderer::refreshPortalLightDefinitions(const WorldRenderOrigin& renderOrigin) {
+  std::vector<PortalLightPlacement> placements;
+  placements.reserve(portalLightPlacements_.size());
+  for (const auto& [position, placement] : portalLightPlacements_) {
+    (void)position;
+    placements.push_back(placement);
+  }
+
+  for (const PortalLightPlacement& placement : placements) {
+    if (!updatePortalLight(placement, renderOrigin)) {
+      return false;
+    }
+  }
+
+  return true;
 }
 
 void RemixRenderer::reconcileParticleLights(const WorldRenderOrigin& renderOrigin) {

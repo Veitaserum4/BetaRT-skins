@@ -37,6 +37,7 @@ void RemixRenderer::emitChunkGeometry(
   auto& surfacesToBuild = build.surfacesToBuild;
   auto& desiredTorchLights = build.desiredTorchLights;
   auto& desiredPortalLights = build.desiredPortalLights;
+  auto& desiredFireLights = build.desiredFireLights;
   surfacesToBuild.reserve(8);
   std::unordered_map<std::uintptr_t, std::size_t> surfaceIndexByHandle;
 
@@ -220,6 +221,11 @@ void RemixRenderer::emitChunkGeometry(
         }
 
         if (isFireRenderType(cell.renderType)) {
+          desiredFireLights.push_back(makeFireLightPlacement(
+              cell,
+              chunkKey.originX + localX,
+              chunkKey.originY + localY,
+              chunkKey.originZ + localZ));
           continue;
         }
 

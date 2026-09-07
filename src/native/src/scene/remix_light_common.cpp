@@ -88,6 +88,45 @@ std::uint64_t makePortalLightHash(const WorldBlockPosition& position) {
   return hash;
 }
 
+std::uint64_t makeFireLightHash(const WorldBlockPosition& position) {
+  std::uint64_t hash = kFireLightHashSeed;
+  hash = mixHashComponent(hash, std::bit_cast<std::uint32_t>(position.x));
+  hash = mixHashComponent(hash, std::bit_cast<std::uint32_t>(position.y));
+  hash = mixHashComponent(hash, std::bit_cast<std::uint32_t>(position.z));
+  return hash;
+}
+
+const FireLightPlacement* findFireLightPlacement(
+    const std::vector<FireLightPlacement>& placements,
+    const WorldBlockPosition& position) {
+  const auto it = std::find_if(
+      placements.begin(),
+      placements.end(),
+      [&position](const FireLightPlacement& placement) {
+        return placement.blockPosition == position;
+      });
+  return it == placements.end() ? nullptr : &(*it);
+}
+
+FireLightPlacement makeFireLightPlacement(
+    const ChunkBlockCell& cell,
+    int worldX,
+    int worldY,
+    int worldZ) {
+  (void)cell;
+  FireLightPlacement placement;
+  placement.blockPosition = WorldBlockPosition {
+      .x = worldX,
+      .y = worldY,
+      .z = worldZ,
+  };
+  placement.lightX = static_cast<float>(worldX) + 0.5f;
+  placement.lightY = static_cast<float>(worldY) + 0.05f;
+  placement.lightZ = static_cast<float>(worldZ) + 0.5f;
+  placement.radiance = kFireLightRadiance;
+  return placement;
+}
+
 const PortalLightPlacement* findPortalLightPlacement(
     const std::vector<PortalLightPlacement>& placements,
     const WorldBlockPosition& position) {

@@ -34,9 +34,11 @@ bool RemixRenderer::rebuildChunkMeshFromData(
   auto& surfacesToBuild = build.surfacesToBuild;
   auto& desiredTorchLights = build.desiredTorchLights;
   auto& desiredPortalLights = build.desiredPortalLights;
+  auto& desiredFireLights = build.desiredFireLights;
   auto& desiredGlowstoneLights = build.desiredGlowstoneLights;
   MCRTX_TRACY_VALUE(desiredTorchLights.size());
   MCRTX_TRACY_VALUE(desiredPortalLights.size());
+  MCRTX_TRACY_VALUE(desiredFireLights.size());
   MCRTX_TRACY_VALUE(desiredGlowstoneLights.size());
 
   std::vector<remixapi_MeshInfoSurfaceTriangles> surfaces;
@@ -76,6 +78,9 @@ bool RemixRenderer::rebuildChunkMeshFromData(
     if (!reconcileChunkPortalLights(meshData, desiredPortalLights)) {
       return false;
     }
+    if (!reconcileChunkFireLights(meshData, desiredFireLights)) {
+      return false;
+    }
     if (!reconcileChunkGlowstoneLights(meshData, desiredGlowstoneLights)) {
       return false;
     }
@@ -107,6 +112,10 @@ bool RemixRenderer::rebuildChunkMeshFromData(
       return false;
     }
     if (!reconcileChunkPortalLights(meshData, desiredPortalLights)) {
+      destroyMeshHandle(newMeshHandle);
+      return false;
+    }
+    if (!reconcileChunkFireLights(meshData, desiredFireLights)) {
       destroyMeshHandle(newMeshHandle);
       return false;
     }
