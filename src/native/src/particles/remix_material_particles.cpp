@@ -12,7 +12,10 @@ using namespace mcrtx::material;
 
 remixapi_MaterialHandle RemixRenderer::acquireParticleMaterial(std::uint32_t textureKind) {
   MCRTX_PERF_SCOPE(::mcrtx::perf::Side::Native, "RemixRenderer::acquireParticleMaterial");
-  if (textureKind == 1 || textureKind == 3) {
+  const bool isEmissive = (textureKind & kParticleEmissiveFlag) != 0;
+  const std::uint32_t baseTextureKind = textureKind & ~kParticleEmissiveFlag;
+
+  if (baseTextureKind == 1 || baseTextureKind == 3) {
     return terrainMaterialHandles_[kCutoutTerrainMaterialClass];
   }
 
@@ -21,7 +24,7 @@ remixapi_MaterialHandle RemixRenderer::acquireParticleMaterial(std::uint32_t tex
     return existing->second;
   }
 
-  const std::filesystem::path resolvedTexturePath = resolveParticleTexturePath(textureKind);
+  const std::filesystem::path resolvedTexturePath = resolveParticleTexturePath(baseTextureKind);
   if (resolvedTexturePath.empty()) {
     return nullptr;
   }
@@ -52,7 +55,11 @@ remixapi_MaterialHandle RemixRenderer::acquireParticleMaterial(std::uint32_t tex
   materialInfo.pNext = &opaqueInfo;
   materialInfo.hash = kParticleMaterialHashSeed ^ static_cast<std::uint64_t>(textureKind);
   materialInfo.albedoTexture = resolvedTexturePath.c_str();
-  if (!emissivePath.empty()) {
+  if (isEmissive) {
+    materialInfo.emissiveTexture = resolvedTexturePath.c_str();
+    materialInfo.emissiveIntensity = 3.0f;
+    materialInfo.emissiveColorConstant = {1.0f, 1.0f, 1.0f};
+  } else if (!emissivePath.empty()) {
     materialInfo.emissiveTexture = emissivePath.c_str();
     materialInfo.emissiveIntensity = 3.0f;
     materialInfo.emissiveColorConstant = {1.0f, 1.0f, 1.0f};
